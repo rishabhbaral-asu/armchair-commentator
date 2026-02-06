@@ -1,28 +1,795 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armchair Commentator | My First Post</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rishabh Baral | AI & Applied NLP</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+        <style>
+            :root {
+                --umd-red: #e21833;
+                --asu-maroon: #8c1d40;
+                --asu-gold: #ffc627;
+                --glass: rgba(255, 255, 255, 0.9);
+            }
 
-    <header>
-        <h1>Armchair Commentator</h1>
-        <p>Back from the 2024 hiatus.</p>
-    </header>
+            body {
+                font-family: "Inter", sans-serif;
+                background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%);
+                scroll-behavior: smooth;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
 
-    <main>
-        <article>
-            <h2>The Great Revival</h2>
-            <p>Published: February 5, 2026</p>
-            <p>It's been a long road, but the blog is finally back online...</p>
-        </article>
-    </main>
+            .floating-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+            }
+            .bubble {
+                position: absolute;
+                bottom: -100px;
+                font-size: 2.5rem;
+                opacity: 0;
+                animation: float-up 15s infinite linear;
+                will-change: transform, opacity;
+            }
+            @keyframes float-up {
+                0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+                10% { opacity: 0.4; }
+                90% { opacity: 0.4; }
+                100% { transform: translateY(-130vh) rotate(360deg); opacity: 0; }
+            }
 
-    <footer>
-        <p>&copy; 2026 Rishabh Baral</p>
-    </footer>
+            .page-content {
+                display: none;
+                min-height: 100vh;
+                position: relative;
+                z-index: 10;
+                background: transparent !important;
+            }
+            .page-active {
+                display: block;
+            }
 
-</body>
+            .glass-card {
+                background: var(--glass);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(140, 29, 64, 0.1);
+                border-radius: 2rem;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            #milestones {
+                background: var(--asu-maroon) !important;
+                color: white;
+            }
+            .flip-box {
+                background: #2a0a14;
+                color: var(--asu-gold);
+                border-radius: 8px;
+                padding: 0.8rem 0.2rem;
+                min-width: 55px;
+                text-align: center;
+                font-family: "monospace";
+                box-shadow: 0 4px 0 #000;
+                border: 1px solid var(--asu-gold);
+            }
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 2px;
+                background: #5c132a;
+                padding: 4px;
+                border-radius: 6px;
+                font-size: 0.5rem;
+            }
+            .cal-day {
+                background: #8c1d40;
+                padding: 2px;
+                text-align: center;
+                border-radius: 2px;
+            }
+            .cal-today {
+                background: var(--asu-gold);
+                color: black;
+                font-weight: bold;
+            }
+            .cal-target {
+                background: white;
+                color: var(--asu-maroon);
+                font-weight: 900;
+            }
+
+            .summary-body h2 {
+                font-weight: 900;
+                color: var(--asu-maroon);
+                font-size: 1.5rem;
+                margin-top: 2rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .summary-body p {
+                margin-bottom: 1.25rem;
+                line-height: 1.8;
+                color: #334155;
+            }
+            .summary-body li {
+                margin-bottom: 0.75rem;
+                color: #475569;
+                padding-left: 1rem;
+                position: relative;
+            }
+            .summary-body li::before {
+                content: "→";
+                position: absolute;
+                left: -10px;
+                color: var(--umd-red);
+                font-weight: bold;
+            }
+
+            .btn-asu {
+                background-color: var(--asu-maroon);
+                color: var(--asu-gold);
+                border: 2px solid var(--asu-gold);
+            }
+
+            /* Map Highlight Style */
+            .map-container {
+                position: relative;
+                width: 100%;
+                height: 200px;
+                background: #f8fafc;
+                border-radius: 1rem;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+            }
+            .map-svg {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                opacity: 0.15;
+            }
+            .state-overlay {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="bg-layer" class="floating-bg">
+            <div class="bubble" style="left: 10%; animation-delay: 0s">🐢</div>
+            <div class="bubble" style="left: 30%; animation-delay: 5s">🔱</div>
+            <div class="bubble" style="left: 60%; animation-delay: 2s">🐢</div>
+            <div class="bubble" style="left: 85%; animation-delay: 8s">🔱</div>
+        </div>
+
+        <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-red-100">
+            <div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+                <button onclick="showPage('home')" class="font-black text-2xl italic tracking-tighter">
+                    <span style="color: var(--umd-red)">RISHABH</span>
+                    <span style="color: var(--asu-maroon)">BARAL</span>
+                </button>
+                <div class="hidden md:flex space-x-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    <button onclick="showPage('portfolio')" class="hover:text-red-600">Portfolio</button>
+                    <button onclick="showPage('experience')" class="hover:text-red-600">Experience</button>
+                    <button onclick="showPage('milestones')" class="hover:text-red-600">Milestones</button>
+                    <button onclick="showPage('contact')" class="hover:text-red-600">Contact</button>
+                </div>
+            </div>
+        </nav>
+
+        <main id="home" class="page-content page-active pt-52">
+            <div class="max-w-5xl mx-auto px-8 animate__animated animate__fadeInUp">
+                <span
+                    class="inline-block px-3 py-1 rounded-full bg-red-100 text-red-600 text-[9px] font-black uppercase tracking-widest mb-6"
+                    >UMD Alum &bull; ASU MSCS Graduate Student</span
+                >
+                <h1 class="text-7xl md:text-9xl font-black mb-8 tracking-tighter leading-none">
+                    A TURTLE <br /><span class="text-red-600">IGNITING THE INFERNO.</span>
+                </h1>
+
+                <div class="max-w-3xl mb-12">
+                    <p class="text-xl text-slate-600 leading-relaxed font-medium">
+                        I am a Graduate Researcher at
+                        <span class="text-asu-maroon font-bold">Arizona State University</span> specializing in AI
+                        Perception and Large Language Models. Beyond engineering, I am a
+                        <strong>passionate educator</strong>. As a Graduate Teaching Assistant for FSE 100, I mentor the
+                        next generation of engineers through the fundamental design process, helping them bridge the gap
+                        between initial concepts and working prototypes.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4">
+                    <button
+                        onclick="showPage('portfolio')"
+                        class="btn-asu px-10 py-4 rounded-full font-black uppercase tracking-widest shadow-lg"
+                    >
+                        View Portfolio
+                    </button>
+                    <a href="resume.pdf" target="_blank" class="px-10 py-4 rounded-full font-black uppercase tracking-widest border-2 border-slate-200 hover:bg-slate-50 transition text-slate-500">
+                        View Resume
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <section id="portfolio" class="page-content pt-32 pb-20">
+            <div class="max-w-6xl mx-auto px-8">
+                <div class="flex justify-between items-end mb-10">
+                    <h2 class="text-4xl font-black italic">Research Under Review 📄</h2>
+                    <button onclick="showPage('home')" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-asu-maroon transition">🏠 Back to Home</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-16">
+                    <button
+                        onclick="showPage('paper-phantom')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-red-600 uppercase">🧠 LLM Logic</span>
+                        <h3 class="text-xl font-bold mt-2">Phantom Recall</h3>
+                        <p class="text-xs text-slate-500 mt-2">Benchmarking memorization vs. reasoning in LLMs.</p>
+                    </button>
+                    <button
+                        onclick="showPage('paper-moneyball')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-red-600 uppercase">📊 Tabular LLM</span>
+                        <h3 class="text-xl font-bold mt-2">Moneyball LLM</h3>
+                        <p class="text-xs text-slate-500 mt-2">
+                            Tabular summarization in long-context sports narratives.
+                        </p>
+                    </button>
+                </div>
+
+                <h2 class="text-4xl font-black mb-10 italic">Graduate Research 🔱</h2>
+                <div class="grid md:grid-cols-1 gap-6 mb-16">
+                    <button
+                        onclick="showPage('grad-lidar')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-red-600 uppercase">📡 L2 Perception</span>
+                        <h3 class="text-xl font-bold mt-2">Temporal-Aware Perception (Digital Snowplow)</h3>
+                        <p class="text-xs text-slate-500 mt-2">
+                            Historical-frame retrieval for autonomous driving in whiteout conditions.
+                        </p>
+                    </button>
+                </div>
+
+                <h2 class="text-4xl font-black mb-10 italic text-slate-400">Undergraduate Engineering 🐢</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <button
+                        onclick="showPage('undergrad-caml')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-slate-500 uppercase">💻 Compilers</span>
+                        <h3 class="text-xl font-bold mt-2">MicroCaml Engineer</h3>
+                    </button>
+                    <button
+                        onclick="showPage('undergrad-satellite')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-slate-500 uppercase">🛰️ GIS</span>
+                        <h3 class="text-xl font-bold mt-2">Satellite Perception</h3>
+                    </button>
+                    <button
+                        onclick="showPage('undergrad-ai')"
+                        class="glass-card p-8 text-left hover:bg-red-50 transition"
+                    >
+                        <span class="text-[9px] font-black text-slate-500 uppercase">🤖 AI Architect</span>
+                        <h3 class="text-xl font-bold mt-2">Deep Learning Scratch</h3>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="page-content pt-32 pb-20">
+            <div class="max-w-5xl mx-auto px-8">
+                <div class="flex justify-between items-end mb-12">
+                    <h2 class="text-5xl font-black italic">Experience</h2>
+                    <button onclick="showPage('home')" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-asu-maroon transition">🏠 Back to Home</button>
+                </div>
+                <div class="space-y-8">
+                    <div class="glass-card p-10 border-l-8 border-asu-maroon">
+                        <h3 class="text-2xl font-bold">Arizona State University 🔱</h3>
+                        <p class="text-[10px] font-black text-asu-maroon uppercase tracking-widest mb-4">
+                            Graduate Project / Teaching Assistant • Aug 2024 - Present
+                        </p>
+                        <p class="text-slate-600 mb-6">
+                            Leading development of the L2 Perception Stack and SportsT2T pipeline. Built a high-speed
+                            Python/Open3D research stack leveraging Apple Metal (MPS) acceleration.
+                        </p>
+
+                        <div class="bg-asu-maroon/5 p-6 rounded-xl border border-asu-maroon/20">
+                            <p class="text-xs font-black text-asu-maroon uppercase mb-2 tracking-widest">
+                                Instructional Lead: FSE 100
+                            </p>
+                            <p class="text-sm text-slate-700 leading-relaxed mb-4">
+                                <strong>FSE 100 (Introduction to Engineering):</strong> Served as a Graduate TA for the
+                                ASU engineering cornerstone. I mentored multidisciplinary teams through the
+                                <strong>Engineering Design Process</strong>, moving projects from abstract requirements
+                                to functional prototypes.
+                            </p>
+                            <ul class="text-xs text-slate-500 space-y-2 list-disc pl-5">
+                                <li>
+                                    <strong>Technical Mentorship:</strong> Guided 100+ students through foundational
+                                    programming in <strong>Python</strong> and <strong>JavaScript</strong> to solve
+                                    automated logic and hardware interface challenges.
+                                </li>
+                                <li>
+                                    <strong>Design Cycle:</strong> Led students through the full lifecycle of
+                                    engineering: brainstorming, rapid prototyping (Arduino/Breadboarding), and iterative
+                                    testing.
+                                </li>
+                                <li>
+                                    <strong>Philosophy:</strong> Applied "Systemic Transparency" to help students
+                                    understand how high-level code interacts with physical components, demystifying the
+                                    "Black Box" of modern hardware.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-10 border-l-8 border-umd-red">
+                        <h3 class="text-2xl font-bold">University of Maryland 🐢</h3>
+                        <p class="text-[10px] font-black text-umd-red uppercase tracking-widest mb-4">
+                            Undergraduate Engineer • 2021 - 2024
+                        </p>
+                        <p class="text-slate-600">
+                            Specialized in compiler infrastructure (MicroCaml) and multi-spectral satellite imagery
+                            analysis (GIS). Mastered low-level language processing and geospatial data modeling.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="milestones" class="page-content pt-32 pb-20">
+            <div class="max-w-6xl mx-auto px-8">
+                <div class="flex justify-between items-end mb-10">
+                    <h2 class="text-5xl font-black italic text-white">ASU Milestones ⏰</h2>
+                    <button onclick="showPage('home')" class="text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-asu-gold transition">🏠 Back to Home</button>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-10">
+                    <div class="bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                        <h3 class="text-asu-gold font-black text-xs uppercase mb-2">START OF ACL Rebuttal Period</h3>
+                        <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                            BEGINS: Sunday, Feb 15, 2026 @ 06:00 AM AZT
+                        </p>
+                        <div class="flex gap-4 items-center">
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="reb-d">00</div>
+                                    <span class="text-[7px]">Days</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="reb-h">00</div>
+                                    <span class="text-[7px]">Hrs</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="reb-m">00</div>
+                                    <span class="text-[7px]">Min</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl text-white" id="reb-s">00</div>
+                                    <span class="text-[7px]">Sec</span>
+                                </div>
+                            </div>
+                            <div id="cal-reb"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                        <h3 class="text-asu-gold font-black text-xs uppercase mb-2">Meta Reviews Release</h3>
+                        <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                            ENDS: Tuesday, Mar 10, 2026 @ 06:00 AM AZT
+                        </p>
+                        <div class="flex gap-4 items-center">
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="meta-d">00</div>
+                                    <span class="text-[7px]">Days</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="meta-h">00</div>
+                                    <span class="text-[7px]">Hrs</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="meta-m">00</div>
+                                    <span class="text-[7px]">Min</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl text-white" id="meta-s">00</div>
+                                    <span class="text-[7px]">Sec</span>
+                                </div>
+                            </div>
+                            <div id="cal-meta"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                        <h3 class="text-asu-gold font-black text-xs uppercase mb-2">ACL 2026 Commitment</h3>
+                        <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                            ENDS: Monday, Mar 16, 2026 @ 04:59 AM AZT
+                        </p>
+                        <div class="flex gap-4 items-center">
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="comm-d">00</div>
+                                    <span class="text-[7px]">Days</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="comm-h">00</div>
+                                    <span class="text-[7px]">Hrs</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl" id="comm-m">00</div>
+                                    <span class="text-[7px]">Min</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flip-box text-2xl text-white" id="comm-s">00</div>
+                                    <span class="text-[7px]">Sec</span>
+                                </div>
+                            </div>
+                            <div id="cal-comm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="page-content pt-40 pb-20">
+            <div class="max-w-4xl mx-auto px-8 text-center animate__animated animate__fadeIn">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-6xl font-black italic">Contact</h1>
+                    <button onclick="showPage('home')" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-asu-maroon transition">🏠 Back to Home</button>
+                </div>
+
+                <div
+                    class="mb-12 inline-block px-8 py-3 rounded-full border-2 border-[#FFC627] bg-[#8C1D40] text-[#FFC627] text-[11px] font-black uppercase tracking-[0.2em] shadow-lg"
+                >
+                    🇺🇸 US Citizen &bull; Seeking May 2026 Opportunities
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-16 text-left">
+                    <div class="glass-card p-10 border-t-4 border-red-600">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-2xl">🚀</span>
+                            <h2 class="text-xl font-black uppercase tracking-tighter">Industry Focus</h2>
+                        </div>
+                        <p class="text-[10px] font-black text-red-600 uppercase mb-4 tracking-widest">
+                            Full-Time • Computer Science & Data Science
+                        </p>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+                            I am seeking engineering roles that bridge the gap between low-level systems and high-level
+                            AI perception. My technical background in compiler architecture and LLM benchmarking makes
+                            me a strong fit for <strong>Core Engineering</strong> or <strong>MLOps</strong> teams.
+                        </p>
+                        <ul class="text-[11px] text-slate-500 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span>→</span> <strong>Location:</strong> Open to relocation
+                                <strong>anywhere in America</strong>.
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span>→</span> <strong>Availability:</strong> Full-time starting May 2026.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-10 border-t-8 border-asu-maroon flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-3xl">🎓</span>
+                            <h2 class="text-2xl font-black uppercase tracking-tighter text-slate-800">Academic Focus</h2>
+                        </div>
+                        
+                        <div class="map-container mb-6 bg-slate-50 flex items-center justify-center overflow-hidden border border-slate-200">
+                            <object id="us-map" type="image/svg+xml" data="Map_of_USA_with_state_names.svg" class="w-full h-full p-2 pointer-events-none opacity-90">
+                                <p class="text-[10px] text-slate-400">Map Loading...</p>
+                            </object>
+                        </div>
+                
+                        <p class="text-[10px] font-black text-asu-maroon uppercase mb-4 tracking-[0.2em]">Lecturer • CS & DS Instruction</p>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+                            Leveraging my experience as a <strong>Graduate TA for FSE 100</strong>, I am seeking faculty positions to mentor students through the Engineering Design Process.
+                        </p>
+                    </div>
+                
+                    <ul class="text-[11px] text-slate-500 space-y-3 pt-6 border-t border-slate-100">
+                        <li class="flex items-start gap-3">
+                            <span class="text-asu-maroon font-bold">📍</span>
+                            <span><strong>Target Geos:</strong> AZ, CA, TX, IL, GA, MD, VA, DC.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-asu-maroon font-bold">🏛️</span>
+                            <span>Open to prestigious opportunities nationwide (e.g., <strong>Yale University</strong>).</span>
+                        </li>
+                    </ul>
+                </div>
+                <a
+                    href="resume.pdf"
+                    target="_blank"
+                    class="btn-asu inline-block px-12 py-5 rounded-full font-black uppercase tracking-widest text-lg mb-12 shadow-2xl hover:scale-105 transition-transform"
+                >
+                    📂 Download Full Resume
+                </a>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass-card p-8">
+                        <p class="text-red-600 font-black tracking-widest text-xs">EMAIL</p>
+                        <p class="font-bold">rishabhbaral2024@yahoo.com</p>
+                    </div>
+                    <div class="glass-card p-8">
+                        <p class="text-asu-maroon font-black tracking-widest text-xs">PHONE</p>
+                        <p class="font-bold">214-701-0146</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="paper-phantom" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">PHANTOM RECALL 🧠</h1>
+
+                <h2>Under Review: ACL Rolling Review</h2>
+                <p>
+                    Benchmarked 8 LLM families to expose "phantom recall"—where models replay remembered scripts instead
+                    of re-solving puzzles after perturbations.
+                </p>
+                <ul>
+                    <li><strong>Logic Judge:</strong> 96% human agreement in evaluating rationale.</li>
+                    <li>
+                        <strong>Mitigation:</strong> Boosted open-source performance by +10.1 points via
+                        logic-forbidding prompts.
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section id="paper-moneyball" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">MONEYBALL LLM 📊</h1>
+                <h2>Under Review: ACL Rolling Review</h2>
+                <p>
+                    Introduced <strong>SporTabSet</strong>: a diagnostic benchmark for long-context tabular
+                    summarization in sports (Cricket & Basketball), requiring models to maintain state over narratives
+                    exceeding 9k tokens.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Multi-Entity Bottleneck:</strong> Identified that failures in table generation stem from
+                        multi-entity interference rather than local arithmetic errors.
+                    </li>
+                    <li>
+                        <strong>Decomposition:</strong> Evaluated "Divide and Generate" strategies, showing that
+                        dissecting interference significantly improves numerical fidelity across 6,500+ commentaries.
+                    </li>
+                    <li>
+                        <strong>CMT Bench:</strong> Developed a multi-table generation benchmark to probe
+                        data-tabulation logic and robustness against OOD (Out-of-Distribution) entity names.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="grad-lidar" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">L2 PERCEPTION & LIDAR 📡</h1>
+
+                <h2>The Digital Snowplow Pipeline</h2>
+                <p>
+                    Unified architecture for adverse weather perception. Leverages a Python-native "Research Stack" for
+                    rapid iteration of filtering algorithms. [cite_start]Transitioned from a ROS 2 Humble stack to a lean Python/Open3D architecture to minimize middleware latency[cite: 1, 4].
+                </p>
+                                <ul>
+                    [cite_start]<li><strong>Hardware Acceleration:</strong> Integrated <strong>Apple Metal (MPS)</strong> GPU acceleration for real-time point cloud processing on local research machines[cite: 3].</li>
+                    [cite_start]<li><strong>L1 Noise Filter:</strong> Successfully implemented <strong>Statistical Outlier Removal (SOR)</strong> to isolate and remove "floating" snow noise while preserving environmental structures[cite: 2].</li>
+                    [cite_start]<li><strong>Ground Detection:</strong> Utilized <strong>RANSAC</strong> plane segmentation to differentiate between drivable surfaces and potential hazards in denoise-filtered scans[cite: 2].</li>
+                    [cite_start]<li><strong>Trajectory Mapping:</strong> Implemented <strong>LiDAR Odometry via Iterative Closest Point (ICP)</strong> to generate trajectory "breadcrumb trails," providing spatial memory for GPS-denied navigation[cite: 4, 5].</li>
+                </ul>
+            </div>
+        </section>
+        <section id="undergrad-caml" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">MICROCAML 💻</h1>
+                <h2>Compiler Architecture & Engineering</h2>
+                <p>
+                    Architected a functional sub-language of OCaml, building a full execution pipeline from raw source
+                    text to higher-order function evaluation.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Frontend:</strong> Developed a custom Lexer for tokenization and a recursive-descent
+                        Parser for Abstract Syntax Tree (AST) generation.
+                    </li>
+                    <li>
+                        <strong>Backend:</strong> Engineered a custom Interpreter capable of handling environment-based
+                        variable binding and closure-based function calls.
+                    </li>
+                    <li>
+                        <strong>Foundations:</strong> Simulated a regular expression engine and a tree-based database
+                        system purely within the OCaml environment.
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section id="undergrad-satellite" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">SATELLITE PERCEPTION 🛰️</h1>
+                <h2>Multi-Spectral Analysis & GIS</h2>
+                <p>
+                    Utilized GIS tools to analyze environmental impacts through multi-spectral imagery, focusing on
+                    automated feature identification and motion tracking.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Geospatial Data:</strong> Processed Landsat-8 and Sentinel-2 data using color composites
+                        to identify geographical features and wildfire damage.
+                    </li>
+                    <li>
+                        <strong>Storm Tracking:</strong> Built high-resolution animations of Hurricane Idalia using NOAA
+                        GOES-16E imagery and ImageMagick for temporal analysis.
+                    </li>
+                    <li>
+                        <strong>Spatial Modeling:</strong> Conducted advanced analysis through ArcGIS and QGIS to
+                        evaluate proximity impacts of California wildfires on local ecosystems.
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section id="undergrad-ai" class="page-content pt-32 pb-20 bg-white">
+            <div class="max-w-3xl mx-auto px-8 summary-body">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="showPage('portfolio')" class="text-slate-400 font-bold text-xs uppercase hover:text-red-600 transition">← Back to Portfolio</button>
+                    <button onclick="showPage('home')" class="text-slate-400 font-bold text-xs uppercase hover:text-asu-maroon transition">🏠 Home</button>
+                </div>
+                <h1 class="text-5xl font-black italic">AI ARCHITECT 🤖</h1>
+                <h2>Neural Networks from First Principles</h2>
+                <p>
+                    Moved beyond high-level libraries (like PyTorch) to build the mathematical foundations of deep
+                    learning from scratch in Python.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Custom Backprop:</strong> Manually implemented the backpropagation algorithm, including
+                        gradient descent and weight optimization for synthetic datasets.
+                    </li>
+                    <li>
+                        <strong>Transfer Learning:</strong> Developed a benchmarking suite to evaluate pre-trained model
+                        performance across CV, NLP, and multi-modal integration.
+                    </li>
+                    <li>
+                        <strong>Systems View:</strong> Analyzed the trade-offs between model complexity and
+                        computational efficiency in vanilla vs. optimized architectures.
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <script>
+            function showPage(pageId) {
+                const bgLayer = document.getElementById("bg-layer");
+                bgLayer.style.display = pageId === "milestones" ? "none" : "block";
+                document.querySelectorAll(".page-content").forEach((p) => p.classList.remove("page-active"));
+                document.getElementById(pageId).classList.add("page-active");
+                window.scrollTo(0, 0);
+            }
+
+            const dates = {
+                reb: new Date("February 15, 2026 06:00:00"),
+                meta: new Date("March 10, 2026 06:00:00"),
+                comm: new Date("March 16, 2026 04:59:00"),
+            };
+
+            function renderMonth(dateObj, targetDate) {
+                const now = new Date();
+                const year = dateObj.getFullYear();
+                const month = dateObj.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                let html = `<div class="w-28 text-white"><div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
+                for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    let cls = "cal-day";
+                    if (d === now.getDate() && month === now.getMonth()) cls += " cal-today";
+                    if (d === targetDate.getDate() && month === targetDate.getMonth()) cls += " cal-target";
+                    html += `<div class="${cls}">${d}</div>`;
+                }
+                html += `</div></div>`;
+                return html;
+            }
+
+            function updateClocks() {
+                const now = new Date().getTime();
+                Object.keys(dates).forEach((key) => {
+                    const diff = dates[key].getTime() - now;
+                    if (diff < 0) return;
+                    document.getElementById(key + "-d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24))
+                        .toString()
+                        .padStart(2, "0");
+                    document.getElementById(key + "-h").innerText = Math.floor(
+                        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    )
+                        .toString()
+                        .padStart(2, "0");
+                    document.getElementById(key + "-m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+                        .toString()
+                        .padStart(2, "0");
+                    document.getElementById(key + "-s").innerText = Math.floor((diff % (1000 * 60)) / 1000)
+                        .toString()
+                        .padStart(2, "0");
+                });
+            }
+
+            document.getElementById("cal-reb").innerHTML = renderMonth(new Date(2026, 1), dates.reb);
+            document.getElementById("cal-meta").innerHTML =
+                renderMonth(new Date(2026, 1), dates.meta) + renderMonth(new Date(2026, 2), dates.meta);
+            document.getElementById("cal-comm").innerHTML =
+                renderMonth(new Date(2026, 1), dates.comm) + renderMonth(new Date(2026, 2), dates.comm);
+            setInterval(updateClocks, 1000);
+            updateClocks();
+            window.onload = function() {
+                const mapObject = document.getElementById('us-map');
+                
+                // Function to color the map
+                function colorMap() {
+                    const svgDoc = mapObject.contentDocument;
+                    if (!svgDoc) return;
+            
+                    const preferredStates = ['AZ', 'CA', 'TX', 'IL', 'GA', 'MD', 'VA', 'DC'];
+                    
+                    preferredStates.forEach(stateId => {
+                        // Find the state by ID (e.g., id="TX")
+                        const state = svgDoc.getElementById(stateId);
+                        if (state) {
+                            state.style.fill = "#8C1D40"; // ASU Maroon
+                            state.style.stroke = "#FFC627"; // ASU Gold Border
+                            state.style.strokeWidth = "1px";
+                            
+                            // Find any text labels inside this state group
+                            const labels = state.querySelectorAll('text, tspan');
+                            labels.forEach(label => {
+                                label.style.fill = "#FFC627"; // Gold Text
+                                label.style.fontWeight = "900";
+                            });
+                        }
+                    });
+                }
+            
+                // Try to color immediately or wait for load
+                if (mapObject.contentDocument) {
+                    colorMap();
+                } else {
+                    mapObject.addEventListener('load', colorMap);
+                }
+            };
+        </script>
+    </body>
 </html>
