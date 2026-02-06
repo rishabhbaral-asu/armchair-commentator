@@ -263,9 +263,7 @@
                 });
             }
 
-            document.getElementById("cal-m1").innerHTML = renderMonth(new Date(2026, 1), dates.m1);
-            document.getElementById("cal-m2").innerHTML = renderMonth(new Date(2026, 1), dates.m2) + renderMonth(new Date(2026, 2), dates.m2);
-            
+            document.getElementById("cal-m1").innerHTML = renderMonth(new Date(2026, 1), dates.m1);            
             setInterval(updateClocks, 1000);
             updateClocks();
         </script>
