@@ -3,12 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Rishabh Baral | AI & Applied NLP</title>
+        <title>Armchair Commentator | Rishabh Baral</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <style>
             :root {
-                --umd-red: #e21833;
                 --asu-maroon: #8c1d40;
                 --asu-gold: #ffc627;
                 --glass: rgba(255, 255, 255, 0.9);
@@ -22,142 +21,193 @@
                 overflow-x: hidden;
             }
 
-            .floating-bg {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 0;
-                overflow: hidden;
-            }
+            .floating-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+            .bubble { position: absolute; bottom: -100px; background: rgba(140, 29, 64, 0.05); border-radius: 50%; animation: rise 15s infinite ease-in; }
+            @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
 
-            .bubble {
-                position: absolute;
-                bottom: -100px;
-                background: rgba(140, 29, 64, 0.05);
-                border-radius: 50%;
-                animation: rise 15s infinite ease-in;
-            }
+            .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
+            .page-active { display: block; }
 
-            @keyframes rise {
-                0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-                50% { opacity: 0.5; }
-                100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+            .glass-card {
+                background: var(--glass);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(140, 29, 64, 0.1);
+                border-radius: 2rem;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
+            .glass-card:hover { transform: translateY(-5px); border-color: var(--asu-maroon); }
 
-            .broadcast-shadow {
-                box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 100px rgba(255,255,255,0.05);
+            /* Broadcast UI Elements */
+            .broadcast-card {
+                background: #0f172a;
+                box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 0 100px rgba(255,255,255,0.02);
+            }
+            .flip-box {
+                background: #1e293b;
+                color: var(--asu-gold);
+                border-radius: 8px;
+                padding: 0.8rem 0.2rem;
+                min-width: 60px;
+                text-align: center;
+                font-family: monospace;
+                border: 1px solid rgba(255,198,39,0.3);
             }
         </style>
     </head>
     <body class="p-4 md:p-12">
         <div class="floating-bg" id="bubble-container"></div>
 
-        <nav class="max-w-6xl mx-auto mb-16 relative z-10 flex justify-between items-center bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-xl">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-asu-maroon rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg transform rotate-3 hover:rotate-0 transition-transform cursor-pointer">R</div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Rishabh Baral</h1>
+        <nav class="max-w-6xl mx-auto mb-16 relative z-20 flex justify-between items-center bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-xl">
+            <button onclick="showPage('posts')" class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-asu-maroon rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg transform rotate-3 italic">R</div>
+                <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase italic">Armchair Commentator</h1>
+            </button>
+            <div class="flex space-x-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <button onclick="showPage('posts')" class="hover:text-red-600 transition">Posts</button>
+                <button onclick="showPage('upcoming')" class="hover:text-red-600 transition text-red-600">Upcoming</button>
+                <button onclick="showPage('contact')" class="hover:text-red-600 transition">Contact</button>
             </div>
         </nav>
 
-        <main class="max-w-5xl mx-auto relative z-10">
-            <div class="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border border-slate-100 mb-20 animate__animated animate__fadeInUp">
-                <div class="flex items-center space-x-4 mb-8">
-                    <span class="px-4 py-2 bg-asu-maroon text-white text-[10px] font-black uppercase tracking-widest rounded-full">World Cup 2026 Special</span>
-                    <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Feb 07, 2026</span>
+        <main id="posts" class="page-content page-active animate__animated animate__fadeIn">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="mb-16">
+                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">Match Analysis // Vol. 01</span>
+                    <h2 class="text-7xl font-black italic tracking-tighter uppercase mt-4">The Heritage <br><span class="text-red-600">Showdown.</span></h2>
                 </div>
 
-                <h2 class="text-5xl md:text-7xl font-black text-slate-900 leading-none tracking-tighter italic uppercase mb-12">
-                    Heritage <span class="text-asu-maroon underline decoration-asu-gold underline-offset-8">Showdown</span>
-                </h2>
-
-                <p class="text-xl text-slate-600 leading-relaxed font-medium max-w-2xl mb-12">
-                    On February 7, 2026, at the historic Wankhede Stadium, the "Silicon Valley" of cricket meets the bedrock of the sport. India and USA face off in a clash defined by shared histories and new rivalries.
-                </p>
-
-                <div class="my-16 overflow-hidden rounded-3xl broadcast-shadow border-b-8 border-asu-maroon animate__animated animate__zoomIn bg-slate-900">
-                    <div class="bg-slate-950 p-4 flex justify-between items-center border-b border-white/10">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-[10px] font-black text-white italic">IND</div>
-                            <div class="text-white/40 font-black italic text-[10px] uppercase tracking-tighter">vs</div>
-                            <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-[10px] font-black text-white italic">USA</div>
-                        </div>
-                        <div class="text-asu-gold font-black italic text-xs uppercase tracking-widest">LIVE // MATCH 03 // WANKHEDE</div>
-                    </div>
-
-                    <div class="grid md:grid-cols-2">
-                        <div class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 p-10">
-                            <div class="flex items-center justify-between mb-8 border-l-4 border-blue-400 pl-4">
-                                <h3 class="text-white font-black italic text-5xl tracking-tighter uppercase">INDIA</h3>
-                            </div>
-                            <ul class="space-y-3 font-bold">
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">1. Abhishek Sharma</span><span class="text-blue-400 font-black italic text-xs">LHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">2. Ishan Kishan <span class="text-blue-300 text-[10px]">(WK)</span></span><span class="text-blue-400 font-black italic text-xs">LHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">3. Tilak Varma</span><span class="text-blue-400 font-black italic text-xs">LHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1 bg-white/5 px-2 -mx-2"><span class="text-asu-gold font-black uppercase tracking-tight text-lg">4. Suryakumar Yadav <span class="text-white text-[10px]">(C)</span></span><span class="text-asu-gold font-black italic text-xs">RHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">5. Hardik Pandya</span><span class="text-blue-400 font-black italic text-xs">ALL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">6. Shivam Dube</span><span class="text-blue-400 font-black italic text-xs">ALL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">7. Rinku Singh</span><span class="text-blue-400 font-black italic text-xs">FIN</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">8. Axar Patel <span class="text-blue-300 text-[10px]">(VC)</span></span><span class="text-blue-400 font-black italic text-xs">AR</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">9. Varun Chakravarthy</span><span class="text-blue-400 font-black italic text-xs">BOWL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">10. Jasprit Bumrah</span><span class="text-blue-400 font-black italic text-xs">BOWL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">11. Arshdeep Singh</span><span class="text-blue-400 font-black italic text-xs">BOWL</span></li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-gradient-to-br from-red-900 via-red-800 to-red-950 p-10 border-l border-white/5">
-                            <div class="flex items-center justify-between mb-8 border-l-4 border-red-400 pl-4">
-                                <h3 class="text-white font-black italic text-5xl tracking-tighter uppercase">USA</h3>
-                            </div>
-                            <ul class="space-y-3 font-bold">
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">1. Monank Patel <span class="text-red-300 text-[10px]">(C/WK)</span></span><span class="text-red-400 font-black italic text-xs">RHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">2. Andries Gous</span><span class="text-red-400 font-black italic text-xs">RHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">3. Shehan Jayasuriya</span><span class="text-red-400 font-black italic text-xs">LHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">4. Milind Kumar</span><span class="text-red-400 font-black italic text-xs">RHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">5. Shubham Ranjane</span><span class="text-red-400 font-black italic text-xs">ALL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">6. Shayan Jahangir</span><span class="text-red-400 font-black italic text-xs">RHB</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">7. Harmeet Singh</span><span class="text-red-400 font-black italic text-xs">AR</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">8. S. van Schalkwyk</span><span class="text-red-400 font-black italic text-xs">AR</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">9. Saurabh Netravalkar</span><span class="text-red-400 font-black italic text-xs">BOWL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">10. Jessy Singh <span class="text-red-300 text-[10px]">(VC)</span></span><span class="text-red-400 font-black italic text-xs">BOWL</span></li>
-                                <li class="flex justify-between border-b border-white/5 pb-1"><span class="text-white uppercase tracking-tight text-lg">11. Ali Khan</span><span class="text-red-400 font-black italic text-xs">BOWL</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6 bg-slate-950 border-t border-white/10 flex flex-wrap gap-4">
+                <div class="glass-card p-10 mb-10 overflow-hidden relative">
+                    <div class="flex flex-col md:flex-row gap-10">
                         <div class="flex-1">
-                            <span class="text-blue-300 font-black text-[10px] uppercase tracking-widest block mb-1">INDIA RESERVES</span>
-                            <p class="text-white/60 text-[10px] uppercase font-bold">Samson, K. Yadav, Sundar, H. Rana</p>
-                        </div>
-                        <div class="flex-1">
-                            <span class="text-red-300 font-black text-[10px] uppercase tracking-widest block mb-1">USA RESERVES</span>
-                            <p class="text-white/60 text-[10px] uppercase font-bold">Kenjige, Mohsin, Mukkamala, Krishnamurthi</p>
+                            <p class="text-xl text-slate-600 leading-relaxed font-medium mb-8">
+                                Why the Oracle engineer vs. The GOAT is the defining narrative of the 2026 T20 World Cup. We breakdown the squads, the stats, and the stakes.
+                            </p>
+                            
+                            <div class="broadcast-card rounded-2xl p-6 mb-8 text-white border-b-4 border-asu-gold">
+                                <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                                    <span class="text-asu-gold font-black italic text-xs uppercase">Likely Playing XI</span>
+                                    <span class="text-[9px] font-bold text-white/40 uppercase">Broadcast Feed 1.0</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-[11px] font-bold uppercase italic">
+                                    <div class="text-blue-400">IND: S. Yadav (C)</div>
+                                    <div class="text-red-400">USA: M. Patel (C)</div>
+                                    <div class="text-blue-400">IND: J. Bumrah</div>
+                                    <div class="text-red-400">USA: S. Netravalkar</div>
+                                </div>
+                            </div>
+
+                            <button onclick="showPage('inner-post')" class="bg-asu-maroon text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest hover:bg-black transition">Read Full Analysis →</button>
                         </div>
                     </div>
-                </div>
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
-                    <p class="text-slate-500 font-medium italic">
-                        "This match isn't just about the points; it's about the heritage that links Mumbai's maidans to the growing parks of Morrisville."
-                    </p>
                 </div>
             </div>
-            </main>
+        </main>
+
+        <section id="inner-post" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-3xl mx-auto bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border border-slate-100">
+                <button onclick="showPage('posts')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
+                
+                <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none mb-8">Blue Blood vs <br><span class="text-red-600">New World</span></h1>
+                
+                <div class="prose text-slate-600 text-lg leading-relaxed">
+                    <p class="mb-6">The 2026 squad lists are out, and the narrative couldn't be sharper. India enters with a roster of global superstars, while the USA brings the most experienced Associate squad in history.</p>
+                    
+                    <div class="broadcast-card rounded-3xl overflow-hidden my-12 border-b-8 border-asu-gold shadow-2xl">
+                        <div class="bg-slate-950 p-3 text-center text-[9px] font-black text-asu-gold uppercase tracking-widest border-b border-white/10">Official 2026 T20 World Cup Squads</div>
+                        <div class="grid md:grid-cols-2">
+                            <div class="p-8 bg-blue-900/40 border-r border-white/5">
+                                <h4 class="text-blue-400 font-black italic text-2xl mb-4">INDIA XI</h4>
+                                <ul class="text-xs text-white/80 font-bold space-y-2 uppercase">
+                                    <li>1. Abhishek Sharma</li><li>2. Ishan Kishan (WK)</li><li>3. Tilak Varma</li>
+                                    <li class="text-asu-gold">4. Suryakumar Yadav (C)</li><li>5. Hardik Pandya</li>
+                                    <li>6. Shivam Dube</li><li>7. Rinku Singh</li><li>8. Axar Patel (VC)</li>
+                                    <li>9. Varun Chakravarthy</li><li>10. Jasprit Bumrah</li><li>11. Arshdeep Singh</li>
+                                </ul>
+                            </div>
+                            <div class="p-8 bg-red-900/40">
+                                <h4 class="text-red-400 font-black italic text-2xl mb-4">USA XI</h4>
+                                <ul class="text-xs text-white/80 font-bold space-y-2 uppercase">
+                                    <li class="text-asu-gold">1. Monank Patel (C/WK)</li><li>2. Andries Gous</li><li>3. Shehan Jayasuriya</li>
+                                    <li>4. Milind Kumar</li><li>5. Shubham Ranjane</li><li>6. Shayan Jahangir</li>
+                                    <li>7. Harmeet Singh</li><li>8. S. van Schalkwyk</li><li>9. Saurabh Netravalkar</li>
+                                    <li>10. Jessy Singh (VC)</li><li>11. Ali Khan</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>The key matchup? <strong>Jasprit Bumrah</strong> vs <strong>Andries Gous</strong> in the powerplay. If the USA can survive the initial swing, we might see the biggest upset of the decade.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="upcoming" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-5xl mx-auto">
+                <div class="mb-12">
+                    <span class="text-red-600 font-black text-[10px] uppercase tracking-[0.3em]">Official T20WC 2026</span>
+                    <h2 class="text-6xl md:text-8xl font-black italic leading-none mt-2 uppercase tracking-tighter">THE HERITAGE <br><span class="text-asu-maroon">SHOWDOWN.</span></h2>
+                </div>
+
+                <div class="broadcast-card p-12 rounded-[3rem] border-2 border-asu-gold/20">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-10">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-5xl font-black text-white italic uppercase tracking-tighter">IND <span class="text-asu-gold">v</span> USA</h3>
+                            <p class="text-white/40 font-mono text-sm mt-4 uppercase tracking-widest">Wankhede Stadium • Feb 7, 06:30 AZT</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="flex flex-col items-center"><div class="flip-box text-3xl" id="wc-d">00</div><span class="text-white/40 text-[9px] uppercase mt-2 font-black">Days</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-3xl" id="wc-h">00</div><span class="text-white/40 text-[9px] uppercase mt-2 font-black">Hrs</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-3xl" id="wc-m">00</div><span class="text-white/40 text-[9px] uppercase mt-2 font-black">Min</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-3xl text-asu-gold" id="wc-s">00</div><span class="text-white/40 text-[9px] uppercase mt-2 font-black">Sec</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-6xl font-black italic mb-12 uppercase italic">Let's Talk <br><span class="text-red-600">Strategy.</span></h1>
+                <div class="glass-card p-16">
+                    <p class="text-3xl font-black text-slate-800 mb-4">rishabhbaral2024@yahoo.com</p>
+                    <div class="w-20 h-1 bg-asu-gold mx-auto mb-8"></div>
+                    <p class="text-slate-500 uppercase tracking-widest text-xs font-bold">Open for collaborations & guest analysis</p>
+                </div>
+            </div>
+        </section>
 
         <script>
-            // Bubble Background Animation
+            function showPage(pageId) {
+                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
+                document.getElementById(pageId).classList.add('page-active');
+                window.scrollTo(0, 0);
+            }
+
+            // Countdown Logic for Feb 7, 2026
+            const targetDate = new Date("February 7, 2026 06:30:00").getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const diff = targetDate - now;
+                if (diff < 0) return;
+
+                document.getElementById('wc-d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById('wc-h').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById('wc-m').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                document.getElementById('wc-s').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            }
+            setInterval(updateCountdown, 1000);
+
+            // Background Bubbles
             const container = document.getElementById('bubble-container');
             for (let i = 0; i < 20; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
                 const size = Math.random() * 100 + 50 + 'px';
-                bubble.style.width = size;
-                bubble.style.height = size;
+                bubble.style.width = size; bubble.style.height = size;
                 bubble.style.left = Math.random() * 100 + '%';
                 bubble.style.animationDelay = Math.random() * 10 + 's';
-                bubble.style.animationDuration = Math.random() * 10 + 10 + 's';
                 container.appendChild(bubble);
             }
         </script>
