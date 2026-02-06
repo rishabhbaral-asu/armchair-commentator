@@ -104,23 +104,70 @@
         </main>
 
         <section id="upcoming" class="page-content pt-32 pb-20">
-            <div class="max-w-5xl mx-auto px-8">
-                <h2 class="text-5xl font-black italic mb-12 text-white">UPCOMING WATCHLIST ⏰</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="match-card">
-                        <p class="text-asu-gold font-black text-xs uppercase tracking-widest mb-2">Cricket World Cup Qualifiers</p>
-                        <h3 class="text-2xl font-bold text-white mb-4">IND vs AUS</h3>
-                        <p class="text-white/60 text-sm">March 15, 2026 • 06:00 AM AZT</p>
+                <div class="max-w-6xl mx-auto px-8">
+                    <div class="flex justify-between items-end mb-10">
+                        <h2 class="text-5xl font-black italic text-white">UPCOMING WATCHLIST ⏰</h2>
                     </div>
-                    <div class="match-card">
-                        <p class="text-asu-gold font-black text-xs uppercase tracking-widest mb-2">NBA Regular Season</p>
-                        <h3 class="text-2xl font-bold text-white mb-4">Suns vs Mavericks</h3>
-                        <p class="text-white/60 text-sm">February 20, 2026 • 07:00 PM AZT</p>
+                    
+                    <div class="grid lg:grid-cols-2 gap-10">
+                        <div class="bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                            <h3 class="text-asu-gold font-black text-xs uppercase mb-2">IND vs AUS: World Cup Qualifier</h3>
+                            <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                                KICKOFF: Sunday, Feb 15, 2026 @ 06:00 AM AZT
+                            </p>
+                            <div class="flex gap-4 items-center">
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match1-d">00</div>
+                                        <span class="text-[7px]">Days</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match1-h">00</div>
+                                        <span class="text-[7px]">Hrs</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match1-m">00</div>
+                                        <span class="text-[7px]">Min</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl text-white" id="match1-s">00</div>
+                                        <span class="text-[7px]">Sec</span>
+                                    </div>
+                                </div>
+                                <div id="cal-match1"></div>
+                            </div>
+                        </div>
+            
+                        <div class="bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                            <h3 class="text-asu-gold font-black text-xs uppercase mb-2">SUNS vs MAVS: Western Conference Duel</h3>
+                            <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                                TIP-OFF: Tuesday, Mar 10, 2026 @ 06:00 AM AZT
+                            </p>
+                            <div class="flex gap-4 items-center">
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match2-d">00</div>
+                                        <span class="text-[7px]">Days</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match2-h">00</div>
+                                        <span class="text-[7px]">Hrs</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl" id="match2-m">00</div>
+                                        <span class="text-[7px]">Min</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="flip-box text-2xl text-white" id="match2-s">00</div>
+                                        <span class="text-[7px]">Sec</span>
+                                    </div>
+                                </div>
+                                <div id="cal-match2"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
+            </section>
         <section id="contact" class="page-content pt-40 pb-20">
             <div class="max-w-4xl mx-auto px-8 text-center">
                 <h1 class="text-6xl font-black italic mb-8">GET IN TOUCH</h1>
@@ -142,16 +189,57 @@
             </div>
         </section>
 
-        <script>
-            function showPage(pageId) {
-                const bgLayer = document.getElementById("bg-layer");
-                // Hide floating bubbles on the "Upcoming" (dark) page for better contrast
-                bgLayer.style.display = pageId === "upcoming" ? "none" : "block";
-                
-                document.querySelectorAll(".page-content").forEach((p) => p.classList.remove("page-active"));
-                document.getElementById(pageId).classList.add("page-active");
-                window.scrollTo(0, 0);
-            }
-        </script>
+       <script>
+    function showPage(pageId) {
+        const bgLayer = document.getElementById("bg-layer");
+        bgLayer.style.display = pageId === "upcoming" ? "none" : "block";
+        document.querySelectorAll(".page-content").forEach((p) => p.classList.remove("page-active"));
+        document.getElementById(pageId).classList.add("page-active");
+        window.scrollTo(0, 0);
+    }
+
+    // UPDATED SPORTS DATES
+    const dates = {
+        match1: new Date("February 15, 2026 06:00:00"),
+        match2: new Date("March 10, 2026 06:00:00"),
+    };
+
+    function renderMonth(dateObj, targetDate) {
+        const now = new Date();
+        const year = dateObj.getFullYear();
+        const month = dateObj.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let html = `<div class="w-28 text-white"><div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
+        for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+            let cls = "cal-day";
+            if (d === now.getDate() && month === now.getMonth()) cls += " cal-today";
+            if (d === targetDate.getDate() && month === targetDate.getMonth()) cls += " cal-target";
+            html += `<div class="${cls}">${d}</div>`;
+        }
+        html += `</div></div>`;
+        return html;
+    }
+
+    function updateClocks() {
+        const now = new Date().getTime();
+        Object.keys(dates).forEach((key) => {
+            const diff = dates[key].getTime() - now;
+            if (diff < 0) return;
+            document.getElementById(key + "-d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, "0");
+            document.getElementById(key + "-h").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, "0");
+            document.getElementById(key + "-m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
+            document.getElementById(key + "-s").innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, "0");
+        });
+    }
+
+    // Initialize Calendars
+    document.getElementById("cal-match1").innerHTML = renderMonth(new Date(2026, 1), dates.match1);
+    document.getElementById("cal-match2").innerHTML = renderMonth(new Date(2026, 1), dates.match2) + renderMonth(new Date(2026, 2), dates.match2);
+
+    setInterval(updateClocks, 1000);
+    updateClocks();
+</script>
     </body>
 </html>
