@@ -8,7 +8,11 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
         <style>
-            :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --glass: rgba(255, 255, 255, 0.9); }
+            :root { 
+                --asu-maroon: #8c1d40; 
+                --asu-gold: #ffc627; 
+                --glass: rgba(255, 255, 255, 0.9); 
+            }
             body { font-family: "Inter", sans-serif; background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%); min-height: 100vh; overflow-x: hidden; }
 
             .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
@@ -16,6 +20,37 @@
 
             /* Pitchfork Logo SVG */
             .pitchfork { width: 24px; height: 24px; fill: white; }
+
+            /* Portfolio-Style Flip Box & Calendar */
+            .flip-box {
+                background: #2a0a14;
+                color: var(--asu-gold);
+                border-radius: 8px;
+                padding: 0.8rem 0.2rem;
+                min-width: 55px;
+                text-align: center;
+                font-family: "monospace";
+                box-shadow: 0 4px 0 #000;
+                border: 1px solid var(--asu-gold);
+            }
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 2px;
+                background: #5c132a;
+                padding: 4px;
+                border-radius: 6px;
+                font-size: 0.5rem;
+            }
+            .cal-day {
+                background: var(--asu-maroon);
+                padding: 2px;
+                text-align: center;
+                border-radius: 2px;
+                color: white;
+            }
+            .cal-today { background: var(--asu-gold); color: black; font-weight: bold; }
+            .cal-target { background: white; color: var(--asu-maroon); font-weight: 900; }
 
             /* Broadcast Card Aesthetics */
             .broadcast-card {
@@ -32,50 +67,12 @@
             .ind-row { border-left-color: #3b82f6; }
             .usa-row { border-left-color: #ef4444; }
 
-            /* Exact flip-box styling from portfolio */
-            .flip-box {
-                background: #2a0a14;
-                color: var(--asu-gold);
-                border-radius: 8px;
-                padding: 0.8rem 0.2rem;
-                min-width: 55px;
-                text-align: center;
-                font-family: "monospace";
-                box-shadow: 0 4px 0 #000;
-                border: 1px solid var(--asu-gold);
-            }
-            
-            /* Exact calendar grid from portfolio */
-            .calendar-grid {
-                display: grid;
-                grid-template-columns: repeat(7, 1fr);
-                gap: 2px;
-                background: #5c132a;
-                padding: 4px;
-                border-radius: 6px;
-                font-size: 0.5rem;
-            }
-            .cal-day {
-                background: #8c1d40;
-                padding: 2px;
-                text-align: center;
-                border-radius: 2px;
-                color: white;
-            }
-            .cal-today {
-                background: var(--asu-gold);
-                color: black;
-                font-weight: bold;
-            }
-            .cal-target {
-                background: white;
-                color: var(--asu-maroon);
-                font-weight: 900;
-            }
             /* Floating BG */
             .floating-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
             .bubble { position: absolute; bottom: -100px; background: rgba(140, 29, 64, 0.05); border-radius: 50%; animation: rise 15s infinite ease-in; }
             @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
+            
+            .btn-asu { background-color: var(--asu-maroon); color: var(--asu-gold); border: 2px solid var(--asu-gold); }
         </style>
     </head>
     <body class="p-4 md:p-12">
@@ -118,11 +115,6 @@
                         <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">Open Story Analysis →</div>
                     </div>
                 </div>
-
-                <div class="mt-8 opacity-50 grayscale p-10 border-2 border-dashed border-slate-300 rounded-[2.5rem]">
-                    <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Upcoming Analysis</span>
-                    <p class="text-xl text-slate-400 font-black uppercase italic mt-2">The Spin-Choke: Can Kuldeep dismantle the Group B heavyweights?</p>
-                </div>
             </div>
         </main>
 
@@ -134,10 +126,30 @@
 
                 <div class="prose prose-lg text-slate-700 max-w-none">
                     <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Injury Report: The Rana Setback</h3>
-                    <p>In a crushing blow to India’s pace-bowling rotation, <strong>Harshit Rana</strong> has been officially ruled out of the 2026 T20 World Cup. The injury, a high-grade side strain, occurred during his second over in the final warmup match against the UAE. While fans were eager to see his raw pace, the BCCI has fast-tracked <strong>Mohammed Siraj</strong> from the reserves. Siraj brings a wealth of Wankhede experience, but the question remains: does India lose that "unpredictable edge" that Rana provided?</p>
+                    <p>In a crushing blow to India’s pace-bowling rotation, <strong>Harshit Rana</strong> has been officially ruled out after sustaining a side strain in the warmup match against the UAE. The BCCI has called up <strong>Mohammed Siraj</strong> to lead the attack alongside Bumrah. While Siraj offers Wankhede familiarity, India loses the raw, hit-the-deck pace that Rana was expected to use to hurry the USA top order.</p>
 
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Homecoming Narrative</h3>
-                    <p>For <strong>Saurabh Netravalkar</strong>, tomorrow is more than a match—it's an alternate-reality homecoming. Bowling from the Tata End at the Wankhede, where he once represented Mumbai, but doing so in USA stars and stripes, is the most poetic storyline of the tournament. Tactically, his left-arm angle across Abhishek Sharma will be the first "Boss Level" test of the game.</p>
+                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Can History Repeat?</h3>
+                    <p>The USA isn't just here to participate. Having famously defeated <strong>Pakistan</strong> in the 2024 World Cup, this unit knows how to handle subcontinent pressure. <strong>Saurabh Netravalkar</strong>, returning to his original home ground, will be the primary threat to Abhishek Sharma and Ishan Kishan early on.</p>
+
+                    
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white border-4 border-asu-gold shadow-2xl my-16">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+                            <span class="text-asu-gold font-black italic text-xl uppercase tracking-widest">Armchair Forecast</span>
+                            <span class="bg-red-600 px-3 py-1 rounded text-[10px] font-black uppercase">Win Probability: IND 78%</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-12">
+                            <div class="text-center md:text-left">
+                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Total</p>
+                                <p class="text-6xl font-black italic tracking-tighter">IND: 198/4</p>
+                                <p class="text-white/40 text-xs mt-2 uppercase">SKY (C) projected 50+ runs</p>
+                            </div>
+                            <div class="text-center md:text-left border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-12">
+                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Chase</p>
+                                <p class="text-6xl font-black italic tracking-tighter text-red-500">USA: 172/7</p>
+                                <p class="text-white/40 text-xs mt-2 uppercase">Netravalkar: 2/28 (4.0)</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="broadcast-card rounded-[2rem] overflow-hidden my-16 shadow-2xl">
                         <div class="bg-slate-950 p-4 text-center border-b border-white/10">
@@ -157,10 +169,7 @@
                                     <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>8. AXAR PATEL (VC)</span><span class="text-white/40">AR</span></div>
                                     <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>9. V. CHAKRAVARTHY</span><span class="text-white/40">BOWL</span></div>
                                     <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>10. JASPRIT BUMRAH</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>11. ARSHDEEP SINGH</span><span class="text-white/40">BOWL</span></div>
-                                </div>
-                                <div class="mt-6 pt-4 border-t border-white/10 text-[10px] text-white/40 font-black uppercase">
-                                    Reserves: S. Samson, K. Yadav, W. Sundar, M. SIRAJ
+                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>11. MOHAMMED SIRAJ</span><span class="text-asu-gold">SUB</span></div>
                                 </div>
                             </div>
                             <div class="p-8">
@@ -175,45 +184,26 @@
                                     <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>7. HARMEET SINGH</span><span class="text-white/40">AR</span></div>
                                     <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>8. S. VAN SCHALKWYK</span><span class="text-white/40">AR</span></div>
                                     <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>9. S. NETRAVALKAR</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>10. JESSY SINGH (VC)</span><span class="text-white/40">BOWL</span></div>
+                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>10. JESSY SINGH</span><span class="text-white/40">BOWL</span></div>
                                     <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>11. ALI KHAN</span><span class="text-white/40">BOWL</span></div>
                                 </div>
-                                <div class="mt-6 pt-4 border-t border-white/10 text-[10px] text-white/40 font-black uppercase">
-                                    Reserves: N. Kenjige, M. Mohsin, S. Mukkamala, S. Krishnamurthi
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div class="bg-asu-maroon rounded-[2.5rem] p-10 text-white mb-16 shadow-xl">
-                        <h4 class="text-asu-gold font-black italic text-3xl uppercase mb-6">The Verdict</h4>
-                        <div class="grid md:grid-cols-2 gap-8 items-center border-t border-white/10 pt-8">
-                            <div>
-                                <div class="mb-4"><span class="block text-white/40 text-[10px] font-black uppercase mb-1">Predicted Total</span><p class="text-4xl font-black italic">INDIA: 194/5</p></div>
-                                <div><span class="block text-white/40 text-[10px] font-black uppercase mb-1">USA Chase</span><p class="text-4xl font-black italic">USA: 168/8</p></div>
-                            </div>
-                            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                                <p class="text-sm font-bold italic mb-4">"Result: India wins by 26 runs."</p>
-                                <p class="text-xs text-white/60 leading-relaxed uppercase tracking-tighter">India’s strike-rate evolution will be too much for the USA’s spin-heavy middle overs. Prediction: Suryakumar Yadav MOTM.</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
         <section id="upcoming" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-5xl mx-auto pt-10 px-4">
                 <div class="text-center mb-16">
                     <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">T-Minus to Heritage Showdown</span>
                     <h2 class="text-7xl font-black italic uppercase mt-2">Wankhede <br><span class="text-red-600">February 2026</span></h2>
                 </div>
-        
+
                 <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
-                    <h3 class="text-[#ffc627] font-black text-xs uppercase mb-2 text-center">IND v USA: Group A Clash</h3>
-                    <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
-                        Feb 07, 2026 @ 19:30 IST
-                    </p>
+                    <h3 class="text-asu-gold font-black text-xs uppercase mb-2 text-center">IND v USA: Group A Clash</h3>
+                    <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">Feb 07, 2026 @ 19:30 IST</p>
                     
                     <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
                         <div class="grid grid-cols-4 gap-2">
@@ -234,13 +224,9 @@
                                 <span class="text-[7px] text-white/50 uppercase mt-1">Sec</span>
                             </div>
                         </div>
-        
                         <div id="cal-game-container"></div>
                     </div>
-                    
-                    <p class="text-[9px] mt-6 font-bold text-red-600 text-center uppercase tracking-widest">
-                        Live from Mumbai
-                    </p>
+                    <p class="text-[9px] mt-6 font-bold text-red-600 text-center uppercase tracking-widest">Live from Mumbai</p>
                 </div>
             </div>
         </section>
@@ -252,11 +238,10 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // Countdown Logic
-            const targetDate = new Date("February 7, 2026 07:00:00");
-            
+            // Fixed Countdown Logic from Portfolio
+            const gameDate = new Date("February 7, 2026 19:30:00");
+
             function renderMonth(dateObj, targetDate) {
-                const now = new Date();
                 const year = dateObj.getFullYear();
                 const month = dateObj.getMonth();
                 const firstDay = new Date(year, month, 1).getDay();
@@ -268,36 +253,41 @@
                                 </div>
                                 <div class="calendar-grid">`;
                 
-                // Fill empty days
                 for (let i = 0; i < firstDay; i++) html += `<div></div>`;
-                
-                // Fill actual days
                 for (let d = 1; d <= daysInMonth; d++) {
                     let cls = "cal-day";
-                    if (d === now.getDate() && month === now.getMonth()) cls += " cal-today";
                     if (d === targetDate.getDate() && month === targetDate.getMonth()) cls += " cal-target";
                     html += `<div class="${cls}">${d}</div>`;
                 }
                 html += `</div></div>`;
                 return html;
             }
-            
+
             function updateClocks() {
-                const now = new Date().getTime();
-                const diff = targetDate.getTime() - now;
-                
+                const diff = gameDate.getTime() - new Date().getTime();
                 if (diff < 0) return;
-                
-                document.getElementById("game-d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, "0");
-                document.getElementById("game-h").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, "0");
-                document.getElementById("game-m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
-                document.getElementById("game-s").innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, "0");
+                document.getElementById("game-d").innerText = Math.floor(diff / 86400000).toString().padStart(2, "0");
+                document.getElementById("game-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
+                document.getElementById("game-m").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
+                document.getElementById("game-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
             }
-            
-            // Initialize
-            document.getElementById("cal-game").innerHTML = renderMonth(new Date(2026, 1), targetDate);
+
+            // Initialization
+            document.getElementById("cal-game-container").innerHTML = renderMonth(new Date(2026, 1), gameDate);
             setInterval(updateClocks, 1000);
             updateClocks();
+
+            // Background Bubbles
+            const bubbleCont = document.getElementById('bubble-container');
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 80 + 20 + 'px';
+                bubble.style.width = size; bubble.style.height = size;
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDelay = Math.random() * 10 + 's';
+                bubbleCont.appendChild(bubble);
+            }
         </script>
     </body>
 </html>
