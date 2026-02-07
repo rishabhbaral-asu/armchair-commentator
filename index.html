@@ -8,15 +8,29 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
         <style>
-            :root { 
-                --asu-maroon: #8c1d40; 
-                --asu-gold: #ffc627; 
-                --glass: rgba(255, 255, 255, 0.9); 
+            :root {
+                --umd-red: #e21833;
+                --asu-maroon: #8c1d40;
+                --asu-gold: #ffc627;
+                --glass: rgba(255, 255, 255, 0.9);
             }
-            body { font-family: "Inter", sans-serif; background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%); min-height: 100vh; overflow-x: hidden; }
 
-            .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
-            .page-active { display: block; }
+            body {
+                font-family: "Inter", sans-serif;
+                background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%);
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .page-content {
+                display: none;
+                min-height: 100vh;
+                position: relative;
+                z-index: 10;
+            }
+            .page-active {
+                display: block;
+            }
 
             /* Pitchfork Logo SVG */
             .pitchfork { width: 24px; height: 24px; fill: white; }
@@ -52,6 +66,14 @@
             .cal-today { background: var(--asu-gold); color: black; font-weight: bold; }
             .cal-target { background: white; color: var(--asu-maroon); font-weight: 900; }
 
+            /* Unified Card Sizing */
+            .blog-card {
+                min-height: 320px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
             /* Broadcast Card Aesthetics */
             .broadcast-card {
                 background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
@@ -59,6 +81,7 @@
                 border: 1px solid rgba(255,255,255,0.1);
             }
             .titillium { font-family: 'Titillium Web', sans-serif; }
+            
             .player-row {
                 background: rgba(255,255,255,0.03);
                 transition: all 0.2s;
@@ -73,6 +96,14 @@
             @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
             
             .btn-asu { background-color: var(--asu-maroon); color: var(--asu-gold); border: 2px solid var(--asu-gold); }
+
+            /* Hockey Specific Lineup */
+            .hockey-lineup {
+                background: rgba(15, 23, 42, 0.95);
+                border-radius: 1.5rem;
+                padding: 1.5rem;
+                border: 1px solid rgba(255, 198, 39, 0.2);
+            }
         </style>
     </head>
     <body class="p-4 md:p-12">
@@ -94,41 +125,40 @@
         </nav>
 
         <main id="feed" class="page-content page-active animate__animated animate__fadeIn">
-            <div class="max-w-5xl mx-auto">
+            <div class="max-w-5xl mx-auto px-4">
                 <div class="mb-12">
                     <span class="text-red-600 font-black text-[10px] uppercase tracking-[0.3em]">Latest Entries</span>
                     <h2 class="text-6xl font-black italic tracking-tighter uppercase mt-2">The Analyst's <span class="text-red-600">Notebook.</span></h2>
                 </div>
 
-                <div class="bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.005]" onclick="showPage('full-story')">
-                    <div class="p-10">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Featured Post</span>
-                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Feb 06, 2026</span>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="blog-card bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl transition-all hover:scale-[1.02]" onclick="showPage('full-story')">
+                        <div class="p-8 h-full flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Featured</span>
+                                    <span class="text-slate-400 text-[8px] font-black uppercase tracking-widest">Feb 06, 2026</span>
+                                </div>
+                                <h3 class="text-3xl text-slate-800 font-black uppercase italic mb-4 leading-tight">Blue Blood vs. New World</h3>
+                                <p class="text-slate-500 text-xs mb-6 italic">Analyzing the tactical fallout of Harshit Rana's injury and Netravalkar's homecoming.</p>
+                            </div>
+                            <div class="text-asu-maroon font-black text-[9px] uppercase tracking-widest">Open Story Analysis →</div>
                         </div>
-                        <p class="text-4xl text-slate-800 leading-tight font-black uppercase italic mb-6">
-                            Blue Blood vs. The New World: <br>Why IND v USA is the heart of 2026.
-                        </p>
-                        <p class="text-slate-500 text-sm mb-8 leading-relaxed max-w-2xl italic">
-                            Analyzing the tactical fallout of Harshit Rana's warmup injury and Saurabh Netravalkar's historic Wankhede homecoming.
-                        </p>
-                        <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">Open Story Analysis →</div>
                     </div>
-                </div>
-            </div>
-            <div class="bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.005] mt-8" onclick="showPage('hockey-story')">
-                <div class="p-10">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">NCHC Gameday</span>
-                        <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Feb 07, 2026</span>
+
+                    <div class="blog-card bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl transition-all hover:scale-[1.02]" onclick="showPage('hockey-story')">
+                        <div class="p-8 h-full flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">NCHC Gameday</span>
+                                    <span class="text-slate-400 text-[8px] font-black uppercase tracking-widest">Feb 07, 2026</span>
+                                </div>
+                                <h3 class="text-3xl text-slate-800 font-black uppercase italic mb-4 leading-tight">Heat vs. North Country</h3>
+                                <p class="text-slate-500 text-xs mb-6 italic">SCSU's first trip to the Mullett and Bennett Schimek's chase for history.</p>
+                            </div>
+                            <div class="text-asu-maroon font-black text-[9px] uppercase tracking-widest">Read Matchup Preview →</div>
+                        </div>
                     </div>
-                    <p class="text-4xl text-slate-800 leading-tight font-black uppercase italic mb-6">
-                        Desert Heat vs. North Country: <br>SCSU's First Trip to the Mullett.
-                    </p>
-                    <p class="text-slate-500 text-sm mb-8 leading-relaxed max-w-2xl italic">
-                        Sun Devil Hockey looks to finalize a home sweep against the Huskies. Can Bennett Schimek surpass the record books tonight?
-                    </p>
-                    <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">Read Matchup Preview →</div>
                 </div>
             </div>
         </main>
@@ -136,147 +166,87 @@
         <section id="full-story" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-4xl mx-auto pb-20 px-4">
                 <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
-                
                 <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85] mb-8">WANKHEDE<br><span class="text-red-600">WARFARE.</span></h1>
 
                 <div class="prose prose-lg text-slate-700 max-w-none">
                     <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Injury Report: The Rana Setback</h3>
-                    <p>In a crushing blow to India’s pace-bowling rotation, <strong>Harshit Rana</strong> has been officially ruled out after sustaining a side strain in the warmup match against the UAE. The BCCI has called up <strong>Mohammed Siraj</strong> to lead the attack alongside Bumrah. While Siraj offers Wankhede familiarity, India loses the raw, hit-the-deck pace that Rana was expected to use to hurry the USA top order.</p>
+                    <p>In a blow to India’s pace rotation, <strong>Harshit Rana</strong> has been ruled out with a side strain. <strong>Mohammed Siraj</strong> steps in to lead the attack alongside Bumrah. While Siraj knows these conditions, India loses the raw bounce Rana provided.</p>
 
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Can History Repeat?</h3>
-                    <p>The USA isn't just here to participate. Having famously defeated <strong>Pakistan</strong> in the 2024 World Cup, this unit knows how to handle subcontinent pressure. <strong>Saurabh Netravalkar</strong>, returning to his original home ground, will be the primary threat to Abhishek Sharma and Ishan Kishan early on.</p>
+                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Pakistan Precedent</h3>
+                    <p>The USA carries "Giant Killer" DNA from their 2024 win over Pakistan. With <strong>Saurabh Netravalkar</strong> returning to his original home ground, the tactical battle early in the powerplay will define the chase.</p>
 
-                    
                     <div class="bg-slate-900 rounded-[2rem] p-8 text-white border-4 border-asu-gold shadow-2xl my-16">
                         <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
                             <span class="text-asu-gold font-black italic text-xl uppercase tracking-widest">Armchair Forecast</span>
-                            <span class="bg-red-600 px-3 py-1 rounded text-[10px] font-black uppercase">Win Probability: IND 78%</span>
+                            <span class="bg-red-600 px-3 py-1 rounded text-[10px] font-black uppercase">IND 78% Win Prob</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-12">
                             <div class="text-center md:text-left">
                                 <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Total</p>
                                 <p class="text-6xl font-black italic tracking-tighter">IND: 198/4</p>
-                                <p class="text-white/40 text-xs mt-2 uppercase">SKY (C) projected 50+ runs</p>
                             </div>
                             <div class="text-center md:text-left border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-12">
                                 <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Chase</p>
                                 <p class="text-6xl font-black italic tracking-tighter text-red-500">USA: 172/7</p>
-                                <p class="text-white/40 text-xs mt-2 uppercase">Netravalkar: 2/28 (4.0)</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="broadcast-card rounded-[2rem] overflow-hidden my-16 shadow-2xl">
-                        <div class="bg-slate-950 p-4 text-center border-b border-white/10">
-                            <span class="titillium text-asu-gold text-sm font-black italic uppercase tracking-[0.3em]">Official Predicted XI // Group A</span>
-                        </div>
-                        <div class="grid md:grid-cols-2">
-                            <div class="p-8 border-r border-white/5">
-                                <h4 class="titillium text-white text-4xl italic uppercase mb-8">INDIA</h4>
-                                <div class="space-y-2">
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>1. ABHISHEK SHARMA</span><span class="text-white/40">LHB</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>2. ISHAN KISHAN (WK)</span><span class="text-white/40">LHB</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>3. TILAK VARMA</span><span class="text-white/40">LHB</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between bg-blue-500/10 text-asu-gold font-bold text-sm"><span>4. S. YADAV (C)</span><span class="text-asu-gold/40 italic">RHB</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>5. HARDIK PANDYA</span><span class="text-white/40">ALL</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>6. SHIVAM DUBE</span><span class="text-white/40">ALL</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>7. RINKU SINGH</span><span class="text-white/40">FIN</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>8. AXAR PATEL (VC)</span><span class="text-white/40">AR</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>9. V. CHAKRAVARTHY</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>10. JASPRIT BUMRAH</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row ind-row p-3 flex justify-between text-white font-bold text-sm"><span>11. MOHAMMED SIRAJ</span><span class="text-asu-gold">SUB</span></div>
-                                </div>
-                            </div>
-                            <div class="p-8">
-                                <h4 class="titillium text-white text-4xl italic uppercase mb-8">USA</h4>
-                                <div class="space-y-2">
-                                    <div class="player-row usa-row p-3 flex justify-between bg-red-500/10 text-asu-gold font-bold text-sm"><span>1. MONANK PATEL (C)</span><span class="text-asu-gold/40">WK</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>2. ANDRIES GOUS</span><span class="text-white/40">RHB</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>3. S. JAYASURIYA</span><span class="text-white/40">LHB</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>4. MILIND KUMAR</span><span class="text-white/40">RHB</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>5. SHUBHAM RANJANE</span><span class="text-white/40">ALL</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>6. SHAYAN JAHANGIR</span><span class="text-white/40">RHB</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>7. HARMEET SINGH</span><span class="text-white/40">AR</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>8. S. VAN SCHALKWYK</span><span class="text-white/40">AR</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>9. S. NETRAVALKAR</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>10. JESSY SINGH</span><span class="text-white/40">BOWL</span></div>
-                                    <div class="player-row usa-row p-3 flex justify-between text-white font-bold text-sm"><span>11. ALI KHAN</span><span class="text-white/40">BOWL</span></div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
         <section id="hockey-story" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-4xl mx-auto pb-20 px-4">
                 <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
-                
                 <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85] mb-8 text-asu-maroon">ICE<br><span class="text-slate-900">COLD.</span></h1>
-        
+
                 <div class="prose prose-lg text-slate-700 max-w-none">
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Chase for History</h3>
-                    <p>ASU’s <strong>Bennett Schimek</strong> enters tonight just points away from surpassing Sun Devil legend Josh Doan on the all-time career points list. After a dominant Friday performance, the Maroon and Gold are looking to leverage the Mullett Arena crowd to stifle a desperate St. Cloud State team.</p>
-        
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Scouting the Huskies</h3>
-                    <p>SCSU brings the "Terrific Trio" of <strong>Tyson Gross</strong>, <strong>Austin Burnevik</strong>, and <strong>Barrett Hall</strong>. Gross remains one of the nation's elite faceoff specialists (60.7%), meaning ASU’s Kyle Smolen and Cruz Lucius will have their hands full fighting for puck possession in the defensive zone.</p>
-        
-                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white border-4 border-asu-gold shadow-2xl my-16">
-                        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-                            <span class="text-asu-gold font-black italic text-xl uppercase tracking-widest">Armchair AI Forecast</span>
-                            <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded text-[10px] font-black uppercase">Mullett Home Edge</span>
+                    <p>ASU’s <strong>Bennett Schimek</strong> is on the verge of history at the Mullett. The Sun Devils look to leverage home-ice advantage to stifle the Huskies' specialized faceoff unit.</p>
+
+                    <div class="hockey-lineup my-12 text-white">
+                        <div class="text-center mb-6 border-b border-white/10 pb-4">
+                            <span class="text-asu-gold font-black uppercase text-xs tracking-widest italic">Projected Starting XI</span>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-12">
-                            <div class="text-center md:text-left">
-                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Score</p>
-                                <p class="text-6xl font-black italic tracking-tighter">ASU: 4</p>
-                                <p class="text-white/40 text-xs mt-2 uppercase">Schimek: 1G, 2A projected</p>
+                        <div class="grid grid-cols-2 gap-4 text-[11px] font-bold">
+                            <div class="space-y-3">
+                                <p class="text-asu-gold uppercase text-[9px]">Forwards</p>
+                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>B. Schimek</span><span>RW</span></div>
+                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>C. Lucius</span><span>LW</span></div>
+                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>K. Smolen</span><span>C</span></div>
                             </div>
-                            <div class="text-center md:text-left border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-12">
-                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Score</p>
-                                <p class="text-6xl font-black italic tracking-tighter text-slate-400">SCSU: 2</p>
-                                <p class="text-white/40 text-xs mt-2 uppercase">Shostak: 32 SV Projected</p>
+                            <div class="space-y-3">
+                                <p class="text-asu-gold uppercase text-[9px]">Defense & Goal</p>
+                                <div class="flex justify-between border-l-2 border-slate-400 pl-2"><span>N. Szmagaj</span><span>LD</span></div>
+                                <div class="flex justify-between border-l-2 border-slate-400 pl-2"><span>T. Gratton</span><span>RD</span></div>
+                                <div class="flex justify-between border-l-2 border-red-600 pl-2"><span class="text-red-500">G. Hallum</span><span>G</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
         <section id="upcoming" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-5xl mx-auto pt-10 px-4">
-                
                 <div class="text-center mb-10">
-                    <span class="text-asu-maroon font-black text-[10px] uppercase tracking-widest">Puck Drop: Mullett Arena</span>
-                    <h2 class="text-7xl font-black italic uppercase mt-2">ASU vs <span class="text-asu-maroon">SCSU</span></h2>
+                    <span class="text-asu-maroon font-black text-[10px] uppercase tracking-widest">NCHC: Mullett Arena</span>
+                    <h2 class="text-5xl font-black italic uppercase mt-2">ASU vs <span class="text-asu-maroon">SCSU</span></h2>
                 </div>
-        
                 <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30 mb-20">
                     <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
                         <div class="grid grid-cols-4 gap-2">
-                            <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="hockey-d">00</div>
-                                <span class="text-[7px] text-white/50 uppercase mt-1">Days</span>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="hockey-h">00</div>
-                                <span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="hockey-m">00</div>
-                                <span class="text-[7px] text-white/50 uppercase mt-1">Min</span>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl text-white" id="hockey-s">00</div>
-                                <span class="text-[7px] text-white/50 uppercase mt-1">Sec</span>
-                            </div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-d">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Days</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-h">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-m">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Min</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-s">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Sec</span></div>
                         </div>
                         <div id="cal-hockey-container"></div>
                     </div>
                 </div>
-        
+
                 <div class="text-center mb-10">
-                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">T-Minus to Heritage Showdown</span>
-                    <h2 class="text-7xl font-black italic uppercase mt-2">Wankhede 2026</h2>
+                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">World Cup: Wankhede</span>
+                    <h2 class="text-5xl font-black italic uppercase mt-2">IND vs <span class="text-red-600">USA</span></h2>
                 </div>
                 <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
                     <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
@@ -293,48 +263,53 @@
         </section>
 
         <script>
+            const dates = {
+                hockey: new Date("February 7, 2026 17:00:00"),
+                game: new Date("February 7, 2026 19:30:00")
+            };
+
             function showPage(pageId) {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
                 document.getElementById(pageId).classList.add('page-active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-            // New Dates
-            const dates = {
-                hockey: new Date("February 7, 2026 17:00:00"), // 5:00 PM MST
-                game: new Date("February 7, 2026 07:00:00")    // Cricket (19:30 IST)
-            };
-            
+
+            function renderMonth(dateObj, targetDate) {
+                const now = new Date();
+                const year = dateObj.getFullYear(), month = dateObj.getMonth();
+                const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
+                let html = `<div class="w-28 text-white"><div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
+                for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    let cls = (d === targetDate.getDate() && month === targetDate.getMonth()) ? "cal-day cal-target" : "cal-day";
+                    html += `<div class="${cls}">${d}</div>`;
+                }
+                return html + `</div></div>`;
+            }
+
             function updateClocks() {
                 const now = new Date().getTime();
-                
                 Object.keys(dates).forEach(key => {
                     const diff = dates[key].getTime() - now;
                     if (diff < 0) return;
-                    
                     document.getElementById(key + "-d").innerText = Math.floor(diff / 86400000).toString().padStart(2, "0");
                     document.getElementById(key + "-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
                     document.getElementById(key + "-m").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
                     document.getElementById(key + "-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
                 });
             }
-            
-            // Initializing both calendars
+
             document.getElementById("cal-hockey-container").innerHTML = renderMonth(new Date(2026, 1), dates.hockey);
             document.getElementById("cal-game-container").innerHTML = renderMonth(new Date(2026, 1), dates.game);
-            
             setInterval(updateClocks, 1000);
             updateClocks();
 
-            // Background Bubbles
             const bubbleCont = document.getElementById('bubble-container');
             for (let i = 0; i < 15; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 80 + 20 + 'px';
-                bubble.style.width = size; bubble.style.height = size;
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.animationDelay = Math.random() * 10 + 's';
-                bubbleCont.appendChild(bubble);
+                const b = document.createElement('div'); b.className = 'bubble';
+                const s = Math.random() * 80 + 20 + 'px'; b.style.width = s; b.style.height = s;
+                b.style.left = Math.random() * 100 + '%'; b.style.animationDelay = Math.random() * 10 + 's';
+                bubbleCont.appendChild(b);
             }
         </script>
     </body>
