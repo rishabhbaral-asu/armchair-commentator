@@ -3,180 +3,148 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Gameday Edition</title>
+        <title>The Tempe Torch | Late Edition</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Inter:wght@400;700;900&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
         <style>
             :root {
                 --asu-maroon: #8c1d40;
                 --asu-gold: #ffc627;
-                --paper-tan: #fdfaf3;
+                --ink: #1a1a1a;
+                --paper: #f4f1ea;
             }
-            body { font-family: 'Libre+Baskerville', serif; background: var(--asu-maroon); color: #1a1a1a; }
-            .newspaper-container { 
-                background: var(--paper-tan); 
-                max-width: 1200px; 
-                margin: 2rem auto; 
-                padding: 2rem;
-                box-shadow: 20px 20px 0px rgba(0,0,0,0.2);
-                border: 1px solid #ddd;
+            body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); line-height: 1.6; }
+            .broadsheet { 
+                background: var(--paper); 
+                max-width: 1100px; 
+                margin: 20px auto; 
+                padding: 40px; 
+                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                border: 1px solid #d1cfc8;
             }
-            .masthead {
-                text-align: center;
-                border-bottom: 4px double var(--asu-maroon);
-                padding-bottom: 1rem;
-                margin-bottom: 2rem;
-            }
-            .masthead h1 {
-                font-family: 'Playfair Display', serif;
-                font-size: 5.5rem;
-                line-height: 1;
-                color: var(--asu-maroon);
-                letter-spacing: -2px;
-            }
-            .sub-mast {
-                display: flex;
-                justify-content: space-between;
-                font-family: 'Inter', sans-serif;
-                font-weight: 900;
-                text-transform: uppercase;
-                font-size: 0.7rem;
-                border-top: 1px solid var(--asu-maroon);
-                padding-top: 0.5rem;
-                margin-top: 0.5rem;
-            }
-            .headline { font-family: 'Playfair Display', serif; font-weight: 900; font-style: italic; line-height: 1.1; }
-            .dropcap { float: left; font-size: 4rem; line-height: 0.8; padding-top: 4px; padding-right: 8px; color: var(--asu-maroon); font-family: 'Playfair Display', serif; }
+            .masthead { border-bottom: 5px solid var(--ink); text-align: center; margin-bottom: 20px; }
+            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 5.5rem; color: var(--asu-maroon); margin: 0; }
+            .date-line { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 5px 0; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; display: flex; justify-content: space-between; }
+            
+            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1; margin-bottom: 15px; color: var(--ink); }
+            .subheadline { font-style: italic; font-size: 1.25rem; color: #444; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+            
+            .columns { column-count: 2; column-gap: 40px; text-align: justify; }
+            @media (max-width: 768px) { .columns { column-count: 1; } }
+            
+            .dropcap { float: left; font-size: 4.5rem; line-height: 0.8; padding-top: 10px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); }
             
             .page-content { display: none; }
             .page-active { display: block; }
             
-            /* Lineup Box */
-            .lineup-box { background: #fff; border: 1px solid #ccc; padding: 1rem; margin-top: 1rem; font-family: 'Inter', sans-serif; }
-            .lineup-title { background: var(--asu-maroon); color: var(--asu-gold); padding: 4px 8px; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; }
+            /* Box Score / Roster Style */
+            .official-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; margin: 20px 0; font-family: sans-serif; }
+            .official-table th { background: #eee; text-align: left; padding: 5px; border: 1px solid #ccc; text-transform: uppercase; }
+            .official-table td { padding: 5px; border: 1px solid #ccc; }
             
-            /* Aesthetics for Timers */
-            .flip-box { background: #2a0a14; color: var(--asu-gold); border-radius: 4px; padding: 0.5rem; min-width: 45px; text-align: center; font-family: monospace; border: 1px solid var(--asu-gold); }
-            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ddd; padding: 2px; font-size: 0.5rem; }
-            .cal-day { background: white; padding: 2px; text-align: center; }
-            .cal-target { background: var(--asu-maroon); color: white; font-weight: 900; }
+            /* Preserved Aesthetic Elements */
+            .flip-box { background: var(--ink); color: var(--asu-gold); border-radius: 4px; padding: 8px; min-width: 50px; text-align: center; font-family: monospace; border: 1px solid var(--asu-gold); }
+            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ccc; padding: 2px; }
+            .cal-day { background: white; padding: 3px; text-align: center; font-size: 0.6rem; }
+            .cal-target { background: var(--asu-maroon); color: white; font-weight: bold; }
         </style>
     </head>
-    <body class="p-2 md:p-6">
+    <body>
 
-        <div class="newspaper-container animate__animated animate__fadeIn">
+        <div class="broadsheet animate__animated animate__fadeIn">
             <header class="masthead">
-                <div class="flex justify-center mb-2">
-                    <span class="bg-asu-maroon text-asu-gold px-4 py-1 text-[10px] font-black uppercase tracking-[0.3em]">Volume I &bull; No. 1</span>
-                </div>
                 <button onclick="showPage('feed')"><h1>The Tempe Torch</h1></button>
-                <div class="sub-mast">
-                    <span>Tempe, Arizona</span>
-                    <span>Saturday, February 7, 2026</span>
-                    <span>Late Edition</span>
+                <div class="date-line">
+                    <span>Vol. 120 — No. 42</span>
+                    <span>Tempe, Arizona — Saturday, February 7, 2026</span>
+                    <span>Price: One Cent</span>
                 </div>
             </header>
 
             <main id="feed" class="page-content page-active">
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="md:col-span-2 border-r border-slate-300 pr-8">
+                <div class="grid md:grid-cols-3 gap-10">
+                    <div class="md:col-span-2">
                         <article class="cursor-pointer" onclick="showPage('hockey')">
-                            <h2 class="headline text-6xl mb-4 hover:text-red-800 transition">Sun Devils Seek Redemption After Friday Night Chill</h2>
-                            <p class="text-sm font-bold uppercase mb-4 text-slate-500">By Rishabh Baral &bull; Sports Desk</p>
-                            <p class="italic text-xl text-slate-700 leading-snug mb-6">"Mullett Arena stunned as St. Cloud State takes opener 4-1; Tonight’s rematch a must-win for NCHC standing."</p>
-                            <div class="text-lg leading-relaxed text-justify">
-                                <span class="dropcap">L</span>ast night, the desert heat wasn't enough to melt the Huskies' defense. Despite a high-volume offensive effort, ASU fell 4-1 to St. Cloud State in a physical contest that saw Tyson Gross silence the Tempe faithful with a two-goal performance. Tonight, the Sun Devils return to the ice with their backs against the wall...
+                            <h2 class="headline text-6xl">SCSU Silences Mullett Arena; Devils Eyes Rematch</h2>
+                            <p class="subheadline">Tyson Gross nets two as Sun Devils fail to capitalize on 34-shot barrage in NCHC opener.</p>
+                            <div class="columns text-sm">
+                                <span class="dropcap">T</span>he atmosphere at Mullett Arena was electric, but the results were ice-cold for the Arizona State Sun Devils. Despite a relentless offensive effort that tested sophomore goaltender Patriks Berzins 34 times, ASU fell 4-1 to St. Cloud State in a physical Friday night showdown. The Huskies utilized a disciplined structural trap that effectively neutralized the Devils' transition game. Tyson Gross proved to be the primary antagonist, netting a shorthanded goal in the second period before adding a back-breaker in the third. Tonight, Coach Greg Powers’ squad faces a pivotal "split or quit" moment as they attempt to solve Berzins and find the back of the net...
                             </div>
-                            <p class="mt-4 font-black uppercase text-xs text-asu-maroon">Read the Full Report Page 2 &rarr;</p>
                         </article>
                     </div>
-
-                    <div class="space-y-8">
+                    <div class="border-l border-slate-300 pl-8">
+                        <h3 class="font-bold border-b-2 border-ink mb-4 uppercase text-xs">The International Desk</h3>
                         <article class="cursor-pointer" onclick="showPage('cricket')">
-                            <h3 class="headline text-3xl mb-2">Wankhede Winds: IND vs USA Set to Bowl</h3>
-                            <p class="text-xs text-slate-500 mb-2">Special to the Torch</p>
-                            <p class="text-sm leading-relaxed mb-4">India faces the USA in a high-stakes T20 World Cup opener. With Bumrah sidelined by illness, Siraj takes the lead while the USA wins the toss.</p>
-                            <p class="font-black uppercase text-[10px] text-asu-maroon">Full Roster Inside &rarr;</p>
+                            <h4 class="headline text-2xl">Bumrah Fever Sidelined; Siraj Returns for Wankhede Clash</h4>
+                            <p class="text-xs italic mb-4">India vs USA: World Cup Title Defense Begins with Toss Loss.</p>
+                            <p class="text-sm">In a shock to the Indian camp, Jasprit Bumrah has been ruled out of today's opener against the USA due to a sudden fever. Mohammed Siraj, returning to the T20I fold after 557 days, steps into the primary pace role. USA captain Monank Patel has won the toss and opted to bowl, looking to exploit early Mumbai sea breezes.</p>
                         </article>
-                        <hr class="border-slate-300">
-                        <div class="bg-asu-gold/10 p-4 border border-asu-gold/30">
-                            <h4 class="font-black uppercase text-xs mb-4 text-center">Upcoming Events</h4>
-                            <div id="side-timer" class="space-y-4">
-                                <div class="text-center">
-                                    <p class="text-[9px] font-bold uppercase">Puck Drop (ASU)</p>
-                                    <div class="flex justify-center gap-1 mt-1">
-                                        <span id="h-h-side" class="font-black">00</span>:
-                                        <span id="h-m-side" class="font-black">00</span>:
-                                        <span id="h-s-side" class="font-black">00</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </main>
 
             <section id="hockey" class="page-content">
-                <div class="max-w-4xl mx-auto">
-                    <button onclick="showPage('feed')" class="text-xs font-black uppercase border-b-2 border-asu-maroon mb-8">&larr; Back to Front Page</button>
-                    <h1 class="headline text-6xl mb-6">Plowing Through the Trap: ASU’s Path to Leveling the Series</h1>
-                    <div class="grid md:grid-cols-2 gap-8 mb-12">
-                        <div class="text-lg leading-relaxed text-justify">
-                            <p class="mb-4">Coach Greg Powers face a critical tactical adjustment tonight. Last night’s 4-1 loss wasn't for lack of opportunity, but for a lack of finishing against a stellar Patriks Berzins. The Huskies' structural trap frustrated the Sun Devils' transition speed, forcing shots from the perimeter.</p>
-                            <p>Tonight, look for Bennett Schimek to move into more central "danger zones." If ASU can capitalize on the power play early, they can force SCSU out of their shell.</p>
-                        </div>
-                        <div class="lineup-box">
-                            <div class="lineup-title">Probable Gameday Starters</div>
-                            <ul class="text-sm space-y-2 font-bold uppercase">
-                                <li class="flex justify-between border-b pb-1"><span>Urban (G)</span><span class="text-asu-maroon">#31</span></li>
-                                <li class="flex justify-between border-b pb-1"><span>Schimek (F)</span><span class="text-asu-maroon">#18</span></li>
-                                <li class="flex justify-between border-b pb-1"><span>Lucius (F)</span><span class="text-asu-maroon">#29</span></li>
-                                <li class="flex justify-between border-b pb-1"><span>Kipkie (D)</span><span class="text-asu-maroon">#02</span></li>
-                            </ul>
-                        </div>
-                    </div>
+                <button onclick="showPage('feed')" class="mb-4 text-xs font-bold uppercase underline">Return to Front Page</button>
+                <h2 class="headline text-5xl">The Anatomy of a Breakdown</h2>
+                <div class="columns text-sm mb-8">
+                    <p>Last night's 4-1 loss was a tale of two efficiencies. While ASU controlled the puck for significant stretches, the Huskies were surgical. Tyson Gross’s first goal came during an ASU power play—a deflection off a skater that allowed Finn Loftus to feed Gross for a tap-in past Samuel Urban. It was a momentum shift from which the Devils never fully recovered. Noah Powell managed to level the score at 1-1 with a shorthanded goal of his own, assisted by Logan Morrell and Samuel Alfano, but the offense stalled thereafter.</p>
+                    <p>Defensively, the Sun Devils struggled with SCSU’s net-front presence. Austin Burnevik and Verner Miettinen added empty-net goals to "ice" the game, but it was the 33-save performance by Berzins that stood as the wall ASU couldn't climb. For tonight’s rematch, the Devils must improve their 0-for-2 power play conversion and find a way to penetrate the slot rather than settling for perimeter shots.</p>
                 </div>
             </section>
 
             <section id="cricket" class="page-content">
-                <div class="max-w-4xl mx-auto">
-                    <button onclick="showPage('feed')" class="text-xs font-black uppercase border-b-2 border-asu-maroon mb-8">&larr; Back to Front Page</button>
-                    <h1 class="headline text-6xl mb-6">The Mumbai Exchange: USA to Bowl First at Wankhede</h1>
-                    <div class="mb-10 text-center border-y border-slate-300 py-4 italic text-xl">
-                        "Bumrah absence leaves void in Indian pace attack; Netravalkar returns to home soil."
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-12">
-                        <div class="lineup-box">
-                            <div class="lineup-title">India Full XI</div>
-                            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
-                                <span>1. I. Kishan</span><span>2. A. Sharma</span><span>3. S. Yadav</span><span>4. T. Varma</span>
-                                <span>5. H. Pandya</span><span>6. R. Singh</span><span>7. A. Patel</span><span>8. A. Singh</span>
-                                <span>9. M. Siraj</span><span>10. V. Chakravarthy</span><span>11. R. Bishnoi</span>
-                            </div>
+                <button onclick="showPage('feed')" class="mb-4 text-xs font-bold uppercase underline">Return to Front Page</button>
+                <h2 class="headline text-5xl">Mumbai Homecoming: Netravalkar Returns to the Wankhede</h2>
+                <div class="columns text-sm">
+                    <p>For USA’s Saurabh Netravalkar, today’s match is more than a World Cup fixture—it is a return to his roots. Born and raised in Mumbai, Netravalkar represented India at the 2010 U19 World Cup alongside stars like KL Rahul. Now, the Oracle software engineer leads the American attack against his native land on the very ground where he once sought to make his name.</p>
+                    <p>The tactical battle shifted at the toss. Monank Patel’s decision to bowl first puts the pressure on India’s new-look opening pair of Abhishek Sharma and Ishan Kishan. With Suryakumar Yadav leading at his home ground, India will look to set a target beyond the reach of Andries Gous and the American middle order, who were frustrated by the "two-paced" nature of the pitch in early sessions.</p>
+                </div>
+
+                <div class="mt-8 border-t-2 border-ink pt-4">
+                    <h3 class="font-bold text-center uppercase tracking-widest text-lg">Official Match Scorecard & Team Rosters</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <table class="official-table">
+                                <thead><tr><th colspan="2">India Playing XI</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1. Abhishek Sharma</td><td>7. Axar Patel</td></tr>
+                                    <tr><td>2. Ishan Kishan (WK)</td><td>8. Arshdeep Singh</td></tr>
+                                    <tr><td>3. Tilak Varma</td><td>9. Mohammed Siraj</td></tr>
+                                    <tr><td>4. Suryakumar Yadav (C)</td><td>10. Varun Chakravarthy</td></tr>
+                                    <tr><td>5. Rinku Singh</td><td>11. Ravi Bishnoi</td></tr>
+                                    <tr><td>6. Hardik Pandya</td><td><span class="italic text-slate-500">Res: S. Samson, K. Yadav</span></td></tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="lineup-box">
-                            <div class="lineup-title">USA Full XI</div>
-                            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
-                                <span>1. M. Patel</span><span>2. A. Gous</span><span>3. S. Mukkamalla</span><span>4. M. Kumar</span>
-                                <span>5. H. Singh</span><span>6. S. Ranjane</span><span>7. N. Kenjige</span><span>8. S. Netravalkar</span>
-                                <span>9. A. Khan</span><span>10. J. Singh</span><span>11. M. Mohsin</span>
-                            </div>
+                        <div>
+                            <table class="official-table">
+                                <thead><tr><th colspan="2">United States Playing XI</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1. Saiteja Mukkamalla</td><td>7. Shubham Ranjane</td></tr>
+                                    <tr><td>2. Andries Gous (WK)</td><td>8. Mohammad Mohsin</td></tr>
+                                    <tr><td>3. Monank Patel (C)</td><td>9. Shadley van Schalkwyk</td></tr>
+                                    <tr><td>4. Milind Kumar</td><td>10. Saurabh Netravalkar</td></tr>
+                                    <tr><td>5. Sanjay Krishnamurthi</td><td>11. Ali Khan</td></tr>
+                                    <tr><td>6. Harmeet Singh</td><td><span class="italic text-slate-500">Res: S. Jahangir, S. Jayasuriya</span></td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <footer class="mt-12 border-t-4 double border-asu-maroon pt-8 pb-4">
-                <div class="flex justify-center gap-12 flex-wrap">
-                    <div class="flex items-center gap-4">
-                        <div class="text-[10px] font-black uppercase">Next Puck Drop</div>
-                        <div class="flex gap-1">
-                            <div class="flip-box" id="h-d">00</div>
-                            <div class="flip-box" id="h-h">00</div>
-                            <div class="flip-box" id="h-m">00</div>
+            <footer class="mt-12 border-t-4 double border-ink pt-8">
+                <div class="flex flex-wrap justify-between items-center gap-8">
+                    <div>
+                        <h4 class="text-[10px] font-black uppercase mb-2">Upcoming Calendar</h4>
+                        <div class="flex gap-2" id="footer-cals"></div>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="text-[10px] font-black uppercase mb-2">Countdown to Puck Drop</h4>
+                        <div class="flex gap-1 justify-end">
+                            <div class="flip-box" id="h-h">00</div><div class="flip-box" id="h-m">00</div><div class="flip-box" id="h-s">00</div>
                         </div>
-                        <div id="cal-h"></div>
                     </div>
                 </div>
             </footer>
@@ -189,15 +157,12 @@
                 window.scrollTo(0,0);
             }
 
-            const dates = {
-                h: new Date("February 7, 2026 17:00:00"),
-                c: new Date("February 7, 2026 07:00:00")
-            };
+            const dates = { h: new Date("February 7, 2026 17:00:00") };
 
             function renderMonth(dateObj, targetDate) {
                 const year = dateObj.getFullYear(), month = dateObj.getMonth();
                 const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-                let html = `<div class="w-24"><div class="text-[8px] font-black text-center mb-1 uppercase">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
+                let html = `<div class="w-24"><div class="text-[7px] font-bold text-center uppercase mb-1">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
                 for (let i = 0; i < firstDay; i++) html += `<div></div>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     let cls = (d === targetDate.getDate() && month === targetDate.getMonth()) ? "cal-day cal-target" : "cal-day";
@@ -208,27 +173,14 @@
 
             function updateClocks() {
                 const now = new Date().getTime();
-                Object.keys(dates).forEach(key => {
-                    const diff = dates[key].getTime() - now;
-                    if (diff < 0) return;
-                    const d = Math.floor(diff / 86400000).toString().padStart(2, "0");
-                    const h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
-                    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
-                    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
-                    
-                    if(document.getElementById(key + "-d")) document.getElementById(key + "-d").innerText = d;
-                    if(document.getElementById(key + "-h")) document.getElementById(key + "-h").innerText = h;
-                    if(document.getElementById(key + "-m")) document.getElementById(key + "-m").innerText = m;
-                    
-                    if(key === 'h') {
-                        document.getElementById('h-h-side').innerText = h;
-                        document.getElementById('h-m-side').innerText = m;
-                        document.getElementById('h-s-side').innerText = s;
-                    }
-                });
+                const diff = dates.h.getTime() - now;
+                if (diff < 0) return;
+                document.getElementById("h-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
+                document.getElementById("h-m").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
+                document.getElementById("h-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
             }
 
-            document.getElementById("cal-h").innerHTML = renderMonth(new Date(2026, 1), dates.h);
+            document.getElementById("footer-cals").innerHTML = renderMonth(new Date(2026, 1), dates.h);
             setInterval(updateClocks, 1000);
             updateClocks();
         </script>
