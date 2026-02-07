@@ -187,20 +187,10 @@
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-8 pb-20">
-                    <div class="calendar-mini">
-                        <h5 class="font-black text-[10px] uppercase tracking-widest mb-4">India Squad Arrival</h5>
-                        <div class="cal-grid" id="cal-ind"></div>
-                        <p class="text-[9px] mt-4 font-bold text-slate-400">Feb 01: Training starts in Mumbai</p>
-                    </div>
                     <div class="calendar-mini border-asu-gold border-2 ring-4 ring-asu-maroon/10">
                         <h5 class="font-black text-[10px] uppercase tracking-widest text-red-600 mb-4 italic">GAMEDAY: IND v USA</h5>
                         <div class="cal-grid" id="cal-game"></div>
                         <p class="text-[9px] mt-4 font-bold text-red-600">Feb 07: Live from Wankhede</p>
-                    </div>
-                    <div class="calendar-mini">
-                        <h5 class="font-black text-[10px] uppercase tracking-widest mb-4">Super 8s Transition</h5>
-                        <div class="cal-grid" id="cal-super"></div>
-                        <p class="text-[9px] mt-4 font-bold text-slate-400">Feb 14: Knockouts begin</p>
                     </div>
                 </div>
             </div>
@@ -214,7 +204,7 @@
             }
 
             // Countdown Logic
-            const targetDate = new Date("February 7, 2026 19:30:00").getTime();
+            const targetDate = new Date("February 7, 2026 06:30:00").getTime();
             function updateCountdown() {
                 const now = new Date().getTime();
                 const diff = targetDate - now;
@@ -237,9 +227,7 @@
                     container.innerHTML += `<div class="cal-day ${isActive} text-slate-800">${i}</div>`;
                 }
             }
-            renderCal('cal-ind', 1);
             renderCal('cal-game', 7);
-            renderCal('cal-super', 14);
 
             // Particles
             const bubbleCont = document.getElementById('bubble-container');
