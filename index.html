@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Saturday Broadside</title>
+        <title>The Tempe Torch | Gameday Edition</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 50px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
             .ticker-box { background: #222; color: var(--asu-gold); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--asu-gold); margin: 0 4px; font-family: monospace; }
+            .live-score { color: #ff4444; text-shadow: 0 0 5px rgba(255,0,0,0.5); }
 
             /* BROADSHEET STRUCTURE */
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 60px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
@@ -30,12 +31,10 @@
             .columns { column-count: 3; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.45; }
             .dropcap { float: left; font-size: 6rem; line-height: 0.7; padding-top: 15px; padding-right: 12px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
 
-            /* LINEUP CARDS */
             .lineup-card { border: 2px solid var(--ink); background: white; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
             .lineup-header { padding: 12px; display: flex; align-items: center; gap: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
             .lineup-grid { padding: 15px; display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.75rem; font-weight: bold; }
 
-            /* NAV */
             .page-content { display: none; }
             .page-active { display: block; }
             .nav-link { font-weight: bold; text-transform: uppercase; font-size: 0.75rem; text-decoration: underline; cursor: pointer; color: var(--asu-maroon); }
@@ -45,10 +44,9 @@
 
         <div class="ticker-wrap">
             <div class="ticker-content">
-                <div class="ticker-item"><span>PUCK DROP: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h">00</span>:<span class="ticker-box" id="t-h-m">00</span>:<span class="ticker-box" id="t-h-s">00</span></div>
-                <div class="ticker-item"><span>FIRST BALL: INDIA vs USA IN</span><span class="ticker-box" id="t-c-h">00</span>:<span class="ticker-box" id="t-c-m">00</span>:<span class="ticker-box" id="t-c-s">00</span></div>
-                <div class="ticker-item"><span>LOCAL TIME ADVISORY: CRICKET STARTS 6:30AM MST</span></div>
-                <div class="ticker-item"><span>PUCK DROP: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h2">00</span>:<span class="ticker-box" id="t-h-m2">00</span>:<span class="ticker-box" id="t-h-s2">00</span></div>
+                <div class="ticker-item" id="ticker-hockey"><span>LOADING PUCK DROP...</span></div>
+                <div class="ticker-item" id="ticker-cricket"><span>LOADING FIRST BALL...</span></div>
+                <div class="ticker-item"><span>THE TEMPE TORCH — EST. 2024 — NEWS FOR THE MODERN DEVIL</span></div>
             </div>
         </div>
 
@@ -58,7 +56,7 @@
                 <div class="date-line">
                     <span>SATURDAY EDITION — LOCAL MST</span>
                     <span>FEBRUARY 7, 2026</span>
-                    <span>TEMPE, ARIZONA — $1.50</span>
+                    <span>TEMPE, ARIZONA — EST. 2024</span>
                 </div>
             </header>
 
@@ -67,38 +65,34 @@
                     <h2 class="headline text-8xl mb-4">A CHESS MATCH AT THE MULLETT</h2>
                     <span class="subheadline">Powers demands execution as Sun Devils face Husky trap; Goaltender Berzins remains the X-factor in tonight's series finale.</span>
                     <div class="columns">
-                        <span class="dropcap">T</span>he Sun Devils find themselves in a familiar position this morning: chasing a result in the ruthless NCHC. Following a 4-1 loss on Friday night that felt closer than the scoreboard indicated, head coach Greg Powers was blunt about the team's finishing ability. "We had the puck for most of the night," Powers noted, "but against a team as disciplined as St. Cloud, you can't just have the puck—you have to do something lethal with it." Arizona State (13-15-1) peppered the Husky net with 34 shots, yet only Noah Powell found the scoresheet in the second frame. The loss was exacerbated by Tyson Gross, who capitalized on a shorthanded opportunity that swung the momentum permanently toward the visitors.
+                        <span class="dropcap">T</span>he Sun Devils find themselves in a familiar position this morning: chasing a result in the ruthless NCHC. Following a 4-1 loss on Friday night that felt closer than the scoreboard indicated, head coach Greg Powers was blunt about the team's finishing ability. "We had the puck for most of the night," Powers noted, "but against a team as disciplined as St. Cloud, you can't just have the puck—you have to do something lethal with it." Arizona State (13-15-1) peppered the Husky net with 34 shots, yet only Noah Powell found the scoresheet in the second frame.
                         <br><br>
-                        Tonight’s strategy must revolve around disrupting the "structural wall" of St. Cloud State. The Huskies thrive when they can force opponents into a perimeter-based offense, relying on sophomore goaltender Patriks Berzins to swallow up low-danger chances. For ASU, the burden of creativity falls on Bennett Schimek and Cruz Lucius. Schimek, currently leading the conference in assists, will need to find the seams in the Husky penalty kill, which was a perfect 2-for-2 on Friday. If the Sun Devils can strike early and force St. Cloud to abandon their defensive shell, the atmosphere at Mullett Arena could become the sixth man they need to even the series.
+                        Tonight’s strategy must revolve around disrupting the "structural wall" of St. Cloud State. The Huskies thrive when they can force opponents into a perimeter-based offense, relying on sophomore goaltender Patriks Berzins to swallow up low-danger chances. If the Sun Devils can strike early and force St. Cloud to abandon their defensive shell, the atmosphere at Mullett Arena could become the sixth man they need to even the series.
                     </div>
-                    <div class="mt-6"><span class="nav-link" onclick="showPage('hockey')">CONTINUE TO HOCKEY PREVIEW PAGE 3A &rarr;</span></div>
+                    <div class="mt-6"><span class="nav-link" onclick="showPage('hockey')">CONTINUE TO SPORTS ANALYSIS PAGE 3A &rarr;</span></div>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-12">
                     <div class="md:col-span-2">
                         <h3 class="headline text-6xl mb-6">MUMBAI DAWN: TEAM USA EYE GOLIATH</h3>
-                        <p class="text-sm italic mb-4">By Special Dispatch | Wankhede Stadium (6:30 AM MST Start)</p>
                         <div class="columns">
                             The cricket world’s eyes turn to Mumbai this morning as the United States of America faces the ultimate test: a defending champion India side on their home turf. For the local Tempe audience, the 6:30 AM MST start time means a sunrise showdown for the American squad. Captain Monank Patel led the team onto the field after winning a crucial toss, electing to bowl first in hopes of exploiting early moisture in the Wankhede pitch. 
                             <br><br>
-                            India, led by the enigmatic Suryakumar Yadav, enters without their pace spearhead Jasprit Bumrah, who was ruled out late last night with a viral fever. This absence opens the door for Mohammed Siraj to lead the attack alongside Arshdeep Singh. The Americans will rely heavily on Saurabh Netravalkar, the former Mumbai youth captain whose knowledge of these specific conditions is unparalleled within the US camp. While the odds are heavily stacked in India's favor, the US middle order, featuring Milind Kumar and Harmeet Singh, has shown they can resist elite spin—a skill that will be tested to its absolute limit by Axar Patel and the returning Varun Chakaravarthy.
+                            India, led by the enigmatic Suryakumar Yadav, enters without their pace spearhead Jasprit Bumrah. This absence opens the door for Mohammed Siraj to lead the attack. While the odds are heavily stacked in India's favor, the US middle order has shown they can resist elite spin—a skill that will be tested to its absolute limit today.
                         </div>
-                        <div class="mt-6"><span class="nav-link" onclick="showPage('cricket')">FULL SQUADS & TACTICAL BREAKDOWN 2B &rarr;</span></div>
+                        <div class="mt-6"><span class="nav-link" onclick="showPage('cricket')">FULL SQUADS & TACTICAL ANALYSIS 2B &rarr;</span></div>
                     </div>
 
                     <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
-                        <h4 class="font-black uppercase text-xs mb-4">OFFICIAL GAMEDAY TIMES (MST)</h4>
+                        <h4 class="font-black uppercase text-xs mb-4">PREDICTION CENTER</h4>
                         <div class="space-y-4">
-                            <div>
-                                <p class="text-[10px] font-bold text-asu-maroon">PUCK DROP</p>
-                                <p class="text-sm font-black">5:00 PM — FEB 7, 2026</p>
-                                <p class="text-[9px]">Mullett Arena, Tempe</p>
+                            <div id="pred-hockey">
+                                <p class="text-[10px] font-bold text-asu-maroon">HOCKEY PROJECTION</p>
+                                <p class="text-sm font-black">ASU 3 - 2 SCSU (OT)</p>
                             </div>
-                            <div class="border-t border-slate-400 pt-2">
-                                <p class="text-[10px] font-bold text-asu-maroon">FIRST BALL (LOCAL TIME)</p>
-                                <p class="text-sm font-black">6:30 AM — FEB 7, 2026</p>
-                                <p class="text-[9px]">Wankhede Stadium, Mumbai</p>
-                                <p class="text-[9px] italic">Note: Scheduled 7:00 PM IST is 6:30 AM MST.</p>
+                            <div class="border-t border-slate-400 pt-2" id="pred-cricket">
+                                <p class="text-[10px] font-bold text-asu-maroon">CRICKET PROJECTION</p>
+                                <p class="text-sm font-black">IND 214/4 - USA 158/9</p>
                             </div>
                         </div>
                     </div>
@@ -107,70 +101,16 @@
 
             <section id="hockey" class="page-content">
                 <span class="nav-link" onclick="showPage('feed')">&larr; FRONT PAGE</span>
-                <h2 class="headline text-6xl my-8 uppercase">NCHC SERIES FINALE: STARTING VI</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:var(--asu-maroon); color:var(--asu-gold);">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/0/0a/Arizona_State_Sun_Devils_logo.svg" class="h-6">
-                            <span>ASU SUN DEVILS</span>
-                        </div>
-                        <div class="lineup-grid">
-                            <span>G: Samuel Urban #31</span><span>D: Ty Ness #10</span>
-                            <span>D: Joel Kipkie #3</span><span>F: Cruz Lucius #51</span>
-                            <span>F: Bennett Schimek #23</span><span>F: Cullen Potter #12</span>
-                        </div>
-                    </div>
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#a10209; color:white;">
-                            <div class="bg-white p-1 rounded-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/St._Cloud_State_Huskies_logo.svg/2560px-St._Cloud_State_Huskies_logo.svg.png" class="h-4"></div>
-                            <span class="ml-2">ST. CLOUD HUSKIES</span>
-                        </div>
-                        <div class="lineup-grid">
-                            <span>G: Patriks Berzins #39</span><span>D: Jack Peart #8</span>
-                            <span>D: Dylan Looft #4</span><span>F: Tyson Gross #22</span>
-                            <span>F: Verner Miettinen #19</span><span>F: Kyler Kupka #10</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <h2 class="headline text-6xl my-8 uppercase">Page 3A: The Frost Report</h2>
+                </section>
 
             <section id="cricket" class="page-content">
                 <span class="nav-link" onclick="showPage('feed')">&larr; FRONT PAGE</span>
-                <h2 class="headline text-6xl my-8 uppercase">ICC WORLD CUP: THE FULL XI</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#000080; color:white;">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg" class="h-4 border border-white">
-                            <span>TEAM INDIA OFFICIAL XI</span>
-                        </div>
-                        <div class="p-4 grid grid-cols-1 text-xs gap-1 font-bold">
-                            <span>1. Ishan Kishan (wk)</span><span>2. Abhishek Sharma</span>
-                            <span>3. Suryakumar Yadav (c)</span><span>4. Tilak Varma</span>
-                            <span>5. Rinku Singh</span><span>6. Hardik Pandya</span>
-                            <span>7. Axar Patel (vc)</span><span>8. Shivam Dube</span>
-                            <span>9. Arshdeep Singh</span><span>10. Mohammed Siraj</span>
-                            <span>11. Varun Chakaravarthy</span>
-                        </div>
-                    </div>
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#b22234; color:white;">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" class="h-4 border border-white">
-                            <span>TEAM USA OFFICIAL XI</span>
-                        </div>
-                        <div class="p-4 grid grid-cols-1 text-xs gap-1 font-bold">
-                            <span>1. Andries Gous (wk)</span><span>2. Saiteja Mukkamalla</span>
-                            <span>3. Monank Patel (c)</span><span>4. Milind Kumar</span>
-                            <span>5. Sanjay Krishnamurthi</span><span>6. Shubham Ranjane</span>
-                            <span>7. Harmeet Singh</span><span>8. Mohammad Mohsin</span>
-                            <span>9. Shadley van Schalkwyk</span><span>10. Ali Khan</span>
-                            <span>11. Saurabh Netravalkar</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <h2 class="headline text-6xl my-8 uppercase">Page 2B: Wankhede War Room</h2>
+                </section>
 
             <footer class="mt-12 border-t-4 double border-ink pt-6 text-[11px] uppercase font-bold text-center tracking-widest">
-                CERTIFIED LOCAL COVERAGE — ESTABLISHED 1890 — TEMPE'S JOURNAL OF RECORD
+                CERTIFIED LOCAL COVERAGE — ESTABLISHED 2024 — TEMPE'S JOURNAL OF RECORD
             </footer>
         </div>
 
@@ -181,28 +121,45 @@
                 window.scrollTo(0,0);
             }
 
-            const gamedays = {
-                h: new Date("February 7, 2026 17:00:00"), // 5PM MST
-                c: new Date("February 7, 2026 06:30:00")  // 6:30AM MST (Converts from 7PM IST)
+            const events = {
+                hockey: {
+                    name: "ASU vs ST. CLOUD",
+                    startTime: new Date("February 7, 2026 17:00:00"),
+                    prediction: "PREDICTION: ASU 3 - 2 SCSU (FINAL/OT)"
+                },
+                cricket: {
+                    name: "INDIA vs USA",
+                    startTime: new Date("February 7, 2026 06:30:00"),
+                    prediction: "PREDICTION: IND 214/4 - USA 158/9 (FINAL)"
+                }
             };
 
             function updateTickers() {
                 const now = new Date().getTime();
-                Object.keys(gamedays).forEach(key => {
-                    const diff = gamedays[key].getTime() - now;
-                    const h = Math.max(0, Math.floor((diff % 86400000) / 3600000)).toString().padStart(2, "0");
-                    const m = Math.max(0, Math.floor((diff % 3600000) / 60000)).toString().padStart(2, "0");
-                    const s = Math.max(0, Math.floor((diff % 60000) / 1000)).toString().padStart(2, "0");
-                    
-                    document.getElementById(`t-${key}-h`).innerText = h;
-                    document.getElementById(`t-${key}-m`).innerText = m;
-                    document.getElementById(`t-${key}-s`).innerText = s;
-                    if(document.getElementById(`t-${key}-h2`)) {
-                        document.getElementById(`t-${key}-h2`).innerText = h;
-                        document.getElementById(`t-${key}-m2`).innerText = m;
-                        document.getElementById(`t-${key}-s2`).innerText = s;
-                    }
-                });
+
+                // Handle Hockey Ticker
+                const hDiff = events.hockey.startTime.getTime() - now;
+                const hTicker = document.getElementById('ticker-hockey');
+                if (hDiff <= 0) {
+                    hTicker.innerHTML = `<span class="live-score">LIVE PREDICTION: ${events.hockey.prediction}</span>`;
+                } else {
+                    const h = Math.floor((hDiff % 86400000) / 3600000).toString().padStart(2, "0");
+                    const m = Math.floor((hDiff % 3600000) / 60000).toString().padStart(2, "0");
+                    const s = Math.floor((hDiff % 60000) / 1000).toString().padStart(2, "0");
+                    hTicker.innerHTML = `<span>PUCK DROP: ${events.hockey.name} IN</span><span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span>:<span class="ticker-box">${s}</span>`;
+                }
+
+                // Handle Cricket Ticker
+                const cDiff = events.cricket.startTime.getTime() - now;
+                const cTicker = document.getElementById('ticker-cricket');
+                if (cDiff <= 0) {
+                    cTicker.innerHTML = `<span class="live-score">LIVE PREDICTION: ${events.cricket.prediction}</span>`;
+                } else {
+                    const h = Math.floor((cDiff % 86400000) / 3600000).toString().padStart(2, "0");
+                    const m = Math.floor((cDiff % 3600000) / 60000).toString().padStart(2, "0");
+                    const s = Math.floor((cDiff % 60000) / 1000).toString().padStart(2, "0");
+                    cTicker.innerHTML = `<span>FIRST BALL: ${events.cricket.name} IN</span><span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span>:<span class="ticker-box">${s}</span>`;
+                }
             }
 
             setInterval(updateTickers, 1000);
