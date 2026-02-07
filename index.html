@@ -14,6 +14,9 @@
             .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
             .page-active { display: block; }
 
+            /* Pitchfork Logo SVG */
+            .pitchfork { width: 24px; height: 24px; fill: white; }
+
             /* Broadcast Card Aesthetics */
             .broadcast-card {
                 background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
@@ -49,33 +52,45 @@
 
         <nav class="max-w-6xl mx-auto mb-16 relative z-20 flex justify-between items-center bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-xl">
             <button onclick="showPage('feed')" class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-asu-maroon rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg transform rotate-3 italic">R</div>
+                <div class="w-10 h-10 bg-asu-maroon rounded-xl flex items-center justify-center shadow-lg transform rotate-3 transition hover:rotate-0">
+                    <svg class="pitchfork" viewBox="0 0 24 24">
+                        <path d="M7,2v3h1v10.35c0,1.24,0.81,2.35,2,2.6V22h4v-4.05c1.19-0.25,2-1.36,2-2.6V5h1V2h-2v3h-1V2h-2v3h-2V2H9v3H8V2H7z M11,18v-2.05 c-0.58-0.12-1-0.64-1-1.25V7h4v7.7c0,0.61-0.42,1.13-1,1.25V18H11z"/>
+                    </svg>
+                </div>
                 <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase italic">Armchair Commentator</h1>
             </button>
             <div class="flex space-x-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                <button onclick="showPage('feed')" class="hover:text-red-600 transition">Posts</button>
-                <button onclick="showPage('upcoming')" class="hover:text-red-600 transition">Countdown & Calendar</button>
+                <button onclick="showPage('feed')" class="hover:text-red-600 transition">Blog Feed</button>
+                <button onclick="showPage('upcoming')" class="hover:text-red-600 transition">Tournament View</button>
             </div>
         </nav>
 
         <main id="feed" class="page-content page-active animate__animated animate__fadeIn">
             <div class="max-w-5xl mx-auto">
                 <div class="mb-12">
-                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">Gameday Eve Analysis</span>
-                    <h2 class="text-7xl font-black italic tracking-tighter uppercase mt-2">The Heritage <br><span class="text-red-600">Showdown.</span></h2>
+                    <span class="text-red-600 font-black text-[10px] uppercase tracking-[0.3em]">Latest Entries</span>
+                    <h2 class="text-6xl font-black italic tracking-tighter uppercase mt-2">The Analyst's <span class="text-red-600">Notebook.</span></h2>
                 </div>
 
-                <div class="bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:shadow-red-900/10" onclick="showPage('full-story')">
+                <div class="bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.005]" onclick="showPage('full-story')">
                     <div class="p-10">
                         <div class="flex items-center space-x-2 mb-4">
-                            <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">Breaking: Rana Out</span>
-                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">Siraj In</span>
+                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Featured Post</span>
+                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Feb 06, 2026</span>
                         </div>
-                        <p class="text-3xl text-slate-800 leading-tight font-black uppercase italic mb-6">
-                            Homecoming, Heartbreak, & The Heat: <br>Full Wankhede Preview.
+                        <p class="text-4xl text-slate-800 leading-tight font-black uppercase italic mb-6">
+                            Blue Blood vs. The New World: <br>Why IND v USA is the heart of 2026.
                         </p>
-                        <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">View Full Analysis & Score Prediction →</div>
+                        <p class="text-slate-500 text-sm mb-8 leading-relaxed max-w-2xl italic">
+                            Analyzing the tactical fallout of Harshit Rana's warmup injury and Saurabh Netravalkar's historic Wankhede homecoming.
+                        </p>
+                        <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">Open Story Analysis →</div>
                     </div>
+                </div>
+
+                <div class="mt-8 opacity-50 grayscale p-10 border-2 border-dashed border-slate-300 rounded-[2.5rem]">
+                    <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Upcoming Analysis</span>
+                    <p class="text-xl text-slate-400 font-black uppercase italic mt-2">The Spin-Choke: Can Kuldeep dismantle the Group B heavyweights?</p>
                 </div>
             </div>
         </main>
@@ -88,12 +103,11 @@
 
                 <div class="prose prose-lg text-slate-700 max-w-none">
                     <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Injury Report: The Rana Setback</h3>
-                    <p>The biggest news out of the Indian camp is the confirmed withdrawal of <strong>Harshit Rana</strong>. A side-strain sustained during the final warmup match against UAE has forced the selectors' hand. While many hoped for Rana’s raw pace to unsettle the American top order, India has turned back to the "Miyan Magic"—<strong>Mohammed Siraj</strong>. Siraj’s experience in high-pressure ICC knockouts provides a tactical floor that Rana’s high-ceiling mystery simply couldn't match right now.</p>
+                    <p>In a crushing blow to India’s pace-bowling rotation, <strong>Harshit Rana</strong> has been officially ruled out of the 2026 T20 World Cup. The injury, a high-grade side strain, occurred during his second over in the final warmup match against the UAE. While fans were eager to see his raw pace, the BCCI has fast-tracked <strong>Mohammed Siraj</strong> from the reserves. Siraj brings a wealth of Wankhede experience, but the question remains: does India lose that "unpredictable edge" that Rana provided?</p>
 
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Tactical Prediction: The "Netravalkar" Effect</h3>
-                    <p>Expect USA to bowl first if they win the toss. They know the evening dew at Wankhede turns the surface into a skid-fest. <strong>Saurabh Netravalkar</strong> will likely target Abhishek Sharma’s outside edge early. If USA can pinch two wickets in the first four overs, the middle-order battle between Hardik Pandya and the USA’s spin-duo (Harmeet & Van Schalkwyk) becomes a grind India isn't used to.</p>
+                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Homecoming Narrative</h3>
+                    <p>For <strong>Saurabh Netravalkar</strong>, tomorrow is more than a match—it's an alternate-reality homecoming. Bowling from the Tata End at the Wankhede, where he once represented Mumbai, but doing so in USA stars and stripes, is the most poetic storyline of the tournament. Tactically, his left-arm angle across Abhishek Sharma will be the first "Boss Level" test of the game.</p>
 
-                    
                     <div class="broadcast-card rounded-[2rem] overflow-hidden my-16 shadow-2xl">
                         <div class="bg-slate-950 p-4 text-center border-b border-white/10">
                             <span class="titillium text-asu-gold text-sm font-black italic uppercase tracking-[0.3em]">Official Predicted XI // Group A</span>
@@ -140,16 +154,17 @@
                         </div>
                     </div>
 
+                    
                     <div class="bg-asu-maroon rounded-[2.5rem] p-10 text-white mb-16 shadow-xl">
-                        <h4 class="text-asu-gold font-black italic text-3xl uppercase mb-6">Armchair Prediction</h4>
-                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <h4 class="text-asu-gold font-black italic text-3xl uppercase mb-6">The Verdict</h4>
+                        <div class="grid md:grid-cols-2 gap-8 items-center border-t border-white/10 pt-8">
                             <div>
-                                <div class="mb-4"><span class="block text-white/40 text-[10px] font-black uppercase mb-1">Predicted Score (Batting First)</span><p class="text-4xl font-black">INDIA: 188/6 <span class="text-sm text-asu-gold italic">(20.0)</span></p></div>
-                                <div><span class="block text-white/40 text-[10px] font-black uppercase mb-1">Chasing Target</span><p class="text-4xl font-black">USA: 162/9 <span class="text-sm text-asu-gold italic">(20.0)</span></p></div>
+                                <div class="mb-4"><span class="block text-white/40 text-[10px] font-black uppercase mb-1">Predicted Total</span><p class="text-4xl font-black italic">INDIA: 194/5</p></div>
+                                <div><span class="block text-white/40 text-[10px] font-black uppercase mb-1">USA Chase</span><p class="text-4xl font-black italic">USA: 168/8</p></div>
                             </div>
-                            <div class="border-l border-white/10 pl-8">
-                                <p class="text-lg font-bold italic mb-4">"The Result: India wins by 26 runs."</p>
-                                <p class="text-xs text-white/60 leading-relaxed">Key Moment: Jasprit Bumrah removes Andries Gous in the 3rd over, breaking the USA's momentum early. Saurabh Netravalkar finishes with a respectable 2/28.</p>
+                            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                                <p class="text-sm font-bold italic mb-4">"Result: India wins by 26 runs."</p>
+                                <p class="text-xs text-white/60 leading-relaxed uppercase tracking-tighter">India’s strike-rate evolution will be too much for the USA’s spin-heavy middle overs. Prediction: Suryakumar Yadav MOTM.</p>
                             </div>
                         </div>
                     </div>
@@ -177,7 +192,7 @@
                         <div class="cal-grid" id="cal-ind"></div>
                         <p class="text-[9px] mt-4 font-bold text-slate-400">Feb 01: Training starts in Mumbai</p>
                     </div>
-                    <div class="calendar-mini border-asu-gold border-2">
+                    <div class="calendar-mini border-asu-gold border-2 ring-4 ring-asu-maroon/10">
                         <h5 class="font-black text-[10px] uppercase tracking-widest text-red-600 mb-4 italic">GAMEDAY: IND v USA</h5>
                         <div class="cal-grid" id="cal-game"></div>
                         <p class="text-[9px] mt-4 font-bold text-red-600">Feb 07: Live from Wankhede</p>
@@ -212,7 +227,7 @@
             setInterval(updateCountdown, 1000);
             updateCountdown();
 
-            // Render Mini Calendars
+            // Render Calendars
             function renderCal(elementId, activeDay) {
                 const container = document.getElementById(elementId);
                 const days = ['S','M','T','W','T','F','S'];
@@ -226,7 +241,7 @@
             renderCal('cal-game', 7);
             renderCal('cal-super', 14);
 
-            // BG Particles
+            // Particles
             const bubbleCont = document.getElementById('bubble-container');
             for (let i = 0; i < 15; i++) {
                 const bubble = document.createElement('div');
