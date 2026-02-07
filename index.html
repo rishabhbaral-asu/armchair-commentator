@@ -12,50 +12,26 @@
                 --asu-maroon: #8c1d40;
                 --asu-gold: #ffc627;
                 --scsu-red: #cc0000;
-                --india-blue: #133463;
-                --usa-red: #d00027;
+                --india-orange: #ff9933;
+                --usa-blue: #002868;
             }
             body { font-family: "Inter", sans-serif; background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%); min-height: 100vh; }
             .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
             .page-active { display: block; }
             
-            .blog-card {
-                min-height: 320px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                border: 1px solid rgba(0,0,0,0.05);
-            }
+            .blog-card { min-height: 320px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0,0,0,0.05); }
 
-            .flip-box {
-                background: #2a0a14;
-                color: var(--asu-gold);
-                border-radius: 8px;
-                padding: 0.8rem 0.2rem;
-                min-width: 55px;
-                text-align: center;
-                font-family: "monospace";
-                box-shadow: 0 4px 0 #000;
-                border: 1px solid var(--asu-gold);
-            }
-            .calendar-grid {
-                display: grid;
-                grid-template-columns: repeat(7, 1fr);
-                gap: 2px;
-                background: #5c132a;
-                padding: 4px;
-                border-radius: 6px;
-                font-size: 0.5rem;
-            }
+            .flip-box { background: #2a0a14; color: var(--asu-gold); border-radius: 8px; padding: 0.8rem 0.2rem; min-width: 55px; text-align: center; font-family: "monospace"; box-shadow: 0 4px 0 #000; border: 1px solid var(--asu-gold); }
+            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: #5c132a; padding: 4px; border-radius: 6px; font-size: 0.5rem; }
             .cal-day { background: var(--asu-maroon); padding: 2px; text-align: center; border-radius: 2px; color: white; }
             .cal-target { background: white; color: var(--asu-maroon); font-weight: 900; }
 
-            .roster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
             .broadcast-card { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); border: 1px solid rgba(255,255,255,0.1); }
             .player-row { background: rgba(255,255,255,0.03); border-left: 3px solid var(--asu-gold); margin-bottom: 2px; padding: 4px 10px; font-size: 11px; }
             .scsu-row { border-left-color: var(--scsu-red); }
-            .india-row { border-left-color: #ff9933; }
-            .usa-row { border-left-color: #002868; }
+            .india-row { border-left-color: var(--india-orange); }
+            .usa-row { border-left-color: var(--usa-blue); }
+            .reserve-row { border-left-style: dashed; opacity: 0.6; font-style: italic; }
             
             .floating-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
             .bubble { position: absolute; bottom: -100px; background: rgba(140, 29, 64, 0.05); border-radius: 50%; animation: rise 15s infinite ease-in; }
@@ -78,18 +54,18 @@
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="blog-card bg-white/80 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl transition-all hover:scale-[1.01] cursor-pointer" onclick="showPage('hockey-story')">
                         <div>
-                            <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">NCHC Preview</span>
-                            <h2 class="text-4xl font-black italic uppercase mt-4">Desert Ice: <br>Huskies at the Mullett</h2>
-                            <p class="text-slate-500 text-sm mt-4 italic">Analysis of Bennett Schimek's record chase and the SCSU defensive strategy.</p>
+                            <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">NCHC Gameday</span>
+                            <h2 class="text-4xl font-black italic uppercase mt-4">Ice, Sand, and <br>Single-Season Records</h2>
+                            <p class="text-slate-500 text-sm mt-4 italic">SCSU's debut at the Mullett and the Schimek legacy.</p>
                         </div>
                         <div class="text-asu-maroon font-black text-[10px] mt-6 uppercase">Read Deep Dive →</div>
                     </div>
 
                     <div class="blog-card bg-white/80 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl transition-all hover:scale-[1.01] cursor-pointer" onclick="showPage('full-story')">
                         <div>
-                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">World Cup T20</span>
-                            <h2 class="text-4xl font-black italic uppercase mt-4">Wankhede War: <br>Green Card vs. Aadhaar</h2>
-                            <p class="text-slate-500 text-sm mt-4 italic">India's pace-heavy rotation vs USA's Mumbai-rooted stars.</p>
+                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">T20 World Cup</span>
+                            <h2 class="text-4xl font-black italic uppercase mt-4">Wankhede Homecoming: <br>IND vs USA</h2>
+                            <p class="text-slate-500 text-sm mt-4 italic">Siraj's emergency call-up and Netravalkar's Mumbai return.</p>
                         </div>
                         <div class="text-asu-maroon font-black text-[10px] mt-6 uppercase">Open Analysis →</div>
                     </div>
@@ -98,37 +74,37 @@
         </main>
 
         <section id="hockey-story" class="page-content animate__animated animate__fadeIn">
-            <div class="max-w-5xl mx-auto px-4 pb-20">
+            <div class="max-w-6xl mx-auto px-4 pb-20">
                 <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase mb-8">← Back</button>
-                <h1 class="text-7xl font-black italic uppercase text-asu-maroon leading-none">NCHC <br>Showdown.</h1>
+                <h1 class="text-7xl font-black italic uppercase text-asu-maroon leading-none mb-8">NCHC <br>Showdown.</h1>
                 
-                <div class="grid lg:grid-cols-3 gap-12 mt-12">
+                <div class="grid lg:grid-cols-3 gap-12">
                     <div class="lg:col-span-2 prose prose-lg text-slate-700">
-                        <p class="font-bold text-xl text-slate-900">The battle for the desert begins as Arizona State hosts St. Cloud State in a critical conference clash.</p>
-                        <p>Arizona State enters the weekend looking to leverage home-ice advantage at Mullett Arena. The Sun Devils have shown a penchant for explosive offensive bursts, led by senior **Bennett Schimek**. Schimek's ability to navigate tight defensive zones has him on track for a record-breaking season, but he faces a disciplined St. Cloud State unit that prioritizes high-percentage shot blocking. The Huskies' veteran presence, particularly **Josh Zinger** on the blue line, will be tasked with neutralizing ASU's speed on the wings.</p>
-                        <p>Goaltending remains the x-factor. **Samuel Urban** has been a pillar for the Sun Devils, often bailing out an aggressive defensive corps that likes to join the rush. St. Cloud State, meanwhile, relies on a balanced four-line attack to wear down opponents. If ASU can capitalize on early power-play opportunities, they may force SCSU out of their defensive shell.</p>
+                        <p class="font-bold text-xl text-slate-900">ASU Hockey returns to Mullett Arena following a split at Colorado College, facing a St. Cloud State team making its first-ever trip to Tempe.</p>
+                        <p>The narrative centers on <strong>Bennett Schimek</strong>. Currently leading the NCHC in assists (27), Schimek is within striking distance of the program's single-season points record. His synergy with <strong>Cruz Lucius</strong> has made the Sun Devils the only team in the country with two players over the 110-career point mark. Defensively, ASU leans on <strong>Samuel Urban</strong>, whose Mike Richter Award watchlist inclusion is well-earned after eight games of 30+ saves this season.</p>
+                        <p>St. Cloud State arrives desperate for a bounce-back. After being swept by Miami (OH), the Huskies are leaning on sophomore <strong>Austin Burnevik</strong> (15 goals) and faceoff specialist <strong>Tyson Gross</strong>, who leads the NCAA in draws won. The Huskies' discipline in the faceoff circle will be the primary obstacle to ASU's puck possession game.</p>
+                        
+                        <div class="bg-asu-maroon/5 border-l-4 border-asu-maroon p-6 my-8 rounded-r-xl">
+                            <h4 class="text-asu-maroon font-black uppercase text-sm mb-2">Score Prediction</h4>
+                            <p class="text-4xl font-black italic">ASU 4 - 2 SCSU</p>
+                            <p class="text-xs text-slate-500 mt-2 italic">Urban's save percentage (.914) to be the deciding factor against a high-volume Husky attack.</p>
+                        </div>
                     </div>
                     
                     <div class="broadcast-card rounded-3xl p-6 text-white h-fit">
-                        <h3 class="text-asu-gold font-black uppercase text-sm mb-4 border-b border-white/10 pb-2">Gameday Rosters</h3>
+                        <h3 class="text-asu-gold font-black uppercase text-xs mb-4 border-b border-white/10 pb-2">Gameday Rotation</h3>
                         <div class="space-y-6">
                             <div>
-                                <p class="text-[9px] uppercase font-black text-white/40 mb-2">Arizona State Starters</p>
-                                <div class="player-row">B. Schimek (RW)</div>
-                                <div class="player-row">K. Smolen (C)</div>
-                                <div class="player-row">C. Lucius (LW)</div>
-                                <div class="player-row">J. Kipkie (D)</div>
-                                <div class="player-row">J. Kjellberg (D)</div>
-                                <div class="player-row">S. Urban (G)</div>
+                                <p class="text-[9px] uppercase font-black text-white/40 mb-2">Arizona State</p>
+                                <div class="player-row">B. Schimek (F)</div><div class="player-row">K. Smolen (F)</div>
+                                <div class="player-row">C. Lucius (F)</div><div class="player-row">J. Kipkie (D)</div>
+                                <div class="player-row">J. Kjellberg (D)</div><div class="player-row">S. Urban (G)</div>
                             </div>
                             <div>
-                                <p class="text-[9px] uppercase font-black text-red-400 mb-2">St. Cloud State Starters</p>
-                                <div class="player-row scsu-row">G. Ahcan (F)</div>
-                                <div class="player-row scsu-row">T. Gross (F)</div>
-                                <div class="player-row scsu-row">A. Ingram (F)</div>
-                                <div class="player-row scsu-row">J. Zinger (D)</div>
-                                <div class="player-row scsu-row">C. Wylie (D)</div>
-                                <div class="player-row scsu-row">P. Bērziņš (G)</div>
+                                <p class="text-[9px] uppercase font-black text-red-400 mb-2">St. Cloud State</p>
+                                <div class="player-row scsu-row">A. Burnevik (F)</div><div class="player-row scsu-row">T. Gross (F)</div>
+                                <div class="player-row scsu-row">G. Ahcan (F)</div><div class="player-row scsu-row">J. Zinger (D)</div>
+                                <div class="player-row scsu-row">C. Wylie (D)</div><div class="player-row scsu-row">P. Berzins (G)</div>
                             </div>
                         </div>
                     </div>
@@ -139,53 +115,56 @@
         <section id="full-story" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-6xl mx-auto px-4 pb-20">
                 <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase mb-8">← Back</button>
-                <h1 class="text-7xl font-black italic uppercase text-red-600 leading-none">Wankhede <br>Return.</h1>
+                <h1 class="text-7xl font-black italic uppercase text-red-600 leading-none mb-8">Wankhede <br>Return.</h1>
                 
-                <div class="grid lg:grid-cols-2 gap-12 mt-12">
+                <div class="grid lg:grid-cols-2 gap-12">
                     <div class="prose prose-lg text-slate-700">
-                        <p class="font-bold text-xl text-slate-900">A high-stakes Group A opener sees the defending champions meet the rising American force.</p>
-                        <p>India's strategy at the Wankhede is clear: use raw pace to disrupt the USA's top order. With **Mohammed Siraj** replacing **Harshit Rana**, India gains an experienced operator who understands Mumbai's swing conditions. **Suryakumar Yadav** leads a side that is transitioning away from the Rohit-Virat era, placing immense pressure on **Abhishek Sharma** to provide the fireworks.</p>
-                        <p>The USA isn't just an underdog; they are a squad full of local knowledge. **Saurabh Netravalkar**, formerly of Mumbai, knows every crack in this pitch. The inclusion of **Shubham Ranjane**, another Mumbai domestic veteran, gives the USA a "home-away-from-home" advantage that could bridge the talent gap.</p>
+                        <p class="font-bold text-xl text-slate-900">India begins its T20 title defense against a USA side that functionally feels like a "Mumbai B" team due to its local connections.</p>
+                        <p>The late injury to <strong>Harshit Rana</strong> has forced a tactical shift, with <strong>Mohammed Siraj</strong> joining the squad to exploit the Wankhede’s evening swing. India’s transition away from the Rohit-Virat era is complete; the focus is now on <strong>Abhishek Sharma's</strong> explosive powerplay intent and <strong>Suryakumar Yadav's</strong> 360-degree dominance on his home ground.</p>
+                        <p>USA’s <strong>Saurabh Netravalkar</strong> returns to the ground where he spent his formative years. Alongside <strong>Shubham Ranjane</strong>, he represents a USA unit that understands Mumbai's "red soil" bounce better than most associate nations. Their primary challenge will be surviving <strong>Jasprit Bumrah’s</strong> opening spell to set a platform for <strong>Andries Gous</strong> and <strong>Monank Patel</strong>.</p>
+
+                        <div class="bg-slate-900 text-white p-8 rounded-3xl border-2 border-asu-gold my-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-asu-gold font-black uppercase text-xs mb-1 tracking-widest">Toss Prediction</h4>
+                                    <p class="text-sm font-bold italic text-white/80">India wins toss, elects to bowl first.</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[8px] bg-red-600 px-2 py-1 rounded font-black">LIVE ODDS: 1.001</span>
+                                </div>
+                            </div>
+                            <h4 class="text-asu-gold font-black uppercase text-xs mb-2">Score Prediction</h4>
+                            <p class="text-5xl font-black italic">IND 192/6 (20) <br><span class="text-red-500">USA 158/8 (20)</span></p>
+                            <p class="text-[10px] text-slate-400 mt-4 uppercase font-black">India win by 34 runs</p>
+                        </div>
                     </div>
 
-                    <div class="broadcast-card rounded-3xl p-8 text-white">
-                        <h3 class="text-asu-gold font-black uppercase text-sm mb-6 text-center border-b border-white/10 pb-4">Full 15-Man Tournament Squads</h3>
-                        <div class="grid grid-cols-2 gap-8">
+                    <div class="broadcast-card rounded-3xl p-6 text-white overflow-hidden">
+                        <h3 class="text-asu-gold font-black uppercase text-xs mb-6 text-center border-b border-white/10 pb-4">Predicted XI & Tactical Reserves</h3>
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-1">
-                                <p class="text-[10px] font-black text-orange-400 uppercase mb-3 tracking-widest">India (IND)</p>
-                                <div class="player-row india-row">Suryakumar Yadav (C)</div>
-                                <div class="player-row india-row">Abhishek Sharma</div>
-                                <div class="player-row india-row">Ishan Kishan (WK)</div>
-                                <div class="player-row india-row">Tilak Varma</div>
-                                <div class="player-row india-row">Sanju Samson</div>
-                                <div class="player-row india-row">Shivam Dube</div>
-                                <div class="player-row india-row">Hardik Pandya</div>
-                                <div class="player-row india-row">Rinku Singh</div>
-                                <div class="player-row india-row">Axar Patel</div>
-                                <div class="player-row india-row">Washington Sundar</div>
-                                <div class="player-row india-row">Jasprit Bumrah</div>
-                                <div class="player-row india-row">Arshdeep Singh</div>
-                                <div class="player-row india-row">Mohammed Siraj</div>
+                                <p class="text-[10px] font-black text-orange-400 uppercase mb-2">India (IND)</p>
+                                <div class="player-row india-row">Ishan Kishan (WK)</div><div class="player-row india-row">Abhishek Sharma</div>
+                                <div class="player-row india-row">Suryakumar Yadav (C)</div><div class="player-row india-row">Tilak Varma</div>
+                                <div class="player-row india-row">Hardik Pandya</div><div class="player-row india-row">Rinku Singh</div>
+                                <div class="player-row india-row">Shivam Dube</div><div class="player-row india-row">Axar Patel (VC)</div>
+                                <div class="player-row india-row">Arshdeep Singh</div><div class="player-row india-row">Jasprit Bumrah</div>
                                 <div class="player-row india-row">Varun Chakravarthy</div>
-                                <div class="player-row india-row">Kuldeep Yadav</div>
+                                <p class="text-[8px] font-black text-white/30 uppercase mt-4 mb-1">Reserves</p>
+                                <div class="player-row india-row reserve-row">Sanju Samson</div><div class="player-row india-row reserve-row">Mohammed Siraj</div>
+                                <div class="player-row india-row reserve-row">Kuldeep Yadav</div><div class="player-row india-row reserve-row">Washington Sundar</div>
                             </div>
                             <div class="space-y-1">
-                                <p class="text-[10px] font-black text-blue-400 uppercase mb-3 tracking-widest">United States (USA)</p>
-                                <div class="player-row usa-row">Monank Patel (C/WK)</div>
-                                <div class="player-row usa-row">Andries Gous</div>
-                                <div class="player-row usa-row">Saiteja Mukkamalla</div>
-                                <div class="player-row usa-row">Milind Kumar</div>
-                                <div class="player-row usa-row">Shayan Jahangir</div>
-                                <div class="player-row usa-row">Shehan Jayasuriya</div>
-                                <div class="player-row usa-row">Sanjay Krishnamurthi</div>
-                                <div class="player-row usa-row">Harmeet Singh</div>
-                                <div class="player-row usa-row">Nosthush Kenjige</div>
-                                <div class="player-row usa-row">Shadley Van Schalkwyk</div>
+                                <p class="text-[10px] font-black text-blue-400 uppercase mb-2">United States (USA)</p>
+                                <div class="player-row usa-row">Monank Patel (C/WK)</div><div class="player-row usa-row">Andries Gous</div>
+                                <div class="player-row usa-row">Saiteja Mukkamalla</div><div class="player-row usa-row">Shayan Jahangir</div>
+                                <div class="player-row usa-row">Milind Kumar</div><div class="player-row usa-row">Harmeet Singh</div>
+                                <div class="player-row usa-row">Shubham Ranjane</div><div class="player-row usa-row">Mohammad Mohsin</div>
+                                <div class="player-row usa-row">Ali Khan</div><div class="player-row usa-row">Nosthush Kenjige</div>
                                 <div class="player-row usa-row">Saurabh Netravalkar</div>
-                                <div class="player-row usa-row">Ali Khan</div>
-                                <div class="player-row usa-row">Jessy Singh</div>
-                                <div class="player-row usa-row">Mohammad Mohsin</div>
-                                <div class="player-row usa-row">Shubham Ranjane</div>
+                                <p class="text-[8px] font-black text-white/30 uppercase mt-4 mb-1">Reserves</p>
+                                <div class="player-row usa-row reserve-row">Jessy Singh</div><div class="player-row usa-row reserve-row">Sanjay Krishnamurthi</div>
+                                <div class="player-row usa-row reserve-row">Shadley Van Schalkwyk</div><div class="player-row usa-row reserve-row">Shehan Jayasuriya</div>
                             </div>
                         </div>
                     </div>
