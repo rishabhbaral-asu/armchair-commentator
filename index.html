@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Gameday Cohesive Edition</title>
+        <title>The Tempe Torch | Local Timezone Edition</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -52,16 +52,20 @@
             .page-content { display: none; }
             .page-active { display: block; }
             .nav-link { font-weight: bold; text-transform: uppercase; font-size: 0.7rem; text-decoration: underline; cursor: pointer; color: var(--asu-maroon); }
+
+            /* SCHEDULE BLOCK */
+            .schedule-block { border: 1px dashed var(--ink); padding: 15px; margin-bottom: 20px; background: rgba(255,198,39,0.1); }
+            .schedule-item { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; }
         </style>
     </head>
     <body>
 
         <div class="ticker-wrap">
             <div class="ticker-content">
-                <div class="ticker-item"><span>NCHC REMATCH: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h">00</span>:<span class="ticker-box" id="t-h-m">00</span>:<span class="ticker-box" id="t-h-s">00</span></div>
-                <div class="ticker-item"><span>WANKHEDE OPENER: INDIA vs USA IN</span><span class="ticker-box" id="t-c-h">00</span>:<span class="ticker-box" id="t-c-m">00</span>:<span class="ticker-box" id="t-c-s">00</span></div>
-                <div class="ticker-item"><span>BREAKING: BUMRAH OUT (FEVER) - SIRAJ TO START</span></div>
-                <div class="ticker-item"><span>NCHC REMATCH: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h2">00</span>:<span class="ticker-box" id="t-h-m2">00</span>:<span class="ticker-box" id="t-h-s2">00</span></div>
+                <div class="ticker-item"><span>PUCK DROP: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h">00</span>:<span class="ticker-box" id="t-h-m">00</span>:<span class="ticker-box" id="t-h-s">00</span></div>
+                <div class="ticker-item"><span>FIRST BALL: INDIA vs USA IN</span><span class="ticker-box" id="t-c-h">00</span>:<span class="ticker-box" id="t-c-m">00</span>:<span class="ticker-box" id="t-c-s">00</span></div>
+                <div class="ticker-item"><span>REMINDER: ALL COUNTDOWNS IN LOCAL MST TIME</span></div>
+                <div class="ticker-item"><span>PUCK DROP: ASU vs ST. CLOUD IN</span><span class="ticker-box" id="t-h-h2">00</span>:<span class="ticker-box" id="t-h-m2">00</span>:<span class="ticker-box" id="t-h-s2">00</span></div>
             </div>
         </div>
 
@@ -71,26 +75,38 @@
                 <div class="date-line">
                     <span>Final Saturday Edition</span>
                     <span>February 7, 2026</span>
-                    <span>Tempe, Arizona — 1¢</span>
+                    <span>Tempe, Arizona — Local Time Zone</span>
                 </div>
             </header>
 
             <main id="feed" class="page-content page-active">
                 <div class="grid md:grid-cols-3 gap-12">
                     <div class="md:col-span-2 border-r border-slate-300 pr-10">
+                        
+                        <div class="schedule-block">
+                            <h5 class="text-[10px] font-black uppercase mb-3 border-b border-ink pb-1">Gameday Schedule (MST)</h5>
+                            <div class="schedule-item">
+                                <span>🏒 ASU vs St. Cloud State (Puck Drop)</span>
+                                <span>5:00 PM - Feb 7, 2026</span>
+                            </div>
+                            <div class="schedule-item">
+                                <span>🏏 India vs USA (First Ball)</span>
+                                <span>7:30 PM - Feb 7, 2026</span>
+                            </div>
+                        </div>
+
                         <article>
                             <h2 class="headline text-7xl mb-4">Redemption at the Mullett</h2>
                             <span class="subheadline">Sun Devils seek to crack the Husky structural trap after Friday night frustration.</span>
                             <div class="columns text-sm">
                                 <span class="dropcap">T</span>he mission for Arizona State tonight is clear: find the slot. After a 4-1 loss where they dominated the shot clock but failed to penetrate the high-danger zones, the Sun Devils return to center ice tonight. Coach Powers has emphasized lateral puck movement to force St. Cloud's Patriks Berzins out of his crease. Tonight's rematch is a litmus test for an ASU power play that struggled to find its rhythm in the series opener.
                             </div>
-                            <div class="mt-6 flex gap-4">
+                            <div class="mt-6">
                                 <span class="nav-link" onclick="showPage('hockey')">Read the Full Tactical Preview &rarr;</span>
                             </div>
                         </article>
 
                         <div class="mt-12 border-t-2 border-ink pt-8">
-                            <h3 class="headline text-4xl mb-6">Lineups for the Night</h3>
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div class="lineup-card">
                                     <div class="lineup-header" style="background:var(--asu-maroon); color:var(--asu-gold);">
@@ -123,10 +139,10 @@
                     <div class="space-y-8">
                         <div>
                             <h3 class="font-black border-b-4 border-ink mb-4 uppercase text-xs pb-1">International News</h3>
-                            <h4 class="headline text-3xl mb-2">Mumbai Tensions High</h4>
-                            <p class="text-xs italic mb-3">India vs USA: A 2026 World Cup Clash</p>
-                            <p class="text-sm leading-snug text-justify mb-4">With Jasprit Bumrah sidelined by a late-onset fever, the Indian pace attack rests on Mohammed Siraj. USA captain Monank Patel has opted to bowl, hoping for early movement under the Wankhede floodlights.</p>
-                            <span class="nav-link" onclick="showPage('cricket')">Full Scorecard & Squads &rarr;</span>
+                            <h4 class="headline text-3xl mb-2">Wankhede Drama</h4>
+                            <p class="text-xs italic mb-3">First Ball: 7:30 PM Local Time</p>
+                            <p class="text-sm leading-snug text-justify mb-4">India defends their crown without Bumrah. USA opts to bowl first in the evening dew of Mumbai.</p>
+                            <span class="nav-link" onclick="showPage('cricket')">Full Squads &rarr;</span>
                         </div>
 
                         <div class="lineup-card">
@@ -147,38 +163,22 @@
 
             <section id="hockey" class="page-content">
                 <span class="nav-link" onclick="showPage('feed')">&larr; Back to Front Page</span>
-                <h2 class="headline text-6xl my-6">Anatomy of the Rematch</h2>
+                <h2 class="headline text-6xl my-6">Tactical Rematch: 5:00 PM Puck Drop</h2>
                 <div class="columns text-md">
-                    <p>Friday night's 4-1 scoreline was deceptive. ASU outshot St. Cloud 34-18, yet the Huskies' defensive structure remained unbroken. The key for tonight lies in the Sun Devils' power play (0-for-2 on Friday). With Bennett Schimek and Cruz Lucius operating the half-wall, the objective is to pull the SCSU defenders out of the low slot.</p>
-                    <p>Defensively, ASU must account for Tyson Gross. His ability to leak behind the defense for odd-man rushes was the difference maker in the opener. Expect Samuel Urban to start in net again; despite the loss, his tracking of the puck remained sharp through two periods.</p>
+                    <p>ASU must break the lateral seal. Friday night proved that shooting high and central won't beat Berzins. Tonight's strategy requires cross-crease passes and screening to make the most of the Mullett home ice advantage.</p>
                 </div>
             </section>
 
             <section id="cricket" class="page-content">
                 <span class="nav-link" onclick="showPage('feed')">&larr; Back to Front Page</span>
-                <h2 class="headline text-6xl my-6">The Wankhede Homecoming</h2>
+                <h2 class="headline text-6xl my-6">World Cup: 7:00 AM First Ball</h2>
                 <div class="columns text-md">
-                    <p>For Saurabh Netravalkar, this match is a full-circle moment. Playing on the Mumbai soil where he was raised, the USA's leading seamer faces an Indian lineup that has been forced to adapt. The loss of Bumrah is massive for India, but it provides a platform for Mohammed Siraj to prove he is still the king of the white-ball opener.</p>
-                    <p>The USA middle order, featuring Harmeet Singh and Milind Kumar, will be tested by the spin-twins Ravi Bishnoi and Varun Chakravarthy on a pitch that is expected to grip as the evening progresses.</p>
-                </div>
-                
-                <div class="mt-10 lineup-card">
-                    <div class="lineup-header" style="background:#b22234; color:white;">
-                        <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USA">
-                        <span>USA 2026 World Cup Roster</span>
-                    </div>
-                    <div class="lineup-grid">
-                        <span>1. Monank Patel</span><span>2. Andries Gous</span>
-                        <span>3. S. Mukkamalla</span><span>4. Milind Kumar</span>
-                        <span>5. S. Krishnamurthi</span><span>6. Shayan Jahangir</span>
-                        <span>7. Harmeet Singh</span><span>8. S. Ranjane</span>
-                        <span>9. S. van Schalkwyk</span><span>10. S. Netravalkar</span>
-                    </div>
+                    <p>India’s 2026 squad represents a transition of power. With SKY at the helm and Abhishek Sharma opening, the aggression is dialed to the maximum. USA will counter with the disciplined seam of Saurabh Netravalkar.</p>
                 </div>
             </section>
 
             <footer class="mt-12 border-t-4 double border-ink pt-6 text-[10px] uppercase font-bold text-center tracking-widest">
-                Official Journal of record — Arizona State University — Est. 1890
+                Official Journal of record — ASU — Est. 1890
             </footer>
         </div>
 
@@ -189,9 +189,10 @@
                 window.scrollTo(0,0);
             }
 
+            // DATES IN LOCAL MST TIME
             const gamedays = {
                 h: new Date("February 7, 2026 17:00:00"),
-                c: new Date("February 7, 2026 19:30:00")
+                c: new Date("February 7, 2026 07:00:00")
             };
 
             function updateTickers() {
