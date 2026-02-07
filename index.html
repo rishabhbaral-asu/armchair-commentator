@@ -32,15 +32,46 @@
             .ind-row { border-left-color: #3b82f6; }
             .usa-row { border-left-color: #ef4444; }
 
-            /* Countdown Styles */
-            .flip-box { background: #020617; color: var(--asu-gold); border-radius: 12px; padding: 1.5rem; min-width: 90px; text-align: center; box-shadow: 0 8px 0 #000; border: 1px solid rgba(255,198,39,0.3); }
+            /* Exact flip-box styling from portfolio */
+            .flip-box {
+                background: #2a0a14;
+                color: var(--asu-gold);
+                border-radius: 8px;
+                padding: 0.8rem 0.2rem;
+                min-width: 55px;
+                text-align: center;
+                font-family: "monospace";
+                box-shadow: 0 4px 0 #000;
+                border: 1px solid var(--asu-gold);
+            }
             
-            /* Calendar Styles */
-            .calendar-mini { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; }
-            .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.65rem; }
-            .cal-day { padding: 4px; font-weight: 700; color: #cbd5e1; }
-            .cal-active { background: var(--asu-maroon); color: white !important; border-radius: 4px; }
-
+            /* Exact calendar grid from portfolio */
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 2px;
+                background: #5c132a;
+                padding: 4px;
+                border-radius: 6px;
+                font-size: 0.5rem;
+            }
+            .cal-day {
+                background: #8c1d40;
+                padding: 2px;
+                text-align: center;
+                border-radius: 2px;
+                color: white;
+            }
+            .cal-today {
+                background: var(--asu-gold);
+                color: black;
+                font-weight: bold;
+            }
+            .cal-target {
+                background: white;
+                color: var(--asu-maroon);
+                font-weight: 900;
+            }
             /* Floating BG */
             .floating-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
             .bubble { position: absolute; bottom: -100px; background: rgba(140, 29, 64, 0.05); border-radius: 50%; animation: rise 15s infinite ease-in; }
@@ -171,27 +202,45 @@
                 </div>
             </div>
         </section>
-
         <section id="upcoming" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-5xl mx-auto pt-10 px-4">
                 <div class="text-center mb-16">
                     <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">T-Minus to Heritage Showdown</span>
                     <h2 class="text-7xl font-black italic uppercase mt-2">Wankhede <br><span class="text-red-600">February 2026</span></h2>
                 </div>
-
-                <div class="flex justify-center flex-wrap gap-8 mb-20">
-                    <div class="flex flex-col items-center"><div class="flip-box text-6xl font-black" id="wc-d">00</div><span class="text-xs uppercase font-black text-slate-400 mt-4">Days</span></div>
-                    <div class="flex flex-col items-center"><div class="flip-box text-6xl font-black" id="wc-h">00</div><span class="text-xs uppercase font-black text-slate-400 mt-4">Hrs</span></div>
-                    <div class="flex flex-col items-center"><div class="flip-box text-6xl font-black" id="wc-m">00</div><span class="text-xs uppercase font-black text-slate-400 mt-4">Min</span></div>
-                    <div class="flex flex-col items-center"><div class="flip-box text-6xl font-black text-white" id="wc-s">00</div><span class="text-xs uppercase font-black text-slate-400 mt-4">Sec</span></div>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-8 pb-20">
-                    <div class="calendar-mini border-asu-gold border-2 ring-4 ring-asu-maroon/10">
-                        <h5 class="font-black text-[10px] uppercase tracking-widest text-red-600 mb-4 italic">GAMEDAY: IND v USA</h5>
-                        <div class="cal-grid" id="cal-game"></div>
-                        <p class="text-[9px] mt-4 font-bold text-red-600">Feb 07: Live from Wankhede</p>
+        
+                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                    <h3 class="text-[#ffc627] font-black text-xs uppercase mb-2 text-center">IND v USA: Group A Clash</h3>
+                    <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">
+                        Feb 07, 2026 @ 19:30 IST
+                    </p>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
+                        <div class="grid grid-cols-4 gap-2">
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box text-2xl" id="game-d">00</div>
+                                <span class="text-[7px] text-white/50 uppercase mt-1">Days</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box text-2xl" id="game-h">00</div>
+                                <span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box text-2xl" id="game-m">00</div>
+                                <span class="text-[7px] text-white/50 uppercase mt-1">Min</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box text-2xl text-white" id="game-s">00</div>
+                                <span class="text-[7px] text-white/50 uppercase mt-1">Sec</span>
+                            </div>
+                        </div>
+        
+                        <div id="cal-game-container"></div>
                     </div>
+                    
+                    <p class="text-[9px] mt-6 font-bold text-red-600 text-center uppercase tracking-widest">
+                        Live from Mumbai
+                    </p>
                 </div>
             </div>
         </section>
@@ -204,42 +253,51 @@
             }
 
             // Countdown Logic
-            const targetDate = new Date("February 7, 2026 06:30:00").getTime();
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const diff = targetDate - now;
-                if (diff < 0) return;
-                document.getElementById('wc-d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-                document.getElementById('wc-h').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-                document.getElementById('wc-m').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-                document.getElementById('wc-s').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-            }
-            setInterval(updateCountdown, 1000);
-            updateCountdown();
-
-            // Render Calendars
-            function renderCal(elementId, activeDay) {
-                const container = document.getElementById(elementId);
-                const days = ['S','M','T','W','T','F','S'];
-                days.forEach(d => container.innerHTML += `<div class="cal-day">${d}</div>`);
-                for (let i = 1; i <= 28; i++) {
-                    const isActive = i === activeDay ? 'cal-active' : '';
-                    container.innerHTML += `<div class="cal-day ${isActive} text-slate-800">${i}</div>`;
+            const targetDate = new Date("February 7, 2026 07:00:00");
+            
+            function renderMonth(dateObj, targetDate) {
+                const now = new Date();
+                const year = dateObj.getFullYear();
+                const month = dateObj.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                let html = `<div class="w-28 text-white">
+                                <div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">
+                                    ${dateObj.toLocaleString("default", { month: "short" })}
+                                </div>
+                                <div class="calendar-grid">`;
+                
+                // Fill empty days
+                for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+                
+                // Fill actual days
+                for (let d = 1; d <= daysInMonth; d++) {
+                    let cls = "cal-day";
+                    if (d === now.getDate() && month === now.getMonth()) cls += " cal-today";
+                    if (d === targetDate.getDate() && month === targetDate.getMonth()) cls += " cal-target";
+                    html += `<div class="${cls}">${d}</div>`;
                 }
+                html += `</div></div>`;
+                return html;
             }
-            renderCal('cal-game', 7);
-
-            // Particles
-            const bubbleCont = document.getElementById('bubble-container');
-            for (let i = 0; i < 15; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 80 + 20 + 'px';
-                bubble.style.width = size; bubble.style.height = size;
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.animationDelay = Math.random() * 10 + 's';
-                bubbleCont.appendChild(bubble);
+            
+            function updateClocks() {
+                const now = new Date().getTime();
+                const diff = targetDate.getTime() - now;
+                
+                if (diff < 0) return;
+                
+                document.getElementById("game-d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, "0");
+                document.getElementById("game-h").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, "0");
+                document.getElementById("game-m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
+                document.getElementById("game-s").innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, "0");
             }
+            
+            // Initialize
+            document.getElementById("cal-game").innerHTML = renderMonth(new Date(2026, 1), targetDate);
+            setInterval(updateClocks, 1000);
+            updateClocks();
         </script>
     </body>
 </html>
