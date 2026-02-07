@@ -116,6 +116,21 @@
                     </div>
                 </div>
             </div>
+            <div class="bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.005] mt-8" onclick="showPage('hockey-story')">
+                <div class="p-10">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">NCHC Gameday</span>
+                        <span class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Feb 07, 2026</span>
+                    </div>
+                    <p class="text-4xl text-slate-800 leading-tight font-black uppercase italic mb-6">
+                        Desert Heat vs. North Country: <br>SCSU's First Trip to the Mullett.
+                    </p>
+                    <p class="text-slate-500 text-sm mb-8 leading-relaxed max-w-2xl italic">
+                        Sun Devil Hockey looks to finalize a home sweep against the Huskies. Can Bennett Schimek surpass the record books tonight?
+                    </p>
+                    <div class="flex items-center text-asu-maroon font-black text-[10px] uppercase tracking-widest">Read Matchup Preview →</div>
+                </div>
+            </div>
         </main>
 
         <section id="full-story" class="page-content animate__animated animate__fadeIn">
@@ -193,40 +208,86 @@
                 </div>
             </div>
         </section>
-
+        <section id="hockey-story" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-4xl mx-auto pb-20 px-4">
+                <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
+                
+                <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85] mb-8 text-asu-maroon">ICE<br><span class="text-slate-900">COLD.</span></h1>
+        
+                <div class="prose prose-lg text-slate-700 max-w-none">
+                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Chase for History</h3>
+                    <p>ASU’s <strong>Bennett Schimek</strong> enters tonight just points away from surpassing Sun Devil legend Josh Doan on the all-time career points list. After a dominant Friday performance, the Maroon and Gold are looking to leverage the Mullett Arena crowd to stifle a desperate St. Cloud State team.</p>
+        
+                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Scouting the Huskies</h3>
+                    <p>SCSU brings the "Terrific Trio" of <strong>Tyson Gross</strong>, <strong>Austin Burnevik</strong>, and <strong>Barrett Hall</strong>. Gross remains one of the nation's elite faceoff specialists (60.7%), meaning ASU’s Kyle Smolen and Cruz Lucius will have their hands full fighting for puck possession in the defensive zone.</p>
+        
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white border-4 border-asu-gold shadow-2xl my-16">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+                            <span class="text-asu-gold font-black italic text-xl uppercase tracking-widest">Armchair AI Forecast</span>
+                            <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded text-[10px] font-black uppercase">Mullett Home Edge</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-12">
+                            <div class="text-center md:text-left">
+                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Score</p>
+                                <p class="text-6xl font-black italic tracking-tighter">ASU: 4</p>
+                                <p class="text-white/40 text-xs mt-2 uppercase">Schimek: 1G, 2A projected</p>
+                            </div>
+                            <div class="text-center md:text-left border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-12">
+                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Score</p>
+                                <p class="text-6xl font-black italic tracking-tighter text-slate-400">SCSU: 2</p>
+                                <p class="text-white/40 text-xs mt-2 uppercase">Shostak: 32 SV Projected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section id="upcoming" class="page-content animate__animated animate__fadeIn">
             <div class="max-w-5xl mx-auto pt-10 px-4">
-                <div class="text-center mb-16">
-                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">T-Minus to Heritage Showdown</span>
-                    <h2 class="text-7xl font-black italic uppercase mt-2">Wankhede <br><span class="text-red-600">February 2026</span></h2>
+                
+                <div class="text-center mb-10">
+                    <span class="text-asu-maroon font-black text-[10px] uppercase tracking-widest">Puck Drop: Mullett Arena</span>
+                    <h2 class="text-7xl font-black italic uppercase mt-2">ASU vs <span class="text-asu-maroon">SCSU</span></h2>
                 </div>
-
-                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
-                    <h3 class="text-asu-gold font-black text-xs uppercase mb-2 text-center">IND v USA: Group A Clash</h3>
-                    <p class="text-[10px] text-white/50 font-mono mb-6 italic text-center">Feb 07, 2026 @ 19:30 IST</p>
-                    
+        
+                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30 mb-20">
                     <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
                         <div class="grid grid-cols-4 gap-2">
                             <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="game-d">00</div>
+                                <div class="flip-box text-2xl" id="hockey-d">00</div>
                                 <span class="text-[7px] text-white/50 uppercase mt-1">Days</span>
                             </div>
                             <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="game-h">00</div>
+                                <div class="flip-box text-2xl" id="hockey-h">00</div>
                                 <span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span>
                             </div>
                             <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl" id="game-m">00</div>
+                                <div class="flip-box text-2xl" id="hockey-m">00</div>
                                 <span class="text-[7px] text-white/50 uppercase mt-1">Min</span>
                             </div>
                             <div class="flex flex-col items-center">
-                                <div class="flip-box text-2xl text-white" id="game-s">00</div>
+                                <div class="flip-box text-2xl text-white" id="hockey-s">00</div>
                                 <span class="text-[7px] text-white/50 uppercase mt-1">Sec</span>
                             </div>
                         </div>
+                        <div id="cal-hockey-container"></div>
+                    </div>
+                </div>
+        
+                <div class="text-center mb-10">
+                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">T-Minus to Heritage Showdown</span>
+                    <h2 class="text-7xl font-black italic uppercase mt-2">Wankhede 2026</h2>
+                </div>
+                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
+                    <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
+                        <div class="grid grid-cols-4 gap-2">
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-d">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Days</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-h">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-m">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Min</span></div>
+                            <div class="flex flex-col items-center"><div class="flip-box text-2xl text-white" id="game-s">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Sec</span></div>
+                        </div>
                         <div id="cal-game-container"></div>
                     </div>
-                    <p class="text-[9px] mt-6 font-bold text-red-600 text-center uppercase tracking-widest">Live from Mumbai</p>
                 </div>
             </div>
         </section>
@@ -237,43 +298,30 @@
                 document.getElementById(pageId).classList.add('page-active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-
-            // Fixed Countdown Logic from Portfolio
-            const gameDate = new Date("February 7, 2026 07:00:00");
-
-            function renderMonth(dateObj, targetDate) {
-                const year = dateObj.getFullYear();
-                const month = dateObj.getMonth();
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                
-                let html = `<div class="w-28 text-white">
-                                <div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">
-                                    ${dateObj.toLocaleString("default", { month: "short" })}
-                                </div>
-                                <div class="calendar-grid">`;
-                
-                for (let i = 0; i < firstDay; i++) html += `<div></div>`;
-                for (let d = 1; d <= daysInMonth; d++) {
-                    let cls = "cal-day";
-                    if (d === targetDate.getDate() && month === targetDate.getMonth()) cls += " cal-target";
-                    html += `<div class="${cls}">${d}</div>`;
-                }
-                html += `</div></div>`;
-                return html;
-            }
-
+            // New Dates
+            const dates = {
+                hockey: new Date("February 7, 2026 17:00:00"), // 5:00 PM MST
+                game: new Date("February 7, 2026 07:00:00")    // Cricket (19:30 IST)
+            };
+            
             function updateClocks() {
-                const diff = gameDate.getTime() - new Date().getTime();
-                if (diff < 0) return;
-                document.getElementById("game-d").innerText = Math.floor(diff / 86400000).toString().padStart(2, "0");
-                document.getElementById("game-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
-                document.getElementById("game-m").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
-                document.getElementById("game-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
+                const now = new Date().getTime();
+                
+                Object.keys(dates).forEach(key => {
+                    const diff = dates[key].getTime() - now;
+                    if (diff < 0) return;
+                    
+                    document.getElementById(key + "-d").innerText = Math.floor(diff / 86400000).toString().padStart(2, "0");
+                    document.getElementById(key + "-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
+                    document.getElementById(key + "-m").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
+                    document.getElementById(key + "-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
+                });
             }
-
-            // Initialization
-            document.getElementById("cal-game-container").innerHTML = renderMonth(new Date(2026, 1), gameDate);
+            
+            // Initializing both calendars
+            document.getElementById("cal-hockey-container").innerHTML = renderMonth(new Date(2026, 1), dates.hockey);
+            document.getElementById("cal-game-container").innerHTML = renderMonth(new Date(2026, 1), dates.game);
+            
             setInterval(updateClocks, 1000);
             updateClocks();
 
