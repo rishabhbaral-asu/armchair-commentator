@@ -9,33 +9,24 @@
         <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
         <style>
             :root {
-                --umd-red: #e21833;
                 --asu-maroon: #8c1d40;
                 --asu-gold: #ffc627;
-                --glass: rgba(255, 255, 255, 0.9);
+                --scsu-red: #cc0000;
+                --india-blue: #133463;
+                --usa-red: #d00027;
+            }
+            body { font-family: "Inter", sans-serif; background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%); min-height: 100vh; }
+            .page-content { display: none; min-height: 100vh; position: relative; z-index: 10; }
+            .page-active { display: block; }
+            
+            .blog-card {
+                min-height: 320px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border: 1px solid rgba(0,0,0,0.05);
             }
 
-            body {
-                font-family: "Inter", sans-serif;
-                background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 50%, #fffbeb 100%);
-                min-height: 100vh;
-                overflow-x: hidden;
-            }
-
-            .page-content {
-                display: none;
-                min-height: 100vh;
-                position: relative;
-                z-index: 10;
-            }
-            .page-active {
-                display: block;
-            }
-
-            /* Pitchfork Logo SVG */
-            .pitchfork { width: 24px; height: 24px; fill: white; }
-
-            /* Portfolio-Style Flip Box & Calendar */
             .flip-box {
                 background: #2a0a14;
                 color: var(--asu-gold);
@@ -56,138 +47,88 @@
                 border-radius: 6px;
                 font-size: 0.5rem;
             }
-            .cal-day {
-                background: var(--asu-maroon);
-                padding: 2px;
-                text-align: center;
-                border-radius: 2px;
-                color: white;
-            }
-            .cal-today { background: var(--asu-gold); color: black; font-weight: bold; }
+            .cal-day { background: var(--asu-maroon); padding: 2px; text-align: center; border-radius: 2px; color: white; }
             .cal-target { background: white; color: var(--asu-maroon); font-weight: 900; }
 
-            /* Unified Card Sizing */
-            .blog-card {
-                min-height: 320px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-            }
-
-            /* Broadcast Card Aesthetics */
-            .broadcast-card {
-                background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                border: 1px solid rgba(255,255,255,0.1);
-            }
-            .titillium { font-family: 'Titillium Web', sans-serif; }
+            .roster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .broadcast-card { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); border: 1px solid rgba(255,255,255,0.1); }
+            .player-row { background: rgba(255,255,255,0.03); border-left: 3px solid var(--asu-gold); margin-bottom: 2px; padding: 4px 10px; font-size: 11px; }
+            .scsu-row { border-left-color: var(--scsu-red); }
+            .india-row { border-left-color: #ff9933; }
+            .usa-row { border-left-color: #002868; }
             
-            .player-row {
-                background: rgba(255,255,255,0.03);
-                transition: all 0.2s;
-                border-left: 4px solid transparent;
-            }
-            .ind-row { border-left-color: #3b82f6; }
-            .usa-row { border-left-color: #ef4444; }
-
-            /* Floating BG */
             .floating-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
             .bubble { position: absolute; bottom: -100px; background: rgba(140, 29, 64, 0.05); border-radius: 50%; animation: rise 15s infinite ease-in; }
-            @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
-            
-            .btn-asu { background-color: var(--asu-maroon); color: var(--asu-gold); border: 2px solid var(--asu-gold); }
-
-            /* Hockey Specific Lineup */
-            .hockey-lineup {
-                background: rgba(15, 23, 42, 0.95);
-                border-radius: 1.5rem;
-                padding: 1.5rem;
-                border: 1px solid rgba(255, 198, 39, 0.2);
-            }
+            @keyframes rise { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-120vh); opacity: 0; } }
         </style>
     </head>
     <body class="p-4 md:p-12">
         <div class="floating-bg" id="bubble-container"></div>
 
-        <nav class="max-w-6xl mx-auto mb-16 relative z-20 flex justify-between items-center bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-xl">
-            <button onclick="showPage('feed')" class="flex items-center space-x-4">
-                <div class="w-10 h-10 bg-asu-maroon rounded-xl flex items-center justify-center shadow-lg transform rotate-3 transition hover:rotate-0">
-                    <svg class="pitchfork" viewBox="0 0 24 24">
-                        <path d="M7,2v3h1v10.35c0,1.24,0.81,2.35,2,2.6V22h4v-4.05c1.19-0.25,2-1.36,2-2.6V5h1V2h-2v3h-1V2h-2v3h-2V2H9v3H8V2H7z M11,18v-2.05 c-0.58-0.12-1-0.64-1-1.25V7h4v7.7c0,0.61-0.42,1.13-1,1.25V18H11z"/>
-                    </svg>
-                </div>
-                <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase italic">Armchair Commentator</h1>
-            </button>
+        <nav class="max-w-6xl mx-auto mb-16 relative z-20 flex justify-between items-center bg-white/70 backdrop-blur-md p-6 rounded-3xl shadow-xl">
+            <button onclick="showPage('feed')" class="text-xl font-black text-slate-800 uppercase italic">Armchair Commentator</button>
             <div class="flex space-x-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                <button onclick="showPage('feed')" class="hover:text-red-600 transition">Blog Feed</button>
-                <button onclick="showPage('upcoming')" class="hover:text-red-600 transition">Tournament View</button>
+                <button onclick="showPage('feed')">Blog Feed</button>
+                <button onclick="showPage('upcoming')">Tournament View</button>
             </div>
         </nav>
 
         <main id="feed" class="page-content page-active animate__animated animate__fadeIn">
-            <div class="max-w-5xl mx-auto px-4">
-                <div class="mb-12">
-                    <span class="text-red-600 font-black text-[10px] uppercase tracking-[0.3em]">Latest Entries</span>
-                    <h2 class="text-6xl font-black italic tracking-tighter uppercase mt-2">The Analyst's <span class="text-red-600">Notebook.</span></h2>
-                </div>
-
+            <div class="max-w-5xl mx-auto">
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="blog-card bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl transition-all hover:scale-[1.02]" onclick="showPage('full-story')">
-                        <div class="p-8 h-full flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center space-x-2 mb-4">
-                                    <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Featured</span>
-                                    <span class="text-slate-400 text-[8px] font-black uppercase tracking-widest">Feb 06, 2026</span>
-                                </div>
-                                <h3 class="text-3xl text-slate-800 font-black uppercase italic mb-4 leading-tight">Blue Blood vs. New World</h3>
-                                <p class="text-slate-500 text-xs mb-6 italic">Analyzing the tactical fallout of Harshit Rana's injury and Netravalkar's homecoming.</p>
-                            </div>
-                            <div class="text-asu-maroon font-black text-[9px] uppercase tracking-widest">Open Story Analysis →</div>
+                    <div class="blog-card bg-white/80 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl transition-all hover:scale-[1.01] cursor-pointer" onclick="showPage('hockey-story')">
+                        <div>
+                            <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">NCHC Preview</span>
+                            <h2 class="text-4xl font-black italic uppercase mt-4">Desert Ice: <br>Huskies at the Mullett</h2>
+                            <p class="text-slate-500 text-sm mt-4 italic">Analysis of Bennett Schimek's record chase and the SCSU defensive strategy.</p>
                         </div>
+                        <div class="text-asu-maroon font-black text-[10px] mt-6 uppercase">Read Deep Dive →</div>
                     </div>
 
-                    <div class="blog-card bg-white/80 backdrop-blur-md p-1 border-slate-200 border rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl transition-all hover:scale-[1.02]" onclick="showPage('hockey-story')">
-                        <div class="p-8 h-full flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center space-x-2 mb-4">
-                                    <span class="bg-asu-maroon text-asu-gold px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">NCHC Gameday</span>
-                                    <span class="text-slate-400 text-[8px] font-black uppercase tracking-widest">Feb 07, 2026</span>
-                                </div>
-                                <h3 class="text-3xl text-slate-800 font-black uppercase italic mb-4 leading-tight">Heat vs. North Country</h3>
-                                <p class="text-slate-500 text-xs mb-6 italic">SCSU's first trip to the Mullett and Bennett Schimek's chase for history.</p>
-                            </div>
-                            <div class="text-asu-maroon font-black text-[9px] uppercase tracking-widest">Read Matchup Preview →</div>
+                    <div class="blog-card bg-white/80 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl transition-all hover:scale-[1.01] cursor-pointer" onclick="showPage('full-story')">
+                        <div>
+                            <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">World Cup T20</span>
+                            <h2 class="text-4xl font-black italic uppercase mt-4">Wankhede War: <br>Green Card vs. Aadhaar</h2>
+                            <p class="text-slate-500 text-sm mt-4 italic">India's pace-heavy rotation vs USA's Mumbai-rooted stars.</p>
                         </div>
+                        <div class="text-asu-maroon font-black text-[10px] mt-6 uppercase">Open Analysis →</div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <section id="full-story" class="page-content animate__animated animate__fadeIn">
-            <div class="max-w-4xl mx-auto pb-20 px-4">
-                <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
-                <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85] mb-8">WANKHEDE<br><span class="text-red-600">WARFARE.</span></h1>
-
-                <div class="prose prose-lg text-slate-700 max-w-none">
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">Injury Report: The Rana Setback</h3>
-                    <p>In a blow to India’s pace rotation, <strong>Harshit Rana</strong> has been ruled out with a side strain. <strong>Mohammed Siraj</strong> steps in to lead the attack alongside Bumrah. While Siraj knows these conditions, India loses the raw bounce Rana provided.</p>
-
-                    <h3 class="text-3xl font-black italic uppercase mt-12 mb-4 text-asu-maroon">The Pakistan Precedent</h3>
-                    <p>The USA carries "Giant Killer" DNA from their 2024 win over Pakistan. With <strong>Saurabh Netravalkar</strong> returning to his original home ground, the tactical battle early in the powerplay will define the chase.</p>
-
-                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white border-4 border-asu-gold shadow-2xl my-16">
-                        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-                            <span class="text-asu-gold font-black italic text-xl uppercase tracking-widest">Armchair Forecast</span>
-                            <span class="bg-red-600 px-3 py-1 rounded text-[10px] font-black uppercase">IND 78% Win Prob</span>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-12">
-                            <div class="text-center md:text-left">
-                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Total</p>
-                                <p class="text-6xl font-black italic tracking-tighter">IND: 198/4</p>
+        <section id="hockey-story" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-5xl mx-auto px-4 pb-20">
+                <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase mb-8">← Back</button>
+                <h1 class="text-7xl font-black italic uppercase text-asu-maroon leading-none">NCHC <br>Showdown.</h1>
+                
+                <div class="grid lg:grid-cols-3 gap-12 mt-12">
+                    <div class="lg:col-span-2 prose prose-lg text-slate-700">
+                        <p class="font-bold text-xl text-slate-900">The battle for the desert begins as Arizona State hosts St. Cloud State in a critical conference clash.</p>
+                        <p>Arizona State enters the weekend looking to leverage home-ice advantage at Mullett Arena. The Sun Devils have shown a penchant for explosive offensive bursts, led by senior **Bennett Schimek**. Schimek's ability to navigate tight defensive zones has him on track for a record-breaking season, but he faces a disciplined St. Cloud State unit that prioritizes high-percentage shot blocking. The Huskies' veteran presence, particularly **Josh Zinger** on the blue line, will be tasked with neutralizing ASU's speed on the wings.</p>
+                        <p>Goaltending remains the x-factor. **Samuel Urban** has been a pillar for the Sun Devils, often bailing out an aggressive defensive corps that likes to join the rush. St. Cloud State, meanwhile, relies on a balanced four-line attack to wear down opponents. If ASU can capitalize on early power-play opportunities, they may force SCSU out of their defensive shell.</p>
+                    </div>
+                    
+                    <div class="broadcast-card rounded-3xl p-6 text-white h-fit">
+                        <h3 class="text-asu-gold font-black uppercase text-sm mb-4 border-b border-white/10 pb-2">Gameday Rosters</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-[9px] uppercase font-black text-white/40 mb-2">Arizona State Starters</p>
+                                <div class="player-row">B. Schimek (RW)</div>
+                                <div class="player-row">K. Smolen (C)</div>
+                                <div class="player-row">C. Lucius (LW)</div>
+                                <div class="player-row">J. Kipkie (D)</div>
+                                <div class="player-row">J. Kjellberg (D)</div>
+                                <div class="player-row">S. Urban (G)</div>
                             </div>
-                            <div class="text-center md:text-left border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-12">
-                                <p class="text-asu-gold text-[10px] font-black uppercase mb-1">Projected Chase</p>
-                                <p class="text-6xl font-black italic tracking-tighter text-red-500">USA: 172/7</p>
+                            <div>
+                                <p class="text-[9px] uppercase font-black text-red-400 mb-2">St. Cloud State Starters</p>
+                                <div class="player-row scsu-row">G. Ahcan (F)</div>
+                                <div class="player-row scsu-row">T. Gross (F)</div>
+                                <div class="player-row scsu-row">A. Ingram (F)</div>
+                                <div class="player-row scsu-row">J. Zinger (D)</div>
+                                <div class="player-row scsu-row">C. Wylie (D)</div>
+                                <div class="player-row scsu-row">P. Bērziņš (G)</div>
                             </div>
                         </div>
                     </div>
@@ -195,30 +136,56 @@
             </div>
         </section>
 
-        <section id="hockey-story" class="page-content animate__animated animate__fadeIn">
-            <div class="max-w-4xl mx-auto pb-20 px-4">
-                <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase hover:text-red-600 mb-8 transition">← Back to Feed</button>
-                <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85] mb-8 text-asu-maroon">ICE<br><span class="text-slate-900">COLD.</span></h1>
+        <section id="full-story" class="page-content animate__animated animate__fadeIn">
+            <div class="max-w-6xl mx-auto px-4 pb-20">
+                <button onclick="showPage('feed')" class="text-slate-400 font-bold text-[10px] uppercase mb-8">← Back</button>
+                <h1 class="text-7xl font-black italic uppercase text-red-600 leading-none">Wankhede <br>Return.</h1>
+                
+                <div class="grid lg:grid-cols-2 gap-12 mt-12">
+                    <div class="prose prose-lg text-slate-700">
+                        <p class="font-bold text-xl text-slate-900">A high-stakes Group A opener sees the defending champions meet the rising American force.</p>
+                        <p>India's strategy at the Wankhede is clear: use raw pace to disrupt the USA's top order. With **Mohammed Siraj** replacing **Harshit Rana**, India gains an experienced operator who understands Mumbai's swing conditions. **Suryakumar Yadav** leads a side that is transitioning away from the Rohit-Virat era, placing immense pressure on **Abhishek Sharma** to provide the fireworks.</p>
+                        <p>The USA isn't just an underdog; they are a squad full of local knowledge. **Saurabh Netravalkar**, formerly of Mumbai, knows every crack in this pitch. The inclusion of **Shubham Ranjane**, another Mumbai domestic veteran, gives the USA a "home-away-from-home" advantage that could bridge the talent gap.</p>
+                    </div>
 
-                <div class="prose prose-lg text-slate-700 max-w-none">
-                    <p>ASU’s <strong>Bennett Schimek</strong> is on the verge of history at the Mullett. The Sun Devils look to leverage home-ice advantage to stifle the Huskies' specialized faceoff unit.</p>
-
-                    <div class="hockey-lineup my-12 text-white">
-                        <div class="text-center mb-6 border-b border-white/10 pb-4">
-                            <span class="text-asu-gold font-black uppercase text-xs tracking-widest italic">Projected Starting XI</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 text-[11px] font-bold">
-                            <div class="space-y-3">
-                                <p class="text-asu-gold uppercase text-[9px]">Forwards</p>
-                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>B. Schimek</span><span>RW</span></div>
-                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>C. Lucius</span><span>LW</span></div>
-                                <div class="flex justify-between border-l-2 border-asu-gold pl-2"><span>K. Smolen</span><span>C</span></div>
+                    <div class="broadcast-card rounded-3xl p-8 text-white">
+                        <h3 class="text-asu-gold font-black uppercase text-sm mb-6 text-center border-b border-white/10 pb-4">Full 15-Man Tournament Squads</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-black text-orange-400 uppercase mb-3 tracking-widest">India (IND)</p>
+                                <div class="player-row india-row">Suryakumar Yadav (C)</div>
+                                <div class="player-row india-row">Abhishek Sharma</div>
+                                <div class="player-row india-row">Ishan Kishan (WK)</div>
+                                <div class="player-row india-row">Tilak Varma</div>
+                                <div class="player-row india-row">Sanju Samson</div>
+                                <div class="player-row india-row">Shivam Dube</div>
+                                <div class="player-row india-row">Hardik Pandya</div>
+                                <div class="player-row india-row">Rinku Singh</div>
+                                <div class="player-row india-row">Axar Patel</div>
+                                <div class="player-row india-row">Washington Sundar</div>
+                                <div class="player-row india-row">Jasprit Bumrah</div>
+                                <div class="player-row india-row">Arshdeep Singh</div>
+                                <div class="player-row india-row">Mohammed Siraj</div>
+                                <div class="player-row india-row">Varun Chakravarthy</div>
+                                <div class="player-row india-row">Kuldeep Yadav</div>
                             </div>
-                            <div class="space-y-3">
-                                <p class="text-asu-gold uppercase text-[9px]">Defense & Goal</p>
-                                <div class="flex justify-between border-l-2 border-slate-400 pl-2"><span>N. Szmagaj</span><span>LD</span></div>
-                                <div class="flex justify-between border-l-2 border-slate-400 pl-2"><span>T. Gratton</span><span>RD</span></div>
-                                <div class="flex justify-between border-l-2 border-red-600 pl-2"><span class="text-red-500">G. Hallum</span><span>G</span></div>
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-black text-blue-400 uppercase mb-3 tracking-widest">United States (USA)</p>
+                                <div class="player-row usa-row">Monank Patel (C/WK)</div>
+                                <div class="player-row usa-row">Andries Gous</div>
+                                <div class="player-row usa-row">Saiteja Mukkamalla</div>
+                                <div class="player-row usa-row">Milind Kumar</div>
+                                <div class="player-row usa-row">Shayan Jahangir</div>
+                                <div class="player-row usa-row">Shehan Jayasuriya</div>
+                                <div class="player-row usa-row">Sanjay Krishnamurthi</div>
+                                <div class="player-row usa-row">Harmeet Singh</div>
+                                <div class="player-row usa-row">Nosthush Kenjige</div>
+                                <div class="player-row usa-row">Shadley Van Schalkwyk</div>
+                                <div class="player-row usa-row">Saurabh Netravalkar</div>
+                                <div class="player-row usa-row">Ali Khan</div>
+                                <div class="player-row usa-row">Jessy Singh</div>
+                                <div class="player-row usa-row">Mohammad Mohsin</div>
+                                <div class="player-row usa-row">Shubham Ranjane</div>
                             </div>
                         </div>
                     </div>
@@ -227,55 +194,48 @@
         </section>
 
         <section id="upcoming" class="page-content animate__animated animate__fadeIn">
-            <div class="max-w-5xl mx-auto pt-10 px-4">
-                <div class="text-center mb-10">
-                    <span class="text-asu-maroon font-black text-[10px] uppercase tracking-widest">NCHC: Mullett Arena</span>
-                    <h2 class="text-5xl font-black italic uppercase mt-2">ASU vs <span class="text-asu-maroon">SCSU</span></h2>
-                </div>
-                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30 mb-20">
-                    <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
+            <div class="max-w-5xl mx-auto py-10">
+                <div class="mb-20 text-center">
+                    <h2 class="text-6xl font-black uppercase italic mb-8">ASU vs SCSU <br><span class="text-asu-maroon">5:00 PM AZT</span></h2>
+                    <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
                         <div class="grid grid-cols-4 gap-2">
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-d">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Days</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-h">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-m">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Min</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="hockey-s">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Sec</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="hockey-d">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Days</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="hockey-h">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Hrs</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="hockey-m">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Min</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="hockey-s">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Sec</span></div>
                         </div>
-                        <div id="cal-hockey-container"></div>
+                        <div id="cal-hockey"></div>
                     </div>
                 </div>
 
-                <div class="text-center mb-10">
-                    <span class="text-red-600 font-black text-[10px] uppercase tracking-widest">World Cup: Wankhede</span>
-                    <h2 class="text-5xl font-black italic uppercase mt-2">IND vs <span class="text-red-600">USA</span></h2>
-                </div>
-                <div class="max-w-md mx-auto bg-black/20 p-8 rounded-3xl border border-asu-gold/30">
-                    <div class="flex flex-col md:flex-row gap-6 items-center justify-center">
+                <div class="text-center">
+                    <h2 class="text-6xl font-black uppercase italic mb-8">IND vs USA <br><span class="text-red-600">7:00 AM AZT</span></h2>
+                    <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
                         <div class="grid grid-cols-4 gap-2">
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-d">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Days</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-h">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Hrs</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl" id="game-m">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Min</span></div>
-                            <div class="flex flex-col items-center"><div class="flip-box text-2xl text-white" id="game-s">00</div><span class="text-[7px] text-white/50 uppercase mt-1">Sec</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="cricket-d">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Days</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="cricket-h">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Hrs</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="cricket-m">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Min</span></div>
+                            <div class="flex flex-col"><div class="flip-box text-2xl" id="cricket-s">00</div><span class="text-[7px] text-slate-500 uppercase mt-1">Sec</span></div>
                         </div>
-                        <div id="cal-game-container"></div>
+                        <div id="cal-cricket"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <script>
-            const dates = {
-                hockey: new Date("February 7, 2026 17:00:00"),
-                game: new Date("February 7, 2026 19:30:00")
-            };
-
-            function showPage(pageId) {
+            function showPage(id) {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
-                document.getElementById(pageId).classList.add('page-active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById(id).classList.add('page-active');
+                window.scrollTo(0,0);
             }
 
+            const dates = {
+                hockey: new Date("February 7, 2026 17:00:00"), 
+                cricket: new Date("February 7, 2026 07:00:00") 
+            };
+
             function renderMonth(dateObj, targetDate) {
-                const now = new Date();
                 const year = dateObj.getFullYear(), month = dateObj.getMonth();
                 const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
                 let html = `<div class="w-28 text-white"><div class="text-[7px] font-black mb-1 text-center text-asu-gold uppercase">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
@@ -299,17 +259,17 @@
                 });
             }
 
-            document.getElementById("cal-hockey-container").innerHTML = renderMonth(new Date(2026, 1), dates.hockey);
-            document.getElementById("cal-game-container").innerHTML = renderMonth(new Date(2026, 1), dates.game);
+            document.getElementById("cal-hockey").innerHTML = renderMonth(new Date(2026, 1), dates.hockey);
+            document.getElementById("cal-cricket").innerHTML = renderMonth(new Date(2026, 1), dates.cricket);
             setInterval(updateClocks, 1000);
             updateClocks();
 
-            const bubbleCont = document.getElementById('bubble-container');
+            const bc = document.getElementById('bubble-container');
             for (let i = 0; i < 15; i++) {
                 const b = document.createElement('div'); b.className = 'bubble';
                 const s = Math.random() * 80 + 20 + 'px'; b.style.width = s; b.style.height = s;
                 b.style.left = Math.random() * 100 + '%'; b.style.animationDelay = Math.random() * 10 + 's';
-                bubbleCont.appendChild(b);
+                bc.appendChild(b);
             }
         </script>
     </body>
