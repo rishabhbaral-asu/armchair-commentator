@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Late Edition</title>
+        <title>The Tempe Torch | Gameday Late Edition</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -17,36 +17,39 @@
             body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); line-height: 1.6; }
             .broadsheet { 
                 background: var(--paper); 
-                max-width: 1100px; 
+                max-width: 1150px; 
                 margin: 20px auto; 
                 padding: 40px; 
-                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                box-shadow: 0 0 50px rgba(0,0,0,0.6);
                 border: 1px solid #d1cfc8;
+                position: relative;
             }
             .masthead { border-bottom: 5px solid var(--ink); text-align: center; margin-bottom: 20px; }
-            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 5.5rem; color: var(--asu-maroon); margin: 0; }
-            .date-line { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 5px 0; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; display: flex; justify-content: space-between; }
+            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 6rem; color: var(--asu-maroon); margin: 0; line-height: 1.1; }
+            .date-line { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 5px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; display: flex; justify-content: space-between; }
             
-            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1; margin-bottom: 15px; color: var(--ink); }
-            .subheadline { font-style: italic; font-size: 1.25rem; color: #444; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1; margin-bottom: 15px; color: var(--ink); text-transform: none; }
+            .subheadline { font-style: italic; font-size: 1.3rem; color: #333; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 15px; display: block; }
             
             .columns { column-count: 2; column-gap: 40px; text-align: justify; }
             @media (max-width: 768px) { .columns { column-count: 1; } }
             
-            .dropcap { float: left; font-size: 4.5rem; line-height: 0.8; padding-top: 10px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); }
+            .dropcap { float: left; font-size: 5rem; line-height: 0.7; padding-top: 12px; padding-right: 12px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
             
             .page-content { display: none; }
             .page-active { display: block; }
             
-            /* Box Score / Roster Style */
-            .official-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; margin: 20px 0; font-family: sans-serif; }
-            .official-table th { background: #eee; text-align: left; padding: 5px; border: 1px solid #ccc; text-transform: uppercase; }
-            .official-table td { padding: 5px; border: 1px solid #ccc; }
-            
-            /* Preserved Aesthetic Elements */
-            .flip-box { background: var(--ink); color: var(--asu-gold); border-radius: 4px; padding: 8px; min-width: 50px; text-align: center; font-family: monospace; border: 1px solid var(--asu-gold); }
-            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ccc; padding: 2px; }
-            .cal-day { background: white; padding: 3px; text-align: center; font-size: 0.6rem; }
+            /* Scorecard Styling */
+            .official-scorecard { width: 100%; font-size: 0.85rem; border: 2px solid var(--ink); margin: 25px 0; background: white; }
+            .official-scorecard th { background: var(--asu-maroon); color: var(--asu-gold); padding: 8px; text-align: left; text-transform: uppercase; letter-spacing: 1px; }
+            .official-scorecard td { padding: 6px 12px; border: 1px solid #ddd; }
+            .reserve-bench { background: #eee; font-size: 0.75rem; padding: 8px; font-style: italic; border-top: 1px solid var(--ink); }
+
+            /* Preserved Elements */
+            .flip-box { background: var(--ink); color: var(--asu-gold); border-radius: 2px; padding: 10px; min-width: 55px; text-align: center; font-family: 'Courier New', Courier, monospace; font-weight: bold; border: 1px solid var(--asu-gold); }
+            .calendar-container { background: white; padding: 10px; border: 1px solid #ccc; display: inline-block; }
+            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: #eee; padding: 2px; }
+            .cal-day { background: white; padding: 4px; text-align: center; font-size: 0.65rem; color: #999; }
             .cal-target { background: var(--asu-maroon); color: white; font-weight: bold; }
         </style>
     </head>
@@ -56,94 +59,109 @@
             <header class="masthead">
                 <button onclick="showPage('feed')"><h1>The Tempe Torch</h1></button>
                 <div class="date-line">
-                    <span>Vol. 120 — No. 42</span>
-                    <span>Tempe, Arizona — Saturday, February 7, 2026</span>
-                    <span>Price: One Cent</span>
+                    <span>Final Edition — No. 42</span>
+                    <span>Saturday, February 7, 2026</span>
+                    <span>Tempe, Arizona — Weather: Clear</span>
                 </div>
             </header>
 
             <main id="feed" class="page-content page-active">
-                <div class="grid md:grid-cols-3 gap-10">
-                    <div class="md:col-span-2">
+                <div class="grid md:grid-cols-3 gap-12">
+                    <div class="md:col-span-2 border-r border-slate-300 pr-10">
                         <article class="cursor-pointer" onclick="showPage('hockey')">
-                            <h2 class="headline text-6xl">SCSU Silences Mullett Arena; Devils Eyes Rematch</h2>
-                            <p class="subheadline">Tyson Gross nets two as Sun Devils fail to capitalize on 34-shot barrage in NCHC opener.</p>
+                            <h2 class="headline text-6xl">Desert Redemption: Sun Devils Eye Rematch Following Friday’s Frustration</h2>
+                            <span class="subheadline">Coach Powers calls for "offensive urgency" as ASU looks to crack the Husky trap in tonight's pivotal NCHC showdown.</span>
                             <div class="columns text-sm">
-                                <span class="dropcap">T</span>he atmosphere at Mullett Arena was electric, but the results were ice-cold for the Arizona State Sun Devils. Despite a relentless offensive effort that tested sophomore goaltender Patriks Berzins 34 times, ASU fell 4-1 to St. Cloud State in a physical Friday night showdown. The Huskies utilized a disciplined structural trap that effectively neutralized the Devils' transition game. Tyson Gross proved to be the primary antagonist, netting a shorthanded goal in the second period before adding a back-breaker in the third. Tonight, Coach Greg Powers’ squad faces a pivotal "split or quit" moment as they attempt to solve Berzins and find the back of the net...
+                                <span class="dropcap">W</span>ith the sting of a 4-1 loss still fresh, the Arizona State Sun Devils return to Mullett Arena tonight for a match that carries heavy implications for their NCHC standings. Last night, despite outshooting St. Cloud State 34-18, the Devils were stymied by the surgical efficiency of the Huskies’ counter-attack. Tonight, the narrative centers on structural adjustments: can the Devils find the "high-danger" zones that Patriks Berzins so effectively guarded in the opener? The blueprint for success lies in discipline—avoiding the defensive lapses that allowed Tyson Gross to net two back-breakers...
                             </div>
+                            <p class="mt-6 font-bold uppercase text-xs text-asu-maroon underline">Continued on Page 3 &rarr;</p>
                         </article>
                     </div>
-                    <div class="border-l border-slate-300 pl-8">
-                        <h3 class="font-bold border-b-2 border-ink mb-4 uppercase text-xs">The International Desk</h3>
+                    
+                    <div>
+                        <h3 class="font-black border-b-4 border-ink mb-4 uppercase text-xs pb-1">World Cup Bulletin</h3>
                         <article class="cursor-pointer" onclick="showPage('cricket')">
-                            <h4 class="headline text-2xl">Bumrah Fever Sidelined; Siraj Returns for Wankhede Clash</h4>
-                            <p class="text-xs italic mb-4">India vs USA: World Cup Title Defense Begins with Toss Loss.</p>
-                            <p class="text-sm">In a shock to the Indian camp, Jasprit Bumrah has been ruled out of today's opener against the USA due to a sudden fever. Mohammed Siraj, returning to the T20I fold after 557 days, steps into the primary pace role. USA captain Monank Patel has won the toss and opted to bowl, looking to exploit early Mumbai sea breezes.</p>
+                            <h4 class="headline text-3xl">Wankhede Drama: USA to Bowl in 2026 Opener</h4>
+                            <p class="text-xs italic mb-4">India vs USA: The Homecoming of Saurabh Netravalkar.</p>
+                            <p class="text-sm text-justify">In a stunning pre-match development, India will be without spearhead Jasprit Bumrah (illness) as they defend their T20 crown. USA Captain Monank Patel won the toss under Mumbai’s hazy afternoon sun and elected to field first, betting on the evening dew to aid their historic chase. All eyes remain on the red soil of the Wankhede...</p>
                         </article>
+                        <div class="mt-8 calendar-container shadow-sm">
+                            <h5 class="text-[9px] font-black uppercase mb-2 text-center">Gameday Calendar</h5>
+                            <div id="footer-cals"></div>
+                        </div>
                     </div>
                 </div>
             </main>
 
             <section id="hockey" class="page-content">
-                <button onclick="showPage('feed')" class="mb-4 text-xs font-bold uppercase underline">Return to Front Page</button>
-                <h2 class="headline text-5xl">The Anatomy of a Breakdown</h2>
-                <div class="columns text-sm mb-8">
-                    <p>Last night's 4-1 loss was a tale of two efficiencies. While ASU controlled the puck for significant stretches, the Huskies were surgical. Tyson Gross’s first goal came during an ASU power play—a deflection off a skater that allowed Finn Loftus to feed Gross for a tap-in past Samuel Urban. It was a momentum shift from which the Devils never fully recovered. Noah Powell managed to level the score at 1-1 with a shorthanded goal of his own, assisted by Logan Morrell and Samuel Alfano, but the offense stalled thereafter.</p>
-                    <p>Defensively, the Sun Devils struggled with SCSU’s net-front presence. Austin Burnevik and Verner Miettinen added empty-net goals to "ice" the game, but it was the 33-save performance by Berzins that stood as the wall ASU couldn't climb. For tonight’s rematch, the Devils must improve their 0-for-2 power play conversion and find a way to penetrate the slot rather than settling for perimeter shots.</p>
+                <button onclick="showPage('feed')" class="mb-6 text-xs font-bold uppercase border-b-2 border-ink">&larr; Return to Front Page</button>
+                <h2 class="headline text-6xl">Solving the Berzins Puzzle</h2>
+                <span class="subheadline">Tonight's Preview: Scouting the Huskies and the ASU Power Play.</span>
+                <div class="columns text-md">
+                    <p>Tonight’s rematch at the Mullett isn't just about effort—it’s about geometry. On Friday, St. Cloud State effectively pushed ASU’s shooters to the perimeter, resulting in high shot counts but low-quality scoring chances. To salvage a series split, the Sun Devils must penetrate the "Royal Road"—the imaginary line bisecting the slot—to force Patriks Berzins to move laterally.</p>
+                    <p>The Sun Devils' power play, which went 0-for-2 last night, will be the X-factor. With Bennett Schimek and Cruz Lucius operating the half-wall, ASU needs more than just puck movement; they need traffic in front of the crease to disrupt Berzins' sightlines. Defensively, Samuel Urban will look to bounce back. While he wasn't at fault for the odd-man rushes on Friday, his ability to steal a goal in the first period could be the psychological edge the Sun Devils need to break the Husky momentum.</p>
                 </div>
             </section>
 
             <section id="cricket" class="page-content">
-                <button onclick="showPage('feed')" class="mb-4 text-xs font-bold uppercase underline">Return to Front Page</button>
-                <h2 class="headline text-5xl">Mumbai Homecoming: Netravalkar Returns to the Wankhede</h2>
-                <div class="columns text-sm">
-                    <p>For USA’s Saurabh Netravalkar, today’s match is more than a World Cup fixture—it is a return to his roots. Born and raised in Mumbai, Netravalkar represented India at the 2010 U19 World Cup alongside stars like KL Rahul. Now, the Oracle software engineer leads the American attack against his native land on the very ground where he once sought to make his name.</p>
-                    <p>The tactical battle shifted at the toss. Monank Patel’s decision to bowl first puts the pressure on India’s new-look opening pair of Abhishek Sharma and Ishan Kishan. With Suryakumar Yadav leading at his home ground, India will look to set a target beyond the reach of Andries Gous and the American middle order, who were frustrated by the "two-paced" nature of the pitch in early sessions.</p>
+                <button onclick="showPage('feed')" class="mb-6 text-xs font-bold uppercase border-b-2 border-ink">&larr; Return to Front Page</button>
+                <h2 class="headline text-6xl">2026 World Cup: The Mumbai Stand-Off</h2>
+                <div class="columns text-md">
+                    <p>The 2026 T20 World Cup begins at the Wankhede Stadium with a script that feels more like a homecoming than an international clash. For USA’s Saurabh Netravalkar, bowling at his former home ground provides a unique advantage; he understands the Mumbai "red soil" bounce better than any other associate player.</p>
+                    <p>India’s strategy, led by Suryakumar Yadav at his domestic base, revolves around sheer power. Despite the absence of Bumrah, the Indian attack led by Arshdeep Singh and a returning Mohammed Siraj remains formidable. The USA will rely on the middle-order stability of Milind Kumar and Harmeet Singh to weather the early storm if India sets a target north of 180.</p>
                 </div>
 
-                <div class="mt-8 border-t-2 border-ink pt-4">
-                    <h3 class="font-bold text-center uppercase tracking-widest text-lg">Official Match Scorecard & Team Rosters</h3>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <table class="official-table">
-                                <thead><tr><th colspan="2">India Playing XI</th></tr></thead>
-                                <tbody>
-                                    <tr><td>1. Abhishek Sharma</td><td>7. Axar Patel</td></tr>
-                                    <tr><td>2. Ishan Kishan (WK)</td><td>8. Arshdeep Singh</td></tr>
-                                    <tr><td>3. Tilak Varma</td><td>9. Mohammed Siraj</td></tr>
-                                    <tr><td>4. Suryakumar Yadav (C)</td><td>10. Varun Chakravarthy</td></tr>
-                                    <tr><td>5. Rinku Singh</td><td>11. Ravi Bishnoi</td></tr>
-                                    <tr><td>6. Hardik Pandya</td><td><span class="italic text-slate-500">Res: S. Samson, K. Yadav</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <table class="official-table">
-                                <thead><tr><th colspan="2">United States Playing XI</th></tr></thead>
-                                <tbody>
-                                    <tr><td>1. Saiteja Mukkamalla</td><td>7. Shubham Ranjane</td></tr>
-                                    <tr><td>2. Andries Gous (WK)</td><td>8. Mohammad Mohsin</td></tr>
-                                    <tr><td>3. Monank Patel (C)</td><td>9. Shadley van Schalkwyk</td></tr>
-                                    <tr><td>4. Milind Kumar</td><td>10. Saurabh Netravalkar</td></tr>
-                                    <tr><td>5. Sanjay Krishnamurthi</td><td>11. Ali Khan</td></tr>
-                                    <tr><td>6. Harmeet Singh</td><td><span class="italic text-slate-500">Res: S. Jahangir, S. Jayasuriya</span></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="mt-10 border-t-2 border-ink pt-6">
+                    <h3 class="font-black text-center uppercase tracking-widest text-xl mb-6">Official 2026 World Cup Roster & XI</h3>
+                    <div class="grid md:grid-cols-2 gap-10">
+                        <table class="official-scorecard">
+                            <thead><tr><th colspan="2">India Playing XI</th></tr></thead>
+                            <tbody>
+                                <tr><td>1. Abhishek Sharma</td><td>7. Axar Patel</td></tr>
+                                <tr><td>2. Ishan Kishan (WK)</td><td>8. Arshdeep Singh</td></tr>
+                                <tr><td>3. Tilak Varma</td><td>9. Mohammed Siraj</td></tr>
+                                <tr><td>4. Suryakumar Yadav (C)</td><td>10. Varun Chakravarthy</td></tr>
+                                <tr><td>5. Rinku Singh</td><td>11. Ravi Bishnoi</td></tr>
+                                <tr><td>6. Hardik Pandya</td><td><span class="font-bold">Bench:</span> S. Samson, K. Yadav, W. Sundar, J. Bumrah (Out)</td></tr>
+                            </tbody>
+                        </table>
+                        <table class="official-scorecard">
+                            <thead><tr><th colspan="2">United States Playing XI</th></tr></thead>
+                            <tbody>
+                                <tr><td>1. Monank Patel (C/WK)</td><td>7. Harmeet Singh</td></tr>
+                                <tr><td>2. Andries Gous</td><td>8. Shubham Ranjane</td></tr>
+                                <tr><td>3. Saiteja Mukkamalla</td><td>9. Shadley van Schalkwyk</td></tr>
+                                <tr><td>4. Milind Kumar</td><td>10. Saurabh Netravalkar</td></tr>
+                                <span></span>
+                                <tr><td>5. Sanjay Krishnamurthi</td><td>11. Ali Khan</td></tr>
+                                <tr><td>6. Shayan Jahangir</td><td><span class="font-bold">Bench:</span> J. Singh, S. Jayasuriya, M. Mohsin, N. Kenjige</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <footer class="mt-12 border-t-4 double border-ink pt-8">
-                <div class="flex flex-wrap justify-between items-center gap-8">
+            <footer class="mt-12 border-t-4 double border-ink pt-10">
+                <div class="flex flex-wrap justify-between items-end gap-10">
                     <div>
-                        <h4 class="text-[10px] font-black uppercase mb-2">Upcoming Calendar</h4>
-                        <div class="flex gap-2" id="footer-cals"></div>
+                        <h4 class="text-[10px] font-black uppercase mb-4">Edition Deadline</h4>
+                        <div class="text-xs italic">Printed in Tempe, Arizona. All rights reserved by The Torch Editorial Board.</div>
                     </div>
                     <div class="text-right">
-                        <h4 class="text-[10px] font-black uppercase mb-2">Countdown to Puck Drop</h4>
-                        <div class="flex gap-1 justify-end">
-                            <div class="flip-box" id="h-h">00</div><div class="flip-box" id="h-m">00</div><div class="flip-box" id="h-s">00</div>
+                        <h4 class="text-[11px] font-black uppercase mb-3">Countdown to Puck Drop</h4>
+                        <div class="flex gap-2 justify-end">
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box" id="h-h">00</div>
+                                <span class="text-[8px] font-bold uppercase mt-1">Hours</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box" id="h-m">00</div>
+                                <span class="text-[8px] font-bold uppercase mt-1">Minutes</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="flip-box" id="h-s">00</div>
+                                <span class="text-[8px] font-bold uppercase mt-1">Seconds</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -162,7 +180,7 @@
             function renderMonth(dateObj, targetDate) {
                 const year = dateObj.getFullYear(), month = dateObj.getMonth();
                 const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-                let html = `<div class="w-24"><div class="text-[7px] font-bold text-center uppercase mb-1">${dateObj.toLocaleString("default", { month: "short" })}</div><div class="calendar-grid">`;
+                let html = `<div class="w-28"><div class="text-[8px] font-bold text-center uppercase mb-2 text-asu-maroon">${dateObj.toLocaleString("default", { month: "long" })}</div><div class="calendar-grid">`;
                 for (let i = 0; i < firstDay; i++) html += `<div></div>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     let cls = (d === targetDate.getDate() && month === targetDate.getMonth()) ? "cal-day cal-target" : "cal-day";
