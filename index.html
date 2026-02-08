@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Sunday Gameday</title>
+        <title>The Tempe Torch | Gameday Central</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -16,6 +16,7 @@
             .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+            .ticker-box { background: #222; color: var(--asu-gold); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--asu-gold); margin: 0 4px; font-family: monospace; }
             .live-indicator { color: #ff4444; animation: blink 1.5s infinite; margin-right: 10px; }
             @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
@@ -70,8 +71,8 @@
             <header class="masthead">
                 <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
                 <div class="date-line">
-                    <span>SUNDAY MORNING POST</span>
-                    <span>FEBRUARY 8, 2026</span>
+                    <span>LATE EDITION</span>
+                    <span>FEBRUARY 7, 2026</span>
                     <span>TEMPE, ARIZONA — EST. 2024</span>
                 </div>
             </header>
@@ -181,15 +182,38 @@
                 window.scrollTo(0,0);
             }
 
-            // === UPDATED REAL-WORLD DATA CENTER ===
-            const gamesDatabase = [
+            // === AUTOMATED DATA FETCHER ===
+            // We use a CORS proxy to allow fetching ESPN data from a browser script.
+            // If the proxy fails, it falls back to the hardcoded data you provided.
+            const CORS_PROXY = "https://corsproxy.io/?"; 
+            
+            // ESPN API Endpoints
+            const APIS = {
+                hockey: "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard",
+                basketball: "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
+                softball: "https://site.api.espn.com/apis/site/v2/sports/baseball/softball/scoreboard",
+                cricket: "https://site.api.espn.com/apis/site/v2/sports/cricket/19304/scoreboard" 
+            };
+
+            // Team IDs to filter for
+            const TEAMS = {
+                ASU_HOCKEY: "58",
+                ASU_BBALL: "9",
+                ASU_SOFTBALL: "9"
+            };
+
+            // Central Game State
+            let gamesDatabase = [];
+
+            // FALLBACK DATA (Used initially or if API fails)
+            const fallbackData = [
                 {
                     sport: "NCAA BASKETBALL",
                     home: "Colorado",
                     away: "ASU",
                     status: "LIVE",
                     score: "60 - 56",
-                    timeInfo: "9:31 - 2nd Half",
+                    timeInfo: "9:31 - 2nd",
                     detailPage: null
                 },
                 {
@@ -198,7 +222,7 @@
                     away: "St. Cloud St.",
                     status: "FINAL",
                     score: "3 - 4",
-                    timeInfo: "Saturday Night",
+                    timeInfo: "Final",
                     detailPage: "hockey"
                 },
                 {
@@ -207,7 +231,7 @@
                     away: "USA",
                     status: "FINAL",
                     score: "161/6 - 132/8",
-                    timeInfo: "India won by 29 runs",
+                    timeInfo: "Final",
                     detailPage: "cricket"
                 },
                 {
@@ -216,22 +240,109 @@
                     away: "Northwestern",
                     status: "FINAL",
                     score: "8 - 0",
-                    timeInfo: "Kajikawa Classic",
+                    timeInfo: "Final",
                     detailPage: null
                 }
             ];
 
+            // 1. MAIN FETCH FUNCTION
+            async function fetchLiveSports() {
+                console.log("Fetching live data...");
+                const newGames = [];
+
+                try {
+                    // Fetch Hockey
+                    const hRes = await fetch(CORS_PROXY + APIS.hockey);
+                    const hData = await hRes.json();
+                    const asuHockey = findGame(hData, TEAMS.ASU_HOCKEY);
+                    if(asuHockey) newGames.push(formatESPNData(asuHockey, "NCHC HOCKEY", "hockey"));
+
+                    // Fetch Basketball
+                    const bRes = await fetch(CORS_PROXY + APIS.basketball);
+                    const bData = await bRes.json();
+                    const asuBball = findGame(bData, TEAMS.ASU_BBALL);
+                    if(asuBball) newGames.push(formatESPNData(asuBball, "NCAA BASKETBALL", null));
+
+                    // Fetch Softball
+                    const sRes = await fetch(CORS_PROXY + APIS.softball);
+                    const sData = await sRes.json();
+                    const asuSoftball = findGame(sData, TEAMS.ASU_SOFTBALL);
+                    if(asuSoftball) newGames.push(formatESPNData(asuSoftball, "NCAA SOFTBALL", null));
+
+                    // Cricket is usually hard to get free API for, so we keep the fallback
+                    newGames.push(fallbackData.find(g => g.sport === "T20 WORLD CUP"));
+
+                    // If we found live games, use them. If not, stick to fallback.
+                    if (newGames.length > 1) {
+                         gamesDatabase = newGames;
+                    } else {
+                         // Merge found games with missing fallbacks
+                         gamesDatabase = [...newGames, ...fallbackData.filter(f => !newGames.some(n => n.sport === f.sport))];
+                    }
+                    
+                    renderScoreboard();
+                    updateTickerSystem();
+
+                } catch (error) {
+                    console.error("API Fetch Error (Using Fallback):", error);
+                    gamesDatabase = fallbackData;
+                    renderScoreboard();
+                    updateTickerSystem();
+                }
+            }
+
+            // 2. HELPER: Find Game in JSON
+            function findGame(data, teamId) {
+                if(!data || !data.events) return null;
+                return data.events.find(e => e.competitions[0].competitors.some(c => c.id === teamId));
+            }
+
+            // 3. HELPER: Format Data
+            function formatESPNData(game, sportLabel, linkId) {
+                const comp = game.competitions[0];
+                const home = comp.competitors.find(c => c.homeAway === 'home');
+                const away = comp.competitors.find(c => c.homeAway === 'away');
+                const statusState = game.status.type.state; 
+
+                let statusText = "UPCOMING";
+                let scoreText = "vs";
+                let timeText = new Date(game.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                if (statusState === 'in') {
+                    statusText = "LIVE";
+                    scoreText = `${home.score} - ${away.score}`;
+                    timeText = game.status.type.shortDetail; 
+                } else if (statusState === 'post') {
+                    statusText = "FINAL";
+                    scoreText = `${home.score} - ${away.score}`;
+                    timeText = "Final";
+                }
+
+                return {
+                    sport: sportLabel,
+                    home: home.team.abbreviation,
+                    away: away.team.abbreviation,
+                    status: statusText,
+                    score: scoreText,
+                    timeInfo: timeText,
+                    detailPage: linkId
+                };
+            }
+
+            // 4. RENDER UI
             function renderScoreboard() {
                 const grid = document.getElementById('scoreboard-grid');
                 grid.innerHTML = '';
                 gamesDatabase.forEach(game => {
-                    const statusClass = game.status.toLowerCase();
+                    let statusClass = game.status.toLowerCase();
+                    if(game.status === 'LIVE') statusClass = 'live';
+
                     const card = document.createElement('div');
                     card.className = 'score-card';
                     card.innerHTML = `
                         <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
-                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
-                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
+                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0]}</span></div>
+                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] || ''}</span></div>
                         <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
                         ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Read Report</button>` : ''}
                     `;
@@ -243,18 +354,24 @@
                 const tickerContainer = document.getElementById('ticker-feed');
                 let tickerHTML = '';
                 gamesDatabase.forEach(game => {
-                    if (game.status === 'LIVE') {
-                         tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
-                    } else if (game.status === 'FINAL') {
+                    if (game.status === 'FINAL') {
                         tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
+                    } else if (game.status === 'LIVE') {
+                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
+                    } else {
+                         tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} (${game.timeInfo})</div>`;
                     }
                 });
                 tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
                 tickerContainer.innerHTML = tickerHTML;
             }
 
+            // INIT
+            gamesDatabase = fallbackData; // Load instant data first
             renderScoreboard();
             updateTickerSystem();
+            fetchLiveSports(); // Try to fetch real data
+            setInterval(fetchLiveSports, 60000); // Refresh every 60s
         </script>
     </body>
 </html>
