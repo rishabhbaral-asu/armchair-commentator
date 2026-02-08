@@ -6,17 +6,19 @@
         <title>The Tempe Torch | Super Bowl LX</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
         <style>
             :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #fdfbf7; --paper-dark: #ebe7de; }
             body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
             
             /* Ticker */
             .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; z-index: 1000; display: flex; align-items: center; }
-            .ticker-content { display: flex; white-space: nowrap; animation: ticker 60s linear infinite; padding-left: 100vw; }
+            .ticker-content { display: flex; white-space: nowrap; animation: ticker 45s linear infinite; padding-left: 100vw; }
             @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: inline-flex; align-items: center; padding: 0 30px; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
             .ticker-item img { height: 20px; margin-right: 10px; }
+            .live-dot { height: 10px; width: 10px; background: red; border-radius: 50%; display: inline-block; margin-right: 8px; animation: flash 1.5s infinite; }
+            @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
             /* Layout */
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 20px; box-shadow: 0 0 70px rgba(0,0,0,0.7); position: relative; }
@@ -31,6 +33,7 @@
             .subheadline { font-style: italic; font-size: 1.1rem; color: #444; display: block; margin: 10px 0; border-bottom: 1px solid #bbb; padding-bottom: 10px; font-family: 'Libre Baskerville', serif; }
             .story-text { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 15px; }
             .dropcap { float: left; font-size: 4.5rem; line-height: 0.7; padding-top: 5px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+            .dateline { font-family: 'Oswald', sans-serif; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; color: #666; margin-right: 5px; }
             
             /* Navigation */
             .nav-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 10px 0; margin-bottom: 30px; background: var(--paper-dark); }
@@ -42,8 +45,12 @@
             .btn-read:hover { background: var(--asu-maroon); }
             
             .team-logo-sm { height: 24px; width: auto; vertical-align: middle; margin: 0 5px; }
-            .team-logo-lg { height: 60px; width: 60px; object-fit: contain; }
-            .team-logo-xl { height: 100px; width: 100px; object-fit: contain; }
+            
+            /* Box Score Table */
+            .box-score { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; margin-top: 20px; background: white; border: 1px solid black; }
+            .box-score th { background: #eee; border-bottom: 2px solid black; text-align: left; padding: 5px; text-transform: uppercase; }
+            .box-score td { border-bottom: 1px solid #ddd; padding: 4px; }
+            .box-header { background: black; color: white; padding: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; margin-top: 20px; }
 
             /* Scoreboard Grid */
             .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
@@ -88,8 +95,8 @@
                 <span class="nav-item" onclick="showPage('front')">Front Page</span>
                 <span class="nav-item" onclick="showPage('scores')">Scoreboard</span>
                 <span class="nav-item" onclick="showPage('superbowl')">Super Bowl LX</span>
-                <span class="nav-item" onclick="showPage('story-bball-preview')">UMD @ Minn</span>
-                <span class="nav-item" onclick="showPage('story-soft-preview')">ASU vs Memphis</span>
+                <span class="nav-item" onclick="showPage('story-bball-live')">MD @ Minn (LIVE)</span>
+                <span class="nav-item" onclick="showPage('story-soft-live')">ASU Softball (LIVE)</span>
                 <span class="nav-item" onclick="showPage('story-cricket')">Cricket WC</span>
             </nav>
 
@@ -106,39 +113,39 @@
                         <span class="subheadline">Devils collapse late in Boulder; Colorado closes on 12-4 run to spoil Odum's big night.</span>
                         
                         <div class="story-text columns-1 md:columns-2 gap-8">
-                            <span class="dropcap">T</span>he altitude in Boulder is undefeated. Arizona State (12-12, 3-8 Big 12) held a lead with four minutes remaining, but gasping lungs and missed free throws doomed them to a 78-70 loss against the Buffaloes.
+                            <span class="dropcap">B</span>OULDER, Colo. — The altitude in Boulder is undefeated, and for 36 minutes, the Arizona State Sun Devils (12-12, 3-8 Big 12) looked like they might be the exception. They held a three-point lead with four minutes remaining, silencing the CU Events Center. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against the Buffaloes.
                             <br><br>
                             Senior point guard <strong>Moe Odum</strong> was electric, pouring in 23 points and dishing 5 assists. He repeatedly attacked Colorado's 7-foot interior, finding freshman center <strong>Massamba Diop</strong> (19 pts, 7 rebs) for easy dunks. But when the game tightened, Colorado's depth took over.
-                            <br><br>
-                            "We stopped moving the ball," said head coach Bobby Hurley. "We played 36 minutes of winning basketball and 4 minutes of hesitation."
                         </div>
                         <button class="btn-read" onclick="showPage('story-bball-recap')">Full Recap & Box Score &rarr;</button>
                     </div>
 
                     <div class="flex flex-col gap-6">
                         
-                        <div class="border-b border-gray-300 pb-4">
+                         <div class="border-b border-gray-300 pb-4 bg-gray-50 p-2 border-l-4 border-red-600">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-asu-maroon text-xs uppercase mb-1">NCHC Hockey</h4>
-                                    <h3 class="headline text-2xl">Brick Wall</h3>
+                                    <div class="text-red-600 font-bold text-xs uppercase mb-1 animate-pulse">● LIVE UPDATE</div>
+                                    <h3 class="headline text-2xl">Crunch Time</h3>
                                 </div>
-                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png" class="h-10">
+                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/135.png" class="h-10">
                             </div>
-                            <p class="text-sm mt-2 mb-2">SCSU goalie Patriks Berzins makes 38 saves to deny the Sun Devils a comeback win.</p>
-                            <button class="text-xs font-bold underline text-blue-900" onclick="showPage('story-hockey')">Read More</button>
+                            <p class="text-sm mt-2 mb-2 font-bold">MINN 68, MD 65 (1:12 remaining)</p>
+                            <p class="text-xs">Chance Stephens hits a corner three to give the Gophers the lead! </p>
+                            <button class="text-xs font-bold underline text-blue-900" onclick="showPage('story-bball-live')">Follow Live</button>
                         </div>
 
                         <div class="border-b border-gray-300 pb-4">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-asu-maroon text-xs uppercase mb-1">ASU Softball</h4>
-                                    <h3 class="headline text-2xl">Perfect Start</h3>
+                                    <div class="text-red-600 font-bold text-xs uppercase mb-1 animate-pulse">● LIVE UPDATE</div>
+                                    <h3 class="headline text-2xl">Devils Lead Early</h3>
                                 </div>
                                 <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" class="h-10">
                             </div>
-                            <p class="text-sm mt-2 mb-2">Devils move to 4-0. Tanya Windle clears the bases in mercy-rule rout of Northwestern.</p>
-                            <button class="text-xs font-bold underline text-blue-900" onclick="showPage('story-soft-recap')">Read More</button>
+                            <p class="text-sm mt-2 mb-2 font-bold">ASU 3, Memphis 0 (Bot 2nd)</p>
+                            <p class="text-xs">Silva strikes out the side in the 1st; Windle RBI double in the 2nd.</p>
+                            <button class="text-xs font-bold underline text-blue-900" onclick="showPage('story-soft-live')">Follow Live</button>
                         </div>
 
                          <div>
@@ -157,40 +164,40 @@
                 </div>
 
                 <div class="mt-12 pt-8 border-t-4 double border-black">
-                    <h3 class="font-oswald text-2xl uppercase mb-6 text-center bg-gray-100 py-2">Upcoming & Live Action</h3>
+                    <h3 class="font-oswald text-2xl uppercase mb-6 text-center bg-gray-100 py-2">Other Action</h3>
                     <div class="grid md:grid-cols-3 gap-6">
                         
-                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="showPage('story-bball-preview')">
+                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="showPage('story-soft-final')">
                             <div class="flex justify-between mb-4">
+                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png" class="h-10">
+                                <span class="font-black text-xl font-sans text-gray-800">FINAL</span>
                                 <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" class="h-10">
-                                <span class="font-black text-xl font-sans">VS</span>
-                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/135.png" class="h-10">
                             </div>
-                            <h4 class="headline text-xl mb-2">Revenge Game</h4>
-                            <p class="text-sm text-gray-600">Former Terp <strong>Chance Stephens</strong> hosts Maryland. Can Derik Queen dominate inside?</p>
-                            <div class="mt-3 text-xs font-bold uppercase text-asu-maroon">Preview &rarr;</div>
+                            <h4 class="headline text-xl mb-2">UCF Holds On</h4>
+                            <p class="text-sm text-gray-600">Ace <strong>Katelyn Cochran</strong> finishes with 10 Ks as UCF defeats Maryland 6-2.</p>
+                            <div class="mt-3 text-xs font-bold uppercase text-gray-800">View Box Score &rarr;</div>
                         </div>
 
-                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="showPage('story-soft-preview')">
+                         <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="showPage('story-hockey')">
                             <div class="flex justify-between mb-4">
-                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/235.png" class="h-10">
-                                <span class="font-black text-xl font-sans">VS</span>
+                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png" class="h-10">
+                                <span class="font-black text-xl font-sans text-gray-800">FINAL</span>
                                 <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" class="h-10">
                             </div>
-                            <h4 class="headline text-xl mb-2">Silva on the Mound</h4>
-                            <p class="text-sm text-gray-600">Ace <strong>Aissa Silva</strong> looks to shut down Memphis in the Kajikawa Classic finale.</p>
-                            <div class="mt-3 text-xs font-bold uppercase text-asu-maroon">Preview &rarr;</div>
+                            <h4 class="headline text-xl mb-2">Berzins Robs Devils</h4>
+                            <p class="text-sm text-gray-600">St. Cloud State goalie makes 38 saves to deny ASU a comeback.</p>
+                            <div class="mt-3 text-xs font-bold uppercase text-gray-800">View Box Score &rarr;</div>
                         </div>
 
-                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="showPage('story-soft-live')">
+                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer bg-black text-white" onclick="showPage('superbowl')">
                             <div class="flex justify-between mb-4">
-                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" class="h-10">
-                                <span class="font-black text-xl font-sans text-red-600 animate-pulse">LIVE</span>
-                                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png" class="h-10">
+                                <img src="https://a.espncdn.com/i/teamlogos/nfl/500/sea.png" class="h-10">
+                                <span class="font-black text-xl font-sans">VS</span>
+                                <img src="https://a.espncdn.com/i/teamlogos/nfl/500/ne.png" class="h-10">
                             </div>
-                            <h4 class="headline text-xl mb-2">Knights Dealing</h4>
-                            <p class="text-sm text-gray-600">UCF ace <strong>Katelyn Cochran</strong> has 8 Ks through 5 innings against Maryland.</p>
-                            <div class="mt-3 text-xs font-bold uppercase text-red-600">Follow Live &rarr;</div>
+                            <h4 class="headline text-xl mb-2 text-white">Super Bowl LX</h4>
+                            <p class="text-sm text-gray-300">Kickoff at 4:30 PM. Complete coverage of Seahawks vs Patriots.</p>
+                            <div class="mt-3 text-xs font-bold uppercase text-asu-gold">Read Preview &rarr;</div>
                         </div>
 
                     </div>
@@ -206,89 +213,83 @@
             <section id="superbowl" class="page-section">
                 <div class="max-w-4xl mx-auto border-4 border-black p-8 bg-white">
                     <img src="https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Super_Bowl_LX_Logo.svg/2560px-Super_Bowl_LX_Logo.svg.png" class="sb-logo-main mb-8">
-                    
-                    <div class="flex justify-between items-center mb-8 px-4 md:px-12">
-                        <div class="text-center">
-                            <img src="https://a.espncdn.com/i/teamlogos/nfl/500/sea.png" class="h-24 md:h-32 mx-auto mb-2">
-                            <h2 class="text-2xl md:text-4xl font-black font-sans uppercase">Seahawks</h2>
-                            <p class="text-gray-500 font-bold">14-3 • NFC Champs</p>
-                        </div>
-                        <div class="text-4xl md:text-6xl font-serif italic text-gray-300">VS</div>
-                        <div class="text-center">
-                            <img src="https://a.espncdn.com/i/teamlogos/nfl/500/ne.png" class="h-24 md:h-32 mx-auto mb-2">
-                            <h2 class="text-2xl md:text-4xl font-black font-sans uppercase text-blue-900">Patriots</h2>
-                            <p class="text-gray-500 font-bold">14-3 • AFC Champs</p>
-                        </div>
-                    </div>
-
+                    <h2 class="headline text-center text-4xl mb-4">Kickoff in 3 Hours</h2>
                     <div class="bg-gray-100 border border-gray-300 p-4 mb-8 text-center font-oswald text-lg">
                         <span class="mr-4"><strong>KICKOFF:</strong> 4:30 PM MST</span>
                         <span class="mr-4"><strong>TV:</strong> NBC</span>
                         <span class="mr-4"><strong>LINE:</strong> SEA -2.5</span>
-                        <span><strong>O/U:</strong> 47.5</span>
                     </div>
-
-                    <h3 class="headline text-4xl mb-4">The Quarterback Clash</h3>
-                    <div class="story-text columns-1 md:columns-2 gap-8">
-                        <p class="mb-4"><strong>Santa Clara, CA —</strong> It is a battle of narratives as much as football. On one sideline stands <strong>Sam Darnold</strong>, the once-discarded prospect who found salvation in Seattle. Under Mike Macdonald's system, Darnold threw for 4,200 yards and 32 touchdowns this season, unlocking the terrifying potential of DK Metcalf and Jaxon Smith-Njigba.</p>
-                        <p class="mb-4">Opposite him is the future: <strong>Drake Maye</strong>. The Patriots' sophomore sensation has evoked memories of Brady, leading New England back to the promised land in just his second year. Maye's connection with rookie wideout Rome Odunze has been lethal in the playoffs.</p>
-                        <p class="mb-4">"We know who they are," Patriots coach Jerod Mayo said yesterday. "They want to stretch the field. Our job is to make Sam play small ball."</p>
-                        <p><strong>Key Matchup:</strong> Patriots CB Christian Gonzalez vs. Seahawks WR DK Metcalf. If Gonzalez can leave Metcalf on an island, New England can stack the box against Kenneth Walker III.</p>
+                    <div class="story-text">
+                         <span class="dateline">SANTA CLARA, Calif. —</span> It is a battle of narratives as much as football. On one sideline stands <strong>Sam Darnold</strong>, the once-discarded prospect who found salvation in Seattle. Under Mike Macdonald's system, Darnold threw for 4,200 yards and 32 touchdowns this season, unlocking the terrifying potential of DK Metcalf and Jaxon Smith-Njigba.
+                         <br><br>
+                         Opposite him is the future: <strong>Drake Maye</strong>. The Patriots' sophomore sensation has evoked memories of Brady, leading New England back to the promised land in just his second year. Maye's connection with rookie wideout <strong>Rome Odunze</strong> has been lethal in the playoffs, dismantling the Chiefs and Ravens on the road.
                     </div>
                 </div>
             </section>
 
-            <section id="story-bball-preview" class="page-section">
+            <section id="story-bball-live" class="page-section">
                 <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
                 <div class="flex items-center gap-4 border-b border-black pb-4 mb-6">
                     <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/135.png" class="h-16">
-                    <h1 class="headline text-5xl">The Chance Stephens Game</h1>
+                    <h1 class="headline text-5xl">LIVE: Stephens Hits HUGE Three</h1>
                 </div>
                 <div class="grid md:grid-cols-3 gap-8">
                     <div class="md:col-span-2 story-text">
-                        <p class="dropcap">I</p>t's not just another Big Ten matchup at Williams Arena. Today, Minnesota (14-7) hosts Maryland (14-8) in a game circled on the calendar of one man: <strong>Chance Stephens</strong>. The sharpshooting guard, who transferred from Maryland to Minnesota for the 2025-26 season, faces his former teammates for the first time.
-                        <p class="mt-4">Stephens has been a revelation for the Gophers, averaging 12.4 points and shooting 41% from deep. But he faces a Maryland defense anchored by sophomore sensation <strong>Derik Queen</strong>. Queen has been a force in the paint, averaging a double-double (16.5 ppg, 10.2 rpg).</p>
-                        <p class="mt-4">"It's all love," Stephens said at shootaround. "But I want this one. Badly."</p>
-                        <p class="mt-4"><strong>Key to the Game:</strong> Can Minnesota senior <strong>Cade Tyson</strong> stretch the floor enough to pull Queen out of the paint? If Maryland controls the rebounding battle, they win.</p>
+                        <div class="bg-red-600 text-white px-3 py-1 font-bold inline-block mb-4 text-xs tracking-wider animate-pulse">LIVE • 2ND HALF • 1:12 REMAINING</div>
+                        <p>
+                            <span class="dateline">MINNEAPOLIS (1:30 PM MST) —</span> The Barn is shaking! Moments ago, <strong>Chance Stephens</strong> drilled a corner three—his fifth of the night—to reclaim the lead for Minnesota. The Gophers (11-12) now lead Maryland (8-14) <strong>68-65</strong> with just over a minute to play.
+                        </p>
+                        <p>
+                            This has been a revenge game for the ages. Stephens, the former Maryland guard, has torched his old team for 17 points. But the Terps are staying alive thanks to <strong>Pharrel Payne</strong>. The former Minnesota big man, now playing for Maryland after a stint at Texas A&M, has been a bully in the paint with 16 points and 9 rebounds.
+                        </p>
+                        <p>
+                            "Timeout Maryland!" the announcer screams. Coach Kevin Willard is drawing up a play. This is coming down to the wire.
+                        </p>
                     </div>
-                    <div class="bg-gray-100 p-4 h-fit border border-gray-300">
-                        <h4 class="font-oswald uppercase mb-2 border-b border-black pb-1">Game Facts</h4>
-                        <ul class="text-sm space-y-2">
-                            <li><strong>Tipoff:</strong> 2:00 PM ET</li>
-                            <li><strong>Venue:</strong> Williams Arena ("The Barn")</li>
-                            <li><strong>TV:</strong> Big Ten Network</li>
-                            <li><strong>Line:</strong> MINN -3.5</li>
-                            <li><strong>Player to Watch:</strong> Isaac Asuma (MINN PG) - 6.2 APG</li>
-                        </ul>
+                    <div class="bg-gray-100 p-4 h-fit border border-gray-300 font-mono text-sm">
+                        <h4 class="font-oswald uppercase mb-2 border-b border-black pb-1">Live Stats</h4>
+                        <div class="flex justify-between mb-1 text-lg font-bold"><span>MINN</span> <span>68</span></div>
+                        <div class="flex justify-between mb-4 text-lg font-bold"><span>MD</span> <span>65</span></div>
+                        
+                        <div class="border-t border-gray-300 pt-2 mb-2 font-bold">Leaders</div>
+                        <div class="mb-1">MIN: C. Stephens (17 pts, 5/8 3PT)</div>
+                        <div class="mb-1">MIN: I. Asuma (6 ast)</div>
+                        <div class="mb-1">MD: P. Payne (16 pts, 9 reb)</div>
+                        <div class="mb-1">MD: D. Queen (14 pts)</div>
                     </div>
-                </div>
-            </section>
-
-            <section id="story-soft-preview" class="page-section">
-                <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
-                <div class="flex items-center gap-4 border-b border-black pb-4 mb-6">
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" class="h-16">
-                    <h1 class="headline text-5xl">Silva Takes the Circle</h1>
-                </div>
-                <div class="story-text">
-                    <p>The Sun Devils (4-0) look to close out the Kajikawa Classic with a perfect record as they host the Memphis Tigers this afternoon.</p>
-                    <p>All eyes are on ASU's senior ace <strong>Aissa Silva</strong>. The Tucson native has been unhittable early in the 2026 campaign, boasting a 0.89 ERA. She matches up against a Memphis lineup struggling for consistency. Memphis senior pitcher <strong>Rylee Dugar</strong> will need the game of her life to stifle an ASU offense led by <strong>Tanya Windle</strong> (batting .450).</p>
-                    <p>"We want to finish the weekend strong," Silva said. "Defense has been amazing behind me."</p>
                 </div>
             </section>
 
             <section id="story-soft-live" class="page-section">
                 <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
                 <div class="bg-red-600 text-white px-4 py-1 inline-block text-xs font-bold uppercase mb-4 animate-pulse">Live Coverage</div>
-                <h1 class="headline text-5xl mb-6">Cochran Stifles Terps in Orlando</h1>
+                <h1 class="headline text-5xl mb-6">Devils Strike Early</h1>
                 <div class="story-text">
-                    <p><strong>ORLANDO —</strong> UCF ace <strong>Katelyn Cochran</strong> is putting on a clinic. Through 6 innings against Maryland, the senior right-hander has struck out 8 and allowed only two hits. The Knights lead 5-2.</p>
-                    <p>Maryland has threatened only once, when <strong>Taylor Borovac</strong> hit a two-run double in the 4th, but Cochran responded by retiring the next six batters in order. UCF's offense provided cushion early with a 3-run homer in the 1st.</p>
+                    <p><strong>TEMPE (1:30 PM MST) —</strong> The Sun Devils have wasted no time. After ace <strong>Aissa Silva</strong> struck out the side in the top of the 1st, the offense went to work against Memphis senior pitcher <strong>Rylee Dugar</strong>.</p>
+                    <p>In the bottom of the 2nd, with runners on second and third, senior <strong>Tanya Windle</strong> ripped a double down the left-field line, scoring two. A subsequent sacrifice fly has made it <strong>3-0 Arizona State</strong>.</p>
                 </div>
-                <table class="w-full text-sm border-collapse border border-black mt-6 font-mono">
-                    <tr class="bg-gray-200"><th class="border border-black p-2">Team</th><th class="border border-black p-2">1</th><th class="border border-black p-2">2</th><th class="border border-black p-2">3</th><th class="border border-black p-2">4</th><th class="border border-black p-2">5</th><th class="border border-black p-2">6</th><th class="border border-black p-2">R</th><th class="border border-black p-2">H</th><th class="border border-black p-2">E</th></tr>
-                    <tr><td class="border border-black p-2">Maryland</td><td class="border border-black p-2">0</td><td class="border border-black p-2">0</td><td class="border border-black p-2">0</td><td class="border border-black p-2">2</td><td class="border border-black p-2">0</td><td class="border border-black p-2">0</td><td class="border border-black p-2 font-bold">2</td><td class="border border-black p-2">3</td><td class="border border-black p-2">1</td></tr>
-                    <tr><td class="border border-black p-2">UCF</td><td class="border border-black p-2">3</td><td class="border border-black p-2">1</td><td class="border border-black p-2">0</td><td class="border border-black p-2">0</td><td class="border border-black p-2">1</td><td class="border border-black p-2 font-bold">-</td><td class="border border-black p-2 font-bold">5</td><td class="border border-black p-2">8</td><td class="border border-black p-2">0</td></tr>
+                <div class="box-header">Live Scorecard (Bottom 2nd)</div>
+                <table class="box-score">
+                    <tr class="bg-gray-200"><th class="border border-black p-2">Team</th><th>1</th><th>2</th><th>3</th><th>R</th><th>H</th><th>E</th></tr>
+                    <tr><td>Memphis</td><td>0</td><td>0</td><td>-</td><td class="font-bold">0</td><td>0</td><td>0</td></tr>
+                    <tr><td>Arizona State</td><td>0</td><td>3</td><td>-</td><td class="font-bold">3</td><td>3</td><td>0</td></tr>
+                </table>
+            </section>
+
+             <section id="story-soft-final" class="page-section">
+                <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
+                <div class="flex items-center gap-4 mb-4">
+                     <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png" class="h-12">
+                     <h1 class="headline text-5xl">Knights Secure Win</h1>
+                </div>
+                <div class="story-text">
+                    <span class="dateline">ORLANDO, Fla. —</span> UCF ace <strong>Katelyn Cochran</strong> went the distance, striking out 10 batters as the Knights defeated Maryland 6-2 in the Black & Gold Classic. Maryland sophomore catcher <strong>Zayda Rocke</strong> attempted a late rally with an RBI double in the 7th, but Cochran induced a game-ending groundout.
+                </div>
+                <div class="box-header">Final Box Score</div>
+                <table class="box-score">
+                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>R</th><th>H</th><th>E</th></tr>
+                    <tr><td>Maryland</td><td>0</td><td>0</td><td>0</td><td>2</td><td>0</td><td>0</td><td>0</td><td class="font-bold">2</td><td>4</td><td>1</td></tr>
+                    <tr><td>UCF</td><td>3</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>X</td><td class="font-bold">6</td><td>9</td><td>0</td></tr>
                 </table>
             </section>
 
@@ -299,9 +300,18 @@
                      <h1 class="headline text-5xl">Buffs Stampede Late</h1>
                 </div>
                 <div class="story-text">
-                    <p>Despite 23 points from <strong>Moe Odum</strong>, the Sun Devils fell 78-70 at the CU Events Center. The turning point came with 3:12 remaining. Tied at 66, Colorado went on a 12-4 run fueled by offensive rebounds. Colorado's big men simply wore down ASU's freshman center <strong>Massamba Diop</strong>.</p>
-                    <p>Junior guard <strong>Bryce Ford</strong> added 12 points for ASU but struggled from deep (2-for-8). "We have to learn how to close on the road," Ford said postgame.</p>
+                    <span class="dateline">BOULDER, Colo. —</span> Despite 23 points from <strong>Moe Odum</strong>, the Sun Devils fell 78-70 at the CU Events Center. The turning point came with 3:12 remaining. Tied at 66, Colorado went on a 12-4 run.
                 </div>
+                <div class="box-header">Box Score: Arizona State vs. Colorado</div>
+                <table class="box-score">
+                    <thead><tr><th>Player (ASU)</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead>
+                    <tbody>
+                        <tr><td>M. Odum</td><td>23</td><td>2</td><td>5</td></tr>
+                        <tr><td>M. Diop</td><td>19</td><td>7</td><td>1</td></tr>
+                        <tr><td>B. Ford</td><td>12</td><td>3</td><td>2</td></tr>
+                        <tr><td><strong>TOTAL</strong></td><td><strong>70</strong></td><td><strong>23</strong></td><td><strong>10</strong></td></tr>
+                    </tbody>
+                </table>
             </section>
 
              <section id="story-cricket" class="page-section">
@@ -311,34 +321,32 @@
                      <h1 class="headline text-5xl">India Avoids Disaster</h1>
                 </div>
                 <div class="story-text">
-                    <p><strong>MUMBAI —</strong> The 2026 T20 World Cup nearly saw its biggest upset on day one. The USA bowling attack, led by Saurabh Netravalkar, reduced India to a stunning 46/4 inside the powerplay at Wankhede Stadium. A silenced crowd watched in horror.</p>
-                    <p>Enter Captain <strong>Suryakumar Yadav</strong>. The "SKY" exploded for an unbeaten 84 off 48 balls, using his trademark scoop shots to manipulate the field. He partnered with Hardik Pandya (32) to drag India to 161/9.</p>
-                    <p>In response, USA fought bravely, reaching 132/8, but the spin duo of Kuldeep Yadav and Axar Patel proved too much on the turning track. India wins by 29 runs.</p>
+                    <span class="dateline">MUMBAI —</span> The 2026 T20 World Cup nearly saw its biggest upset on day one. Captain <strong>Suryakumar Yadav</strong> exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse.
                 </div>
+                <div class="box-header">Match Summary (Group A)</div>
+                <table class="box-score">
+                    <tr><th colspan="2">India (161/9)</th><th colspan="2">USA (132/8)</th></tr>
+                    <tr><td>S. Yadav</td><td>84* (48)</td><td>Monank Patel</td><td>45 (38)</td></tr>
+                    <tr><td>H. Pandya</td><td>32 (22)</td><td>Andries Gous</td><td>31 (25)</td></tr>
+                    <tr><td>T. Varma</td><td>12 (8)</td><td>S. Netravalkar</td><td>3/28 (4)</td></tr>
+                </table>
             </section>
 
             <section id="story-hockey" class="page-section">
                 <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
                 <div class="flex items-center gap-4 mb-4">
-                     <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png" class="h-12">
+                     <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png" class="h-12">
                      <h1 class="headline text-5xl">Berzins Robs Devils</h1>
                 </div>
                 <div class="story-text">
-                    <p>St. Cloud State goalie <strong>Patriks Berzins</strong> was the difference maker Saturday night at Mullett Arena. The Latvian netminder turned away 38 shots, including a miraculous glove save in the dying seconds to preserve a 4-3 victory for the Huskies.</p>
-                    <p>ASU trailed 4-1 entering the third but mounted a furious comeback. Goals by <strong>Bennett Schimek</strong> and a power-play blast cut the lead to one, but they could not find the equalizer. St. Cloud's <strong>Veeti Miettinen</strong> scored twice for the visitors.</p>
+                    <span class="dateline">TEMPE, Ariz. —</span> St. Cloud State goalie <strong>Patriks Berzins</strong> turned away 38 shots to preserve a 4-3 victory for the Huskies.
                 </div>
-            </section>
-            
-            <section id="story-soft-recap" class="page-section">
-                <button class="mb-6 text-xs font-bold uppercase text-asu-maroon hover:underline" onclick="showPage('front')">&larr; Back to Front Page</button>
-                <div class="flex items-center gap-4 mb-4">
-                     <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" class="h-12">
-                     <h1 class="headline text-5xl">Mercy Rule in Tempe</h1>
-                </div>
-                <div class="story-text">
-                    <p>Arizona State needed only five innings to dispatch Northwestern 8-0. Pitcher <strong>Kenzie Brown</strong> was efficient, throwing a complete game two-hitter. The offense was sparked by senior <strong>Tanya Windle</strong>, who cleared the bases with a double in the 3rd inning to break the game open.</p>
-                    <p>Freshman <strong>JazMarie Roberts</strong> also impressed, going 2-for-3 with an RBI triple. The Sun Devils are now 4-0.</p>
-                </div>
+                <div class="box-header">Final Score</div>
+                <table class="box-score">
+                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>F</th></tr>
+                    <tr><td>St. Cloud State</td><td>1</td><td>3</td><td>0</td><td class="font-bold">4</td></tr>
+                    <tr><td>Arizona State</td><td>0</td><td>1</td><td>2</td><td class="font-bold">3</td></tr>
+                </table>
             </section>
 
         </div>
@@ -346,12 +354,12 @@
         <script>
             // DATA & LOGIC
             const games = [
+                { sport: "NCAA M.BB", home: "Minnesota", away: "Maryland", score: "68-65", status: "LIVE (2nd 1:12)", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/135.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", detail: "story-bball-live" },
+                { sport: "SOFTBALL", home: "ASU", away: "Memphis", score: "3-0", status: "LIVE (Bot 2nd)", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/235.png", detail: "story-soft-live" },
+                { sport: "SOFTBALL", home: "UCF", away: "Maryland", score: "6-2", status: "FINAL", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", detail: "story-soft-final" },
                 { sport: "NFL", home: "Seahawks", away: "Patriots", score: "VS", status: "4:30 PM", hLogo: "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", aLogo: "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", detail: "superbowl" },
-                { sport: "NCAA W.BB", home: "Maryland", away: "Minnesota", score: "VS", status: "2:00 PM", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/135.png", detail: "story-bball-preview" },
-                { sport: "SOFTBALL", home: "UCF", away: "Maryland", score: "5-2", status: "LIVE (6th)", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png", detail: "story-soft-live" },
-                { sport: "SOFTBALL", home: "ASU", away: "Memphis", score: "VS", status: "12:45 PM", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/235.png", detail: "story-soft-preview" },
                 { sport: "NCAA BB", home: "Colorado", away: "ASU", score: "78-70", status: "FINAL", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", detail: "story-bball-recap" },
-                { sport: "HOCKEY", home: "St Cloud", away: "ASU", score: "4-3", status: "FINAL", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", detail: "story-hockey" },
+                { sport: "HOCKEY", home: "St Cloud", away: "ASU", score: "4-3", status: "FINAL", hLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png", aLogo: "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", detail: "story-hockey" },
                 { sport: "T20 WC", home: "India", away: "USA", score: "161-132", status: "FINAL", hLogo: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg", aLogo: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg", detail: "story-cricket" }
             ];
 
@@ -368,10 +376,11 @@
                     
                     const isLive = g.status.includes("LIVE");
                     const statusColor = isLive ? "text-red-600 animate-pulse" : "text-gray-500";
+                    const liveDot = isLive ? '<span class="live-dot"></span>' : '';
 
                     card.innerHTML = `
                         <div class="score-status ${statusColor}">
-                            <span>${g.status}</span>
+                            <span>${liveDot}${g.status}</span>
                             <span>${g.sport}</span>
                         </div>
                         <div class="score-row">
@@ -391,7 +400,8 @@
                     container.appendChild(card);
 
                     // Ticker Item
-                    tickerHTML += `<div class="ticker-item"><img src="${g.hLogo}"> ${g.home} vs ${g.away}: ${g.score} [${g.status}]</div>`;
+                    const tickerLive = isLive ? '<span class="text-red-500 font-bold mr-2">LIVE:</span>' : '';
+                    tickerHTML += `<div class="ticker-item">${tickerLive} <img src="${g.hLogo}"> ${g.home} ${g.score} ${g.away}</div>`;
                 });
                 
                 tickerHTML += `<div class="ticker-item" style="color:var(--asu-gold)">THE TEMPE TORCH • SUPER BOWL EDITION</div>`;
