@@ -13,7 +13,7 @@
             
             /* DYNAMIC TICKER */
             .ticker-wrap { width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; position: fixed; top: 0; z-index: 1000; display: flex; align-items: center; }
-            .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
+            .ticker-content { display: flex; white-space: nowrap; animation: ticker 45s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
 
@@ -21,18 +21,18 @@
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 60px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
             .masthead { border-bottom: 8px double var(--ink); text-align: center; margin-bottom: 30px; }
             .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 7.5rem; color: var(--asu-maroon); margin: 0; line-height: 1; cursor: pointer; }
+            .section-header { font-family: sans-serif; font-weight: 900; text-transform: uppercase; border-bottom: 4px solid var(--asu-maroon); margin: 40px 0 20px 0; color: var(--asu-maroon); letter-spacing: 1px; }
             
             /* NAVIGATION BAR */
-            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 10px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 40px; }
-            .nav-item { font-family: sans-serif; font-weight: 900; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: color 0.2s; }
+            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 10px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+            .nav-item { font-family: sans-serif; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: color 0.2s; }
             .nav-item:hover { color: var(--asu-maroon); text-decoration: underline; }
-            .nav-item.active { color: var(--asu-maroon); text-decoration: underline; }
 
             /* TYPOGRAPHY */
             .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.9; color: var(--ink); letter-spacing: -2px; }
-            .subheadline { font-style: italic; font-size: 1.4rem; color: #222; display: block; margin: 20px 0; border-bottom: 1px solid #bbb; padding-bottom: 15px; }
-            .columns { column-count: 3; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.45; }
-            .dropcap { float: left; font-size: 6rem; line-height: 0.7; padding-top: 15px; padding-right: 12px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+            .subheadline { font-style: italic; font-size: 1.3rem; color: #333; display: block; margin: 15px 0; border-bottom: 1px solid #bbb; padding-bottom: 15px; }
+            .columns { column-count: 2; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.5; }
+            .dropcap { float: left; font-size: 5rem; line-height: 0.7; padding-top: 10px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
 
             /* SCORE CARDS */
             .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
@@ -45,22 +45,24 @@
             .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 1px solid var(--ink); padding: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
             .card-btn:hover { background: var(--asu-maroon); color: white; }
 
+            /* INSIDE PAGES */
             .page-content { display: none; }
             .page-active { display: block; }
-
-            /* DETAIL PAGE STYLES */
-            .lineup-card { border: 2px solid var(--ink); background: white; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
-            .lineup-header { padding: 12px; display: flex; align-items: center; gap: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
-            .lineup-grid { padding: 15px; display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.75rem; font-weight: bold; }
-            .analysis-box { background: #e9e5db; padding: 20px; border: 1px solid #c5c1b5; margin-top: 20px; position: relative; }
-            .analysis-box:before { content: "STAFF ANALYSIS"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
+            .box-score { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.8rem; font-family: sans-serif; }
+            .box-score th { background: #e0e0e0; text-align: left; padding: 8px; border: 1px solid #999; }
+            .box-score td { border: 1px solid #ccc; padding: 8px; }
+            .analysis-box { background: #e9e5db; padding: 25px; border: 1px solid #c5c1b5; margin: 30px 0; position: relative; }
+            .analysis-box:before { content: "THE FROST REPORT"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
+            .three-stars { display: flex; justify-content: space-between; margin-top: 30px; border-top: 4px double var(--ink); pt-4; }
+            .star-player { text-align: center; width: 30%; }
+            .star-name { font-weight: bold; display: block; text-transform: uppercase; font-size: 0.8rem; }
+            .star-stat { font-style: italic; font-size: 0.75rem; color: #555; }
         </style>
     </head>
     <body>
 
         <div class="ticker-wrap">
-            <div class="ticker-content" id="ticker-feed">
-                </div>
+            <div class="ticker-content" id="ticker-feed"></div>
         </div>
 
         <div class="broadsheet animate__animated animate__fadeIn">
@@ -76,40 +78,45 @@
             <nav class="nav-bar">
                 <span class="nav-item" onclick="navigateTo('feed')">Front Page</span>
                 <span class="nav-item" onclick="navigateTo('scores')">Scoreboard</span>
-                <span class="nav-item" onclick="navigateTo('hockey')">Hockey Recap</span>
-                <span class="nav-item" onclick="navigateTo('cricket')">Cricket Recap</span>
+                <span class="nav-item" onclick="navigateTo('basketball')">Men's Basketball</span>
+                <span class="nav-item" onclick="navigateTo('hockey')">NCHC Hockey</span>
+                <span class="nav-item" onclick="navigateTo('softball')">Softball</span>
+                <span class="nav-item" onclick="navigateTo('cricket')">Cricket</span>
             </nav>
 
             <main id="feed" class="page-content page-active">
-                <div class="border-b-4 border-ink pb-8 mb-8">
-                    <h2 class="headline text-8xl mb-4">DEVILS FALL IN BOULDER</h2>
-                    <span class="subheadline">Colorado pulls away late to defeat ASU 78-70; Softball provides bright spot with 8-0 mercy-rule victory over Northwestern.</span>
+                
+                <div class="section-header">Men's Basketball</div>
+                <article class="mb-12">
+                    <h2 class="headline text-7xl mb-4">ALTITUDE SICKNESS IN BOULDER</h2>
+                    <span class="subheadline">Devils fade late at CU Events Center, falling 78-70 despite offensive spark.</span>
                     <div class="columns">
-                        <span class="dropcap">T</span>he road woes continue for Bobby Hurley's squad. Despite a competitive first 30 minutes, the Sun Devils faded down the stretch, falling to the Colorado Buffaloes 78-70 at the CU Events Center. Arizona State (12-12, 3-8 Big 12) cut the deficit to four points late in the second half but couldn't get the critical stops when needed. "We fought hard, but you can't have empty possessions in the final four minutes on the road," Hurley noted post-game.
+                        <span class="dropcap">B</span>oulder remains a house of horrors for the Sun Devils. In a game defined by runs, Arizona State (12-12, 3-8 Big 12) couldn't withstand the final surge from the Colorado Buffaloes, dropping a hard-fought 78-70 contest on the road. The Devils held a slim lead with eight minutes remaining, thanks to aggressive penetration from the guards, but Colorado's size advantage in the paint ultimately wore down the smaller ASU lineup. 
                         <br><br>
-                        Across the sports complex, the mood was far brighter. The Sun Devil softball team delivered a statement win at the Kajikawa Classic, run-ruling Northwestern 8-0 in just five innings. Kenzie Brown was electric in the circle, while the offense exploded for a five-run 3rd inning that put the game out of reach early. It was the complete performance Coach Ford has been demanding all week.
+                        "We expended so much energy digging out of that early hole," Head Coach Bobby Hurley said post-game. "When you're playing at 5,000 feet, you can't afford empty possessions in crunch time." Colorado closed the game on a 12-4 run, converting six consecutive free throws to ice the game. The loss puts ASU's tournament hopes on life support, making next week's homestand a mandatory sweep.
                     </div>
-                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</button></div>
-                </div>
+                    <div class="mt-4"><button class="card-btn" style="width:auto; padding:8px 25px;" onclick="navigateTo('basketball')">FULL BOX SCORE & ANALYSIS &rarr;</button></div>
+                </article>
 
-                <div class="grid md:grid-cols-2 gap-12">
+                <div class="grid md:grid-cols-2 gap-12 border-t border-ink pt-8">
                     <div>
-                        <h3 class="headline text-5xl mb-6">MUMBAI: INDIA SURVIVES USA SCARE</h3>
-                        <p class="text-sm italic mb-4">By Special Dispatch | Wankhede Stadium</p>
-                        <div class="columns" style="column-count: 2;">
-                            In a match that was closer than the scorecard suggests, India defeated the USA by 29 runs to open their 2026 World Cup campaign. Suryakumar Yadav was the savior for the hosts, smashing a captain's knock of 84* after the American pacers reduced India to 77/6. The USA chase started brightly but crumbled against the spin of Axar Patel (2/16).
+                        <div class="section-header" style="margin-top:0;">NCHC Hockey</div>
+                        <h3 class="headline text-4xl mb-3">Sweep at the Mullett</h3>
+                        <p class="text-sm font-bold text-gray-600 mb-2">FINAL: St. Cloud State 4, ASU 3</p>
+                        <div class="text-sm text-justify mb-4">
+                            A frantic third-period rally wasn't enough to save the weekend. Down 4-1, goals from Schimek and Lucius brought the 5,000 fans to their feet, but SCSU goaltender Patriks Berzins made a sprawling save at the buzzer to deny overtime. The Sun Devils have now lost four straight conference games.
                         </div>
-                        <div class="mt-4"><button class="card-btn" onclick="navigateTo('cricket')">FULL MATCH REPORT &rarr;</button></div>
+                        <button class="card-btn" onclick="navigateTo('hockey')">READ HOCKEY RECAP &rarr;</button>
                     </div>
-                    <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
-                        <h4 class="font-black uppercase text-xl mb-6">Final Scores</h4>
-                        <ul class="list-disc pl-5 space-y-4 text-sm font-serif">
-                            <li><strong>Basketball:</strong> Colorado 78, ASU 70. The Buffs secure the home win despite a late push from the Devils.</li>
-                            <li><strong>Softball:</strong> ASU 8, Northwestern 0. Complete dominance in the Kajikawa Classic (5 Innings).</li>
-                        </ul>
-                        <div class="mt-6 pt-4 border-t border-slate-300">
-                            <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</span>
+
+                    <div>
+                        <div class="section-header" style="margin-top:0;">NCAA Softball</div>
+                        <h3 class="headline text-4xl mb-3">Mercy Rule Mastery</h3>
+                        <p class="text-sm font-bold text-gray-600 mb-2">FINAL: ASU 8, Northwestern 0 (5 Innings)</p>
+                        <div class="text-sm text-justify mb-4">
+                            Kenzie Brown was nearly untouchable, and the Sun Devil bats woke up in a big way at Farrington Stadium. A five-run 3rd inning broke the game open, culminating in a walk-off double that invoked the mercy rule. It was a complete performance against a ranked opponent.
                         </div>
+                        <button class="card-btn" onclick="navigateTo('softball')">READ SOFTBALL RECAP &rarr;</button>
                     </div>
                 </div>
             </main>
@@ -119,50 +126,134 @@
                 <div id="scoreboard-grid" class="score-grid"></div>
             </section>
 
+            <section id="basketball" class="page-content">
+                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
+                <h2 class="headline text-6xl my-6 uppercase">Hoops Analysis: Paint Problems</h2>
+                
+                <div class="columns">
+                    <p><strong>The Breakdown:</strong> Colorado out-rebounded ASU 42-28, a stat that tells the entire story. While ASU forced 14 turnovers, they gave up 16 second-chance points. The Buffaloes' big men simply camped in the lane, forcing ASU's guards to collapse and leaving shooters open on the perimeter.</p>
+                    <p><strong>Turning Point:</strong> With 3:30 left and the game tied 68-68, ASU committed back-to-back offensive fouls. Colorado capitalized with a corner three and a dunk, swinging momentum permanently. "Discipline in the final four minutes is non-negotiable," Hurley noted.</p>
+                </div>
+
+                <div class="analysis-box">
+                    <h4 class="font-bold uppercase text-sm mb-2">Coach's Corner</h4>
+                    <p class="text-sm italic">"We liked the pace. We liked the shots we got. We just didn't like the result on the glass. You can't beat a team like Colorado if you don't box out on free throws." — Bobby Hurley</p>
+                </div>
+
+                <table class="box-score">
+                    <tr><th>Team</th><th>1st Half</th><th>2nd Half</th><th>Total</th></tr>
+                    <tr><td>Arizona State</td><td>34</td><td>36</td><td><strong>70</strong></td></tr>
+                    <tr><td>Colorado</td><td>38</td><td>40</td><td><strong>78</strong></td></tr>
+                </table>
+
+                <div class="three-stars">
+                    <div class="star-player">
+                        <span class="star-name">1. T. da Silva (COLO)</span>
+                        <span class="star-stat">22 Pts, 10 Reb</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">2. ASU Guard Play</span>
+                        <span class="star-stat">Combined 38 Pts</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">3. K. Simpson (COLO)</span>
+                        <span class="star-stat">8 Assists, Clutch FTs</span>
+                    </div>
+                </div>
+            </section>
+
             <section id="hockey" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Recap: Too Little, Too Late</h2>
+                <h2 class="headline text-6xl my-6 uppercase">Ice Recap: The Late Surge</h2>
+                
                 <div class="columns">
-                    <p>St. Cloud State jumped out to a 2-0 lead early, punishing ASU defensive turnovers. The Sun Devils seemed lifeless until the third period, when desperation finally set in. Bennett Schimek's goal at 12:45 breathed life into the building, and when Lucius scored on a 6-on-4 advantage, the comeback seemed destined. But the hole dug in the first 40 minutes proved too deep.</p>
+                    <p><strong>The Breakdown:</strong> For 40 minutes, St. Cloud State put on a defensive clinic, trapping ASU in the neutral zone and forcing turnovers. But the third period saw a different Sun Devil team. Coach Powers shifted lines, loading up the top unit, which resulted in two quick goals. The Mullett was rocking, but the clock was the ultimate enemy.</p>
+                    <p><strong>Key Stat:</strong> 1-for-5 on the Power Play. In a one-goal game, the failure to convert on a 5-minute major in the second period haunts the Devils.</p>
                 </div>
-                <div class="analysis-box text-sm italic">
-                    <strong>Stat of the Night:</strong> ASU outshot SCSU 41-26 but went just 1-for-5 on the power play. The inability to convert special teams chances defined the weekend sweep.
+
+                <div class="analysis-box">
+                    <h4 class="font-bold uppercase text-sm mb-2">Tactical Note</h4>
+                    <p class="text-sm italic">ASU finally started moving the puck laterally across the "Royal Road" in the third period. This forced Berzins to move East-West, opening up the five-hole. Too little, too late, but a blueprint for next week.</p>
                 </div>
-                <div class="mt-8 border-t pt-4">
-                     <h3 class="font-bold text-xl mb-4">Final Box Score</h3>
-                     <table class="w-full text-sm border">
-                         <tr class="bg-gray-100 border-b"><th class="p-2 text-left">Team</th><th class="p-2">1</th><th class="p-2">2</th><th class="p-2">3</th><th class="p-2">F</th></tr>
-                         <tr class="border-b"><td class="p-2 font-bold">St. Cloud State</td><td class="p-2 text-center">1</td><td class="p-2 text-center">2</td><td class="p-2 text-center">1</td><td class="p-2 text-center font-bold">4</td></tr>
-                         <tr><td class="p-2 font-bold">Arizona State</td><td class="p-2 text-center">0</td><td class="p-2 text-center">1</td><td class="p-2 text-center">2</td><td class="p-2 text-center font-bold">3</td></tr>
-                     </table>
+
+                <table class="box-score">
+                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>F</th></tr>
+                    <tr><td>St. Cloud St.</td><td>1</td><td>2</td><td>1</td><td><strong>4</strong></td></tr>
+                    <tr><td>Arizona State</td><td>0</td><td>1</td><td>2</td><td><strong>3</strong></td></tr>
+                </table>
+
+                <div class="three-stars">
+                    <div class="star-player">
+                        <span class="star-name">1. P. Berzins (SCSU)</span>
+                        <span class="star-stat">38 Saves</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">2. B. Schimek (ASU)</span>
+                        <span class="star-stat">1 Goal, 1 Assist</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">3. T. Gross (SCSU)</span>
+                        <span class="star-stat">2 Goals</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="softball" class="page-content">
+                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
+                <h2 class="headline text-6xl my-6 uppercase">Diamond Report: Run Rule</h2>
+                
+                <div class="columns">
+                    <p><strong>The Breakdown:</strong> This was total domination. Northwestern, usually a Big Ten powerhouse, looked lost against the spin of ASU's Kenzie Brown. Offensively, the Sun Devils were aggressive early in the count, jumping on fastballs. The 5-run third inning featured three doubles and a moonshot home run to left field.</p>
+                    <p><strong>The Mercy Rule:</strong> Enacted when a team leads by 8 or more runs after 5 innings. It saved the bullpen arms for tomorrow's double-header.</p>
+                </div>
+
+                <table class="box-score">
+                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>R</th><th>H</th><th>E</th></tr>
+                    <tr><td>Northwestern</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><strong>0</strong></td><td>2</td><td>2</td></tr>
+                    <tr><td>Arizona State</td><td>1</td><td>2</td><td>5</td><td>0</td><td>X</td><td><strong>8</strong></td><td>9</td><td>0</td></tr>
+                </table>
+
+                <div class="three-stars">
+                    <div class="star-player">
+                        <span class="star-name">1. Kenzie Brown</span>
+                        <span class="star-stat">CG, Shutout, 8 K</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">2. ASU Offense</span>
+                        <span class="star-stat">9 Hits, 5 XBH</span>
+                    </div>
+                    <div class="star-player">
+                        <span class="star-name">3. The Defense</span>
+                        <span class="star-stat">0 Errors, 2 DPs</span>
+                    </div>
                 </div>
             </section>
 
             <section id="cricket" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Recap: SKY Saves India</h2>
+                <h2 class="headline text-6xl my-6 uppercase">World Cup: SKY's Rescue Act</h2>
+                
                 <div class="columns">
-                    <p>For 12 overs, the USA dared to dream. Mohammed Mohsin and Ali Khan ripped through the Indian top order, leaving the Wankhede stunned. But Suryakumar Yadav (84 off 48) played an innings of pure class, dragging India to 161. In reply, the USA lost wickets at regular intervals to Mohammed Siraj (3/22) and never recovered.</p>
+                    <p><strong>The Breakdown:</strong> The USA had India on the ropes at 77/6. The Wankhede was silent. But Suryakumar Yadav proved why he is the best T20 batter on the planet. His 360-degree play manipulated the field settings, frustrating the American bowlers who had started so well. USA's chase never got out of second gear against the spin choke.</p>
+                    <p><strong>Key Moment:</strong> The 18th over. SKY hit three sixes off Ali Khan, shifting the momentum entirely and pushing the total from "defendable" to "winning."</p>
                 </div>
-                <div class="analysis-box text-sm italic">
-                    <strong>Turning Point:</strong> The wicket of Monank Patel in the powerplay. Once the captain fell, the chase lost its anchor, allowing India's spinners to squeeze the middle overs.
+
+                <div class="analysis-box">
+                    <h4 class="font-bold uppercase text-sm mb-2">Pitch Report</h4>
+                    <p class="text-sm italic">The dew factor didn't play as big a role as expected. The pitch slowed down in the second innings, making Axar Patel's arm-balls lethal.</p>
                 </div>
-                <div class="mt-8 border-t pt-4">
-                     <h3 class="font-bold text-xl mb-4">Brief Scorecard</h3>
-                     <div class="grid grid-cols-2 gap-4 text-sm">
-                         <div class="border p-4">
-                             <strong>INDIA: 161/6 (20.0)</strong><br>
-                             S. Yadav 84* (48)<br>
-                             T. Varma 32 (24)<br>
-                             S. Netravalkar 2/28
-                         </div>
-                         <div class="border p-4">
-                             <strong>USA: 132/8 (20.0)</strong><br>
-                             A. Gous 41 (35)<br>
-                             S. Mukkamalla 28 (20)<br>
-                             M. Siraj 3/22
-                         </div>
-                     </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm mt-4 border border-ink p-4 bg-white">
+                    <div>
+                        <strong>INDIA: 161/6 (20.0)</strong><br>
+                        S. Yadav 84* (48)<br>
+                        S. Netravalkar 2/28
+                    </div>
+                    <div>
+                        <strong>USA: 132/8 (20.0)</strong><br>
+                        A. Gous 41 (35)<br>
+                        M. Siraj 3/22
+                    </div>
                 </div>
             </section>
 
@@ -178,8 +269,7 @@
                 window.scrollTo(0,0);
             }
 
-            // === FINAL "HARDCODED" DATABASE ===
-            // This is the only way to guarantee correct scores on a static site.
+            // FINAL DATABASE
             const gamesDatabase = [
                 {
                     sport: "NCAA BASKETBALL",
@@ -188,7 +278,7 @@
                     status: "FINAL",
                     score: "78 - 70",
                     timeInfo: "Final - Boulder, CO",
-                    detailPage: null
+                    detailPage: "basketball"
                 },
                 {
                     sport: "NCAA SOFTBALL",
@@ -197,7 +287,7 @@
                     status: "FINAL",
                     score: "8 - 0",
                     timeInfo: "Final (5 Innings)",
-                    detailPage: null
+                    detailPage: "softball"
                 },
                 {
                     sport: "NCHC HOCKEY",
@@ -219,7 +309,6 @@
                 }
             ];
 
-            // RENDER UI
             function renderUI() {
                 const grid = document.getElementById('scoreboard-grid');
                 const ticker = document.getElementById('ticker-feed');
@@ -245,7 +334,6 @@
                 ticker.innerHTML = tickerHTML;
             }
 
-            // Init
             renderUI();
         </script>
     </body>
