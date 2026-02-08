@@ -1,487 +1,335 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Super Bowl Sunday</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-        <style>
-            :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #f4f1ea; --paper-dark: #e8e4d9; }
-            body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
-            
-            /* DYNAMIC TICKER - MOBILE FIX */
-            .ticker-wrap { 
-                position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
-                background: black; border-bottom: 3px solid var(--asu-gold); 
-                overflow: hidden; z-index: 1000; display: flex; align-items: center; 
-            }
-            .ticker-content { 
-                display: flex; 
-                white-space: nowrap; 
-                /* Start at right edge of screen (100vw) and move left */
-                animation: ticker 45s linear infinite; 
-                padding-left: 100vw; 
-            }
-            @keyframes ticker { 
-                0% { transform: translateX(0); } 
-                100% { transform: translateX(-100%); } 
-            }
-            .ticker-item { 
-                display: inline-flex; align-items: center; padding: 0 30px; 
-                color: var(--asu-gold); font-family: 'Oswald', sans-serif; 
-                text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; 
-            }
-            .ticker-item::after {
-                content: "///";
-                color: #555;
-                margin-left: 30px;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Tempe Torch: Feb 8, 2026</title>
+    <style>
+        :root {
+            --primary: #8C1D40; /* ASU Maroon */
+            --secondary: #FFC627; /* ASU Gold */
+            --paper: #f4f1ea;
+            --text: #111;
+            --sb-patriots: #002244;
+            --sb-seahawks: #002244;
+            --sb-accent: #69BE28;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--paper);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        header {
+            text-align: center;
+            border-bottom: 4px double var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-family: 'Impact', sans-serif;
+            font-size: 4rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 2px 2px var(--secondary);
+            cursor: pointer;
+        }
+        .date-line {
+            font-family: 'Arial', sans-serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            padding: 6px 0;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            text-transform: uppercase;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        article {
+            background: #fff;
+            padding: 25px;
+            border: 1px solid #ddd;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .article-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .article-header img {
+            height: 50px;
+            width: 50px;
+            margin-right: 15px;
+            object-fit: contain;
+        }
+        h2 {
+            font-family: 'Arial Narrow', sans-serif;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8rem;
+            line-height: 1.1;
+        }
+        .score-box {
+            font-family: 'Courier New', monospace;
+            background: #eee;
+            padding: 8px 12px;
+            border-left: 5px solid var(--secondary);
+            margin: 0 0 15px 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        /* SUPER BOWL SPECIAL STYLE */
+        .super-bowl-section {
+            grid-column: 1 / -1;
+            background: #fff;
+            border: 4px solid #111;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .sb-header-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .sb-logo {
+            height: 70px;
+            width: auto;
+        }
+        .sb-title {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: #111;
+        }
+        .matchup {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin: 20px 0 30px 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        .team-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .team-logo-lg {
+            height: 100px;
+            width: 100px;
+            margin-bottom: 10px;
+            object-fit: contain;
+        }
+        .team-name {
+            font-size: 2.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .pats { color: var(--sb-patriots); }
+        .hawks { color: var(--sb-seahawks); }
+        .vs { 
+            font-size: 1.5rem; 
+            color: #888; 
+            font-style: italic; 
+            font-family: 'Georgia', serif;
+        }
+        .sb-preview-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            text-align: left;
+            columns: 2;
+            column-gap: 50px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        /* SIDEBAR */
+        .sidebar-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-top: 4px solid var(--primary);
+            margin-bottom: 20px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .sidebar-section h3 {
+            font-family: 'Arial', sans-serif;
+            text-transform: uppercase;
+            font-size: 1rem;
+            margin-top: 0;
+            color: #555;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
 
-            /* BROADSHEET STRUCTURE */
-            .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 20px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
-            @media (min-width: 768px) { .broadsheet { padding: 60px; } }
+        /* TICKER */
+        .ticker-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 40px;
+            background: #111; color: var(--secondary); z-index: 100;
+            overflow: hidden; line-height: 40px; font-family: 'Arial', sans-serif;
+            font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+        }
+        .ticker-content {
+            display: inline-block; white-space: nowrap;
+            padding-left: 100%; animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
 
-            .masthead { border-bottom: 8px double var(--ink); text-align: center; margin-bottom: 30px; }
-            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 15vw; md:font-size: 8rem; color: var(--asu-maroon); margin: 0; line-height: 0.8; cursor: pointer; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-            @media (min-width: 768px) { .masthead h1 { font-size: 8rem; } }
-            
-            /* NAVIGATION BAR */
-            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 12px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; background: var(--paper-dark); }
-            .nav-item { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: all 0.2s; letter-spacing: 1px; }
-            @media (min-width: 768px) { .nav-item { font-size: 0.9rem; gap: 40px; } }
-            .nav-item:hover { color: var(--asu-maroon); transform: translateY(-2px); }
-            .nav-item.active-nav { color: var(--asu-maroon); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .sb-preview-text { columns: 1; }
+            .matchup { flex-direction: column; gap: 20px; }
+            body { padding-top: 50px; }
+        }
+    </style>
+</head>
+<body>
 
-            /* TYPOGRAPHY */
-            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.9; color: var(--ink); letter-spacing: -1px; }
-            .subheadline { font-style: italic; font-size: 1.2rem; color: #444; display: block; margin: 15px 0; border-bottom: 1px solid #bbb; padding-bottom: 15px; font-family: 'Libre Baskerville', serif; }
-            .columns { column-count: 1; column-gap: 40px; text-align: justify; font-size: 1rem; line-height: 1.6; }
-            @media (min-width: 768px) { .columns { column-count: 2; } }
-            .dropcap { float: left; font-size: 5.5rem; line-height: 0.7; padding-top: 10px; padding-right: 15px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
-            .byline { font-family: sans-serif; font-size: 0.75rem; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 20px; display: block; }
+<div class="ticker-wrap">
+    <div class="ticker-content">
+        SUPER BOWL LX: SEAHAWKS VS. PATRIOTS (6:30 PM ET) /// NCAA HOOPS: MINNESOTA @ MARYLAND (2:00 PM ET) /// SOFTBALL: ASU DEF. MEMPHIS 4-1 /// UCF DEF. MARYLAND 5-2 /// 
+    </div>
+</div>
 
-            /* SPECIAL ELEMENTS */
-            .super-bowl-banner { background: var(--ink); color: var(--paper); text-align: center; padding: 15px; font-family: 'Oswald', sans-serif; font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 30px; border: 4px double var(--asu-gold); cursor: pointer; transition: all 0.3s; }
-            .super-bowl-banner:hover { background: var(--asu-maroon); border-color: white; }
+<header>
+    <h1>The Tempe Torch</h1>
+    <div class="date-line">
+        <span>Vol. 102, No. 45</span>
+        <span>Sunday, February 8, 2026</span>
+        <span>Price: $1.00</span>
+    </div>
+</header>
 
-            /* SCORE CARDS */
-            .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-            .score-card { border: 2px solid var(--ink); background: white; padding: 20px; position: relative; transition: transform 0.2s; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
-            .score-card:hover { transform: translateY(-3px); box-shadow: 8px 8px 0px rgba(0,0,0,0.15); }
-            .card-status { font-family: 'Oswald', sans-serif; font-size: 0.7rem; text-transform: uppercase; color: white; background: var(--ink); padding: 4px 10px; display: inline-block; margin-bottom: 15px; }
-            .card-status.live { background: #cc0000; animation: pulse 2s infinite; }
-            .card-status.upcoming { background: #004d99; }
-            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-            
-            .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; border-bottom: 1px dashed #ddd; padding-bottom: 8px; }
-            .teams-row:last-child { border-bottom: none; }
-            .team-score { font-size: 1.8rem; font-family: 'Oswald', sans-serif; }
-            .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 2px solid var(--ink); padding: 10px; margin-top: 15px; font-size: 0.75rem; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.2s; }
-            .card-btn:hover { background: var(--asu-maroon); color: white; border-color: var(--asu-maroon); }
+<div class="main-grid">
 
-            /* INSIDE PAGE ELEMENTS */
-            .page-content { display: none; animation: fadeIn 0.5s; }
-            .page-active { display: block; }
-            
-            .box-score { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.85rem; font-family: 'Oswald', sans-serif; letter-spacing: 0.5px; }
-            .box-score th { background: #e0e0e0; text-align: left; padding: 10px; border-bottom: 2px solid var(--ink); text-transform: uppercase; }
-            .box-score td { border-bottom: 1px solid #ccc; padding: 10px; }
-            .box-score tr:last-child td { font-weight: bold; background: #f9f9f9; }
-
-            .analysis-box { background: #e9e5db; padding: 30px; border: 1px solid #c5c1b5; margin: 30px 0; position: relative; }
-            .analysis-tag { position: absolute; top: -12px; left: 20px; background: var(--asu-maroon); color: white; padding: 4px 15px; font-size: 0.7rem; font-weight: 900; font-family: 'Oswald', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-            
-            .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; text-align: center; }
-            .stat-item { border: 1px solid var(--ink); padding: 10px; background: white; }
-            .stat-val { display: block; font-size: 1.5rem; font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--asu-maroon); }
-            .stat-label { font-size: 0.65rem; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
-
-            /* SUPER BOWL PAGE SPECIFIC */
-            .sb-header { text-align: center; border-bottom: 4px solid var(--ink); padding-bottom: 30px; margin-bottom: 30px; }
-            .sb-matchup { display: flex; flex-direction: column; md:flex-row; justify-content: center; align-items: center; gap: 20px; margin: 30px 0; }
-            @media (min-width: 768px) { .sb-matchup { flex-direction: row; gap: 40px; } }
-            .sb-team { font-family: 'UnifrakturMaguntia', serif; font-size: 3rem; md:font-size: 4rem; }
-            .sb-vs { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #888; }
-            .betting-line { background: #1a1a1a; color: #ffc627; padding: 15px; text-align: center; font-family: 'Oswald', sans-serif; letter-spacing: 2px; margin-top: 20px; font-size: 0.8rem; }
-            
-            /* SUPER BOWL WEATHER BOX */
-            .sb-weather { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; background: #e0e0e0; padding: 10px; border: 1px solid #999; text-align: center; }
-            .sb-weather-item { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.85rem; }
-            .sb-weather-val { font-weight: 900; display: block; font-size: 1.1rem; }
-
-        </style>
-    </head>
-    <body>
-
-        <div class="ticker-wrap">
-            <div class="ticker-content" id="ticker-feed"></div>
-        </div>
-
-        <div class="broadsheet animate__animated animate__fadeIn">
-
-            <header class="masthead">
-                <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
-                <div class="date-line text-sm font-bold tracking-widest mt-2 border-t border-b border-ink py-2">
-                    <span>SUNDAY EXTRA</span> • 
-                    <span>FEBRUARY 8, 2026</span> • 
-                    <span>TEMPE, AZ</span>
-                </div>
-            </header>
-
-            <div class="super-bowl-banner" onclick="navigateTo('superbowl')">
-                ★ SUPER BOWL LX EDITION: KICKOFF 4:30 PM MST ★
+    <div class="main-content">
+        
+        <article>
+            <div class="article-header">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png" alt="UCF Logo">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" alt="Maryland Logo">
+                <h2>Knights' Cochran Stifles Terps' Bats</h2>
             </div>
+            <div class="score-box">
+                FINAL: UCF 5, Maryland 2
+            </div>
+            <p><strong>ORLANDO, FL</strong> — The UCF Knights (4-1) continued their dominance in the Black & Gold Classic, relying on the arm of pitcher <strong>Katelyn Cochran</strong> to secure a victory over Maryland.</p>
+            <p>Maryland's sophomore catcher <strong>Zayda Rocke</strong> tried to rally the troops, delivering a vocal performance behind the plate and an RBI double in the 6th inning. However, UCF infielder <strong>Aubrey Evans</strong> proved too much to handle, going 3-for-4 with two runs scored.</p>
+            <p>Maryland two-way player <strong>Elisea Wiegand</strong> took the loss in the circle but showed promise at first base, turning an unassisted double play in the 4th. The Terps (2-3) will look to bounce back next weekend.</p>
+        </article>
 
-            <nav class="nav-bar">
-                <span class="nav-item" id="nav-feed" onclick="navigateTo('feed')">Front Page</span>
-                <span class="nav-item" id="nav-scores" onclick="navigateTo('scores')">Scoreboard</span>
-                <span class="nav-item" id="nav-sb" onclick="navigateTo('superbowl')">Super Bowl LX</span>
-                <span class="nav-item" id="nav-bball" onclick="navigateTo('basketball')">NCAA Hoops</span>
-                <span class="nav-item" id="nav-hock" onclick="navigateTo('hockey')">Hockey</span>
-                <span class="nav-item" id="nav-soft" onclick="navigateTo('softball')">Softball</span>
-            </nav>
+        <article>
+            <div class="article-header">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" alt="ASU Logo">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/235.png" alt="Memphis Logo">
+                <h2>Silva Spins Gem for Sun Devils</h2>
+            </div>
+            <div class="score-box">
+                FINAL: Arizona State 4, Memphis 1
+            </div>
+            <p><strong>TEMPE, Ariz.</strong> — Senior ace <strong>Aissa Silva</strong> was the story of the day at Farrington Stadium. The Arizona transfer struck out 10 Memphis batters, cementing her role as the Sun Devils' true No. 1 option for the 2026 campaign.</p>
+            <p>Memphis senior pitcher <strong>Rylee Dugar</strong> kept the Tigers in the game early, changing speeds effectively. But in the 5th inning, ASU senior outfielder <strong>Tanya Windle</strong> sparked the decisive rally with a triple into the right-center gap.</p>
+            <p>Memphis junior <strong>Marley Maness</strong> broke the shutout in the 7th with a solo home run, but it was too little, too late. "Silva was just painting the corners today," Maness admitted postgame.</p>
+        </article>
 
-            <main id="feed" class="page-content page-active">
-                
-                <div class="section-header text-asu-maroon font-black uppercase text-sm mb-2 tracking-widest">NCAA Basketball</div>
-                <article class="mb-12 border-b-2 border-ink pb-12">
-                    <h2 class="headline text-6xl md:text-8xl mb-4">ALTITUDE SICKNESS</h2>
-                    <span class="subheadline">Devils fade late in Boulder; Colorado closes on 12-4 run to seal 78-70 victory.</span>
-                    <span class="byline">By THE SPORTS DESK</span>
-                    
-                    <div class="columns">
-                        <span class="dropcap">B</span>oulder remains a house of horrors for the Sun Devils. In a game defined by thin air and thinner margins, Arizona State (12-12, 3-8 Big 12) withered in the final four minutes at the CU Events Center.
-                        <br><br>
-                        Despite a heroic 23-point effort from point guard Moe Odum, who fearlessly attacked the paint against Colorado's towering frontcourt, the Devils simply ran out of gas. With the game tied 66-66 at the 4:10 mark, Colorado's Barrington Hargress (23 pts) took over, hitting a contested mid-range jumper that sparked the decisive run. The Buffaloes converted six consecutive free throws in the final minute to ice the game.
-                    </div>
-                    <button class="card-btn" style="width:auto; padding:12px 30px; margin-top:20px;" onclick="navigateTo('basketball')">See Full Box Score & Analysis &rarr;</button>
-                </article>
+        <article>
+            <div class="article-header">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" alt="Maryland Logo">
+                <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/135.png" alt="Minnesota Logo">
+                <h2>Preview: The Return of Chance Stephens</h2>
+            </div>
+            <div class="score-box">
+                UPCOMING: 2:00 PM ET • XFINITY CENTER
+            </div>
+            <p><strong>COLLEGE PARK, MD</strong> — The narrative writes itself. Today, Minnesota guard <strong>Chance Stephens</strong> returns to the XFINITY Center, not as a Terp, but as a Golden Gopher.</p>
+            <p>Stephens, now a redshirt junior, has become a perimeter assassin for Minnesota (13-9). He is joined by senior transfer <strong>Cade Tyson</strong> and sophomore floor general <strong>Isaac Asuma</strong>. "It's just another game," Stephens said yesterday, though few believe him.</p>
+            <p>Maryland (14-8) looks different too. The Terps are now led by Kansas transfer <strong>Rakease Passmore</strong>, whose athleticism has electrified the fanbase. In the paint, Northeastern transfer <strong>Collin Metcalf</strong> faces a tough test boxing out Minnesota's physical front line. Expect a hostile crowd welcoming their former guard home.</p>
+        </article>
 
-                <div class="bg-gray-100 p-6 border border-ink mb-12">
-                    <div class="text-center mb-6">
-                        <span class="bg-asu-maroon text-white px-4 py-1 text-sm font-bold uppercase tracking-widest">Sunday Gameday Preview</span>
-                        <h3 class="headline text-4xl mt-3">On The Docket Today</h3>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-3 gap-8">
-                        <div class="bg-white p-4 border border-gray-300">
-                            <span class="text-xs font-bold text-gray-500 uppercase">1:00 PM MST • Big Ten Network</span>
-                            <h4 class="font-bold text-xl mt-1 mb-2">Maryland (14-9) at Minnesota (13-10)</h4>
-                            <p class="text-sm mb-3"><strong>The Stakes:</strong> Both teams are fighting for their lives on the bubble. The Gophers are tough at "The Barn" (11-2 home record), but Maryland's Julian Reese has been a double-double machine lately.</p>
-                            <div class="text-xs font-bold text-asu-maroon uppercase">Prediction: Minnesota 72, Maryland 68</div>
-                        </div>
+    </div>
 
-                         <div class="bg-white p-4 border border-gray-300">
-                            <span class="text-xs font-bold text-gray-500 uppercase">12:45 PM MST • Kajikawa Classic</span>
-                            <h4 class="font-bold text-xl mt-1 mb-2">Memphis (1-3) at ASU (3-1)</h4>
-                            <p class="text-sm mb-3"><strong>The Stakes:</strong> The Devils look to close the Kajikawa Classic with a win. Keep an eye on Memphis coach Trena Prater's aggressive base-running strategy. ASU starts freshman lefty Kenzie Brown in the circle.</p>
-                            <div class="text-xs font-bold text-asu-maroon uppercase">Prediction: ASU 9, Memphis 2</div>
-                        </div>
-
-                         <div class="bg-white p-4 border border-gray-300">
-                            <span class="text-xs font-bold text-gray-500 uppercase">LIVE NOW • Orlando, FL</span>
-                            <h4 class="font-bold text-xl mt-1 mb-2">Maryland vs. UCF</h4>
-                            <p class="text-sm mb-3"><strong>Live Update:</strong> The Terps and Knights are battling in the Black & Gold Classic. UCF's pitching staff has allowed just 2 runs all weekend. Maryland needs to wake up the bats to avoid a shutout.</p>
-                            <button class="text-xs font-bold text-blue-800 uppercase hover:underline" onclick="navigateTo('scores')">Check Scoreboard &rarr;</button>
-                        </div>
-                    </div>
-                 </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="border-r border-ink pr-6">
-                        <h4 class="font-bold text-asu-maroon uppercase text-xs mb-2">NCHC Hockey</h4>
-                        <h3 class="headline text-3xl mb-2">Heartbreak at Mullett</h3>
-                        <p class="text-sm mb-3">St. Cloud State goaltender Patriks Berzins made 38 saves, stealing a win in Tempe despite a furious 3rd period rally.</p>
-                        <button class="card-btn" onclick="navigateTo('hockey')">Read Recap &rarr;</button>
-                    </div>
-
-                    <div class="border-r border-ink pr-6">
-                        <h4 class="font-bold text-asu-maroon uppercase text-xs mb-2">NCAA Softball</h4>
-                        <h3 class="headline text-3xl mb-2">Mercy Rule in 5</h3>
-                        <p class="text-sm mb-3">Kenzie Brown spun a shutout and the bats exploded for 5 runs in the 3rd inning to crush Northwestern 8-0.</p>
-                        <button class="card-btn" onclick="navigateTo('softball')">Read Recap &rarr;</button>
-                    </div>
-
-                    <div class="col-span-2 bg-black text-white p-6 border-4 double border-asu-gold">
-                        <h4 class="font-bold text-asu-gold uppercase text-xs mb-2">Super Bowl LX • 4:30 PM</h4>
-                        <h3 class="headline text-4xl mb-2 text-white">Destiny Calls</h3>
-                        <p class="text-sm mb-4">Sam Darnold vs. Drake Maye. Seahawks vs. Patriots. The old guard vs. the new dynasty. Our expert preview of tonight's clash.</p>
-                        <button class="card-btn" style="background:var(--asu-gold); color:black; border:none;" onclick="navigateTo('superbowl')">Read Full Preview &rarr;</button>
-                    </div>
-                </div>
-            </main>
-
-            <section id="scores" class="page-content">
-                <h2 class="headline text-6xl mb-8 uppercase text-center border-b-2 border-ink pb-4">Gameday Scoreboard</h2>
-                <div id="scoreboard-grid" class="score-grid"></div>
-            </section>
-
-            <section id="superbowl" class="page-content">
-                <div class="sb-header">
-                    <span class="text-sm font-bold tracking-widest">NFL CHAMPIONSHIP • LEVI'S STADIUM</span>
-                    <h2 class="headline text-5xl md:text-7xl mt-4">THE GRAND STAGE</h2>
-                    <span class="subheadline">Seahawks favored by 4.5 as Sam Darnold seeks redemption against the Patriots dynasty reboot.</span>
-                </div>
-
-                <div class="sb-weather">
-                    <div class="sb-weather-item border-r border-gray-400 pr-10">
-                        WATCH PARTY (TEMPE)
-                        <span class="sb-weather-val text-asu-maroon">72°F SUNNY</span>
-                    </div>
-                    <div class="sb-weather-item pl-4">
-                        KICKOFF (SANTA CLARA)
-                        <span class="sb-weather-val">61°F CLOUDY</span>
-                    </div>
-                </div>
-
-                <div class="sb-matchup">
-                    <div class="text-center">
-                        <div class="sb-team text-asu-maroon">Seahawks</div>
-                        <div class="font-bold text-xl">14-3 (NFC)</div>
-                    </div>
-                    <div class="sb-vs">VS</div>
-                    <div class="text-center">
-                        <div class="sb-team text-blue-900">Patriots</div>
-                        <div class="font-bold text-xl">14-3 (AFC)</div>
-                    </div>
-                </div>
-
-                <div class="betting-line">
-                    LINE: SEA -4.5 • O/U: 45.5 • MONEYLINE: SEA -230 / NE +190
-                </div>
-
-                <div class="columns mt-8">
-                    <p><strong>The Narrative:</strong> It is a rematch of Super Bowl XLIX, but the faces have changed. The Seattle Seahawks, led by the resurrection of Sam Darnold, arrive in Santa Clara with the league's most balanced attack. Across the field, the New England Patriots have returned to the mountaintop in the post-Belichick era, riding the arm of young sensation Drake Maye.</p>
-                    
-                    <p><strong>The Matchup to Watch:</strong> <em>Seattle's WR Corps vs. Christian Gonzalez.</em> Jaxon Smith-Njigba has been unguardable in the playoffs (22 rec, 3 TDs). If Gonzalez travels with him, it leaves DK Metcalf one-on-one. Darnold has been excellent at identifying the mismatch pre-snap.</p>
-
-                    <div class="analysis-box">
-                        <div class="analysis-tag">VEGAS INSIDER</div>
-                        <h4 class="font-bold text-lg mb-2">Where the Sharp Money is Going</h4>
-                        <p>The line opened at Seattle -3.5 and was quickly bet up to -4.5. The public loves the Patriots underdog story, but the sharps are looking at Seattle's defensive DVOA rankings. The Seahawks rank #1 against the pass, a nightmare scenario for a young QB like Maye in his first Super Bowl.</p>
-                    </div>
-
-                    <p><strong>Prediction:</strong> Defense travels. The Patriots have had a magical run, beating Denver in the snow to get here, but the Seahawks are playing efficient, mistake-free football. Darnold manages the game, Kenneth Walker III controls the clock, and Seattle hoists the Lombardi.</p>
-                    <p class="font-bold text-center mt-4">Pick: Seahawks 27, Patriots 17.</p>
-                </div>
-            </section>
-
-            <section id="basketball" class="page-content">
-                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Hoops Analysis</h2>
-                
-                <div class="mb-12 border-b border-ink pb-8">
-                    <h3 class="headline text-3xl mb-4">TODAY: Terps invade The Barn</h3>
-                    <div class="bg-gray-100 p-4 border-l-4 border-asu-maroon">
-                        <strong>Game Info:</strong> Maryland @ Minnesota • 1:00 PM MST • Big Ten Network
-                    </div>
-                    <p class="mt-4"><strong>Scouting Report:</strong> This is a classic Big Ten grinder. Maryland (14-9) relies heavily on Julian Reese inside, but Minnesota's Dawson Garcia (averaging 17.5 ppg) presents a matchup nightmare with his ability to stretch the floor. The key stat? Turnovers. Maryland ranks 12th in the conference in assist-to-turnover ratio. If Minnesota's press forces mistakes early, the Barn will be rocking.</p>
-                    <p class="mt-2 font-bold">Vegas Line: Minnesota -3.5</p>
-                </div>
-
-                <h3 class="headline text-3xl mb-4">RECAP: Paint Problems in Boulder</h3>
-                <div class="columns">
-                    <p><strong>The Breakdown:</strong> Colorado out-rebounded ASU 42-28. This singular stat decided the game. While ASU forced 14 turnovers and shot a respectable 45% from the field, they gave up 16 second-chance points. The Buffaloes' 6'11" sophomore Sebastian Rancik (17 pts, 11 reb) simply camped in the lane, forcing ASU's guards to collapse and leaving shooters open on the perimeter.</p>
-                    <p><strong>Coach's Quote:</strong> "We liked the pace. We liked the shots we got. But you can't beat a team like Colorado at altitude if you don't box out on free throws. We gave them three extra possessions in the last two minutes. That's the ballgame." — Bobby Hurley</p>
-                </div>
-
-                <div class="stat-grid">
-                    <div class="stat-item">
-                        <span class="stat-val">42-28</span>
-                        <span class="stat-label">Rebound Margin (CU)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val">23</span>
-                        <span class="stat-label">Moe Odum Points</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val">12-4</span>
-                        <span class="stat-label">Final CU Run</span>
-                    </div>
-                </div>
-
-                <table class="box-score">
-                    <tr><th>Player (ASU)</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr>
-                    <tr><td>M. Odum</td><td>36</td><td>23</td><td>2</td><td>5</td></tr>
-                    <tr><td>M. Diop</td><td>28</td><td>19</td><td>7</td><td>1</td></tr>
-                    <tr><td>A. Johnson</td><td>24</td><td>14</td><td>3</td><td>0</td></tr>
-                    <tr><td>**TEAM TOTALS**</td><td>**200**</td><td>**70**</td><td>**28**</td><td>**12**</td></tr>
-                </table>
-            </section>
-
-            <section id="softball" class="page-content">
-                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Diamond Report</h2>
-                
-                <div class="grid md:grid-cols-2 gap-8 mb-12 border-b border-ink pb-8">
-                    <div class="bg-gray-100 p-6">
-                        <div class="card-status upcoming mb-2">UPCOMING: 12:45 PM</div>
-                        <h3 class="font-bold text-2xl">Memphis vs. ASU</h3>
-                        <p class="text-sm mt-2"><strong>The Setup:</strong> The Sun Devils look to close out the Kajikawa Classic with a win against the Memphis Tigers. Memphis (1-3) has struggled defensively this weekend, allowing 24 runs in 4 games.</p>
-                        <p class="text-sm mt-2"><strong>Key Matchup:</strong> ASU's top of the order (Windle and Acuña) vs. Memphis pitching. If the Devils get on base early, expect aggressive base running.</p>
-                    </div>
-                    <div class="bg-gray-100 p-6">
-                         <div class="card-status live mb-2">LIVE NOW: ORLANDO</div>
-                        <h3 class="font-bold text-2xl">Maryland vs. UCF</h3>
-                        <p class="text-sm mt-2"><strong>The Setup:</strong> It's the Black & Gold Classic finale. UCF is the host and the heavy favorite. Maryland is looking to salvage a split on the weekend. </p>
-                        <p class="text-sm mt-2"><strong>Live Note:</strong> Weather in Orlando is perfect (72°F). Expect the ball to fly if pitchers leave it over the plate.</p>
-                    </div>
-                </div>
-
-                <h3 class="headline text-3xl mb-4">RECAP: Total Domination</h3>
-                <div class="columns">
-                    <p><strong>The Breakdown:</strong> This was a statement. Northwestern, usually a Big Ten powerhouse, looked lost against the rise-ball of ASU ace Kenzie Brown. She struck out 8 of the first 9 batters she faced. Offensively, the Sun Devils were aggressive early in the count, hunting fastballs.</p>
-                    
-                    <div class="analysis-box">
-                        <div class="analysis-tag">KEY SEQUENCE</div>
-                        <p class="font-bold mb-2">Bottom 3rd Inning • 0 Outs</p>
-                        <p class="text-sm">Leading just 3-0, ASU loaded the bases on two walks and a bunt single. Senior Captain Yannira Acuña then ripped a bases-clearing double into the left-center gap. The exit velocity was 104 mph. That swing broke the game open and demoralized the Wildcats.</p>
-                    </div>
-
-                    <p><strong>The Mercy Rule:</strong> Enacted when a team leads by 8 or more runs after 5 innings. By ending the game early, ASU saved their bullpen arms for tomorrow's double-header against Oklahoma State. "Efficiency is the name of the game in February," Coach Ford said.</p>
-                </div>
-
-                <table class="box-score">
-                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>R</th><th>H</th><th>E</th></tr>
-                    <tr><td>Northwestern</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><strong>0</strong></td><td>2</td><td>2</td></tr>
-                    <tr><td>Arizona State</td><td>1</td><td>2</td><td>5</td><td>0</td><td>X</td><td><strong>8</strong></td><td>9</td><td>0</td></tr>
-                </table>
-            </section>
-            
-            <section id="hockey" class="page-content">
-                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Ice Report: The Wall of St. Cloud</h2>
-                <div class="columns">
-                    <p><strong>The Breakdown:</strong> For 40 minutes, St. Cloud State put on a defensive clinic, trapping ASU in the neutral zone (1-3-1 forecheck) and forcing turnovers at the blue line. But the third period saw a different Sun Devil team. Coach Powers shifted lines, loading up the top unit, which resulted in two quick goals to cut the deficit to 4-3.</p>
-                    <p>The final minute was pure chaos at Mullett Arena. With the goalie pulled, ASU fired four shots in the last 15 seconds. SCSU goalie Patriks Berzins made a sprawling pad save on Bennett Schimek right as the buzzer sounded, preserving the win and silencing the student section.</p>
-                </div>
-                <table class="box-score">
-                    <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>F</th></tr>
-                    <tr><td>St. Cloud St. (15-6)</td><td>1</td><td>2</td><td>1</td><td><strong>4</strong></td></tr>
-                    <tr><td>Arizona State (10-14)</td><td>0</td><td>1</td><td>2</td><td><strong>3</strong></td></tr>
-                </table>
-            </section>
-
-            <footer class="mt-12 border-t-4 double border-ink pt-6 text-[11px] uppercase font-bold text-center tracking-widest text-gray-500">
-                The Tempe Torch © 2026 • Published in Tempe, Arizona • "Sun Devils First, Everything Else Second"
-            </footer>
+    <div class="sidebar">
+        
+        <div class="sidebar-section">
+            <h3>Weather Outlook</h3>
+            <div style="text-align: center; font-size: 1.2rem;">
+                ☀️ <strong>72°F</strong>
+            </div>
+            <p style="text-align: center; margin: 5px 0;">Sunny & Clear in Tempe</p>
         </div>
 
-        <script>
-            function navigateTo(pageId) {
-                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
-                document.getElementById(pageId).classList.add('page-active');
-                
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-                let navId = 'nav-' + (pageId === 'feed' ? 'feed' : 
-                                      pageId === 'scores' ? 'scores' : 
-                                      pageId === 'superbowl' ? 'sb' :
-                                      pageId === 'basketball' ? 'bball' :
-                                      pageId === 'hockey' ? 'hock' :
-                                      pageId === 'softball' ? 'soft' : 'scores');
-                if(document.getElementById(navId)) document.getElementById(navId).classList.add('active-nav');
-                window.scrollTo(0,0);
-            }
+        <div class="sidebar-section">
+            <h3>Super Bowl Quick Stats</h3>
+            <ul style="padding-left: 20px; font-size: 0.9rem;">
+                <li><strong>Line:</strong> SEA -2.5</li>
+                <li><strong>O/U:</strong> 47.5</li>
+                <li><strong>MVP Fav:</strong> S. Darnold (+120)</li>
+            </ul>
+        </div>
 
-            // UPDATED DATABASE
-            const gamesDatabase = [
-                {
-                    sport: "NFL SUPER BOWL",
-                    home: "Seahawks",
-                    away: "Patriots",
-                    status: "4:30 PM",
-                    score: "VS",
-                    timeInfo: "Levi's Stadium",
-                    detailPage: "superbowl"
-                },
-                 {
-                    sport: "NCAA SOFTBALL",
-                    home: "UCF",
-                    away: "Maryland",
-                    status: "LIVE",
-                    score: "3 - 2",
-                    timeInfo: "Bot 5th • Orlando, FL",
-                    detailPage: "softball"
-                },
-                {
-                    sport: "NCAA SOFTBALL",
-                    home: "ASU",
-                    away: "Memphis",
-                    status: "12:45 PM",
-                    score: "VS",
-                    timeInfo: "Kajikawa Classic • Tempe",
-                    detailPage: "softball"
-                },
-                {
-                    sport: "NCAA MEN'S BB",
-                    home: "Minnesota",
-                    away: "Maryland",
-                    status: "1:00 PM",
-                    score: "VS",
-                    timeInfo: "Big Ten Network",
-                    detailPage: "basketball"
-                },
-                {
-                    sport: "NCAA BASKETBALL",
-                    home: "Colorado",
-                    away: "ASU",
-                    status: "FINAL",
-                    score: "78 - 70",
-                    timeInfo: "Final - Boulder, CO",
-                    detailPage: "basketball"
-                },
-                {
-                    sport: "NCAA SOFTBALL",
-                    home: "ASU",
-                    away: "Northwestern",
-                    status: "FINAL",
-                    score: "8 - 0",
-                    timeInfo: "Final (5 Innings)",
-                    detailPage: "softball"
-                },
-                {
-                    sport: "NCHC HOCKEY",
-                    home: "ASU",
-                    away: "St. Cloud St.",
-                    status: "FINAL",
-                    score: "3 - 4",
-                    timeInfo: "Final - Mullett Arena",
-                    detailPage: "hockey"
-                }
-            ];
+        <div class="sidebar-section">
+            <h3>Did You Know?</h3>
+            <p style="font-size: 0.9rem;">This is the second time Sam Darnold has played in Levi's Stadium this season; he threw for 3 TDs against the 49ers in Week 12.</p>
+        </div>
 
-            function renderUI() {
-                const grid = document.getElementById('scoreboard-grid');
-                const ticker = document.getElementById('ticker-feed');
-                grid.innerHTML = '';
-                let tickerHTML = '';
+    </div>
 
-                gamesDatabase.forEach(game => {
-                    const isLive = game.status === "LIVE";
-                    const isUpcoming = game.status.includes("PM");
-                    const statusClass = isLive ? "live" : (isUpcoming ? "upcoming" : "final");
-                    
-                    const card = document.createElement('div');
-                    card.className = 'score-card';
-                    card.innerHTML = `
-                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
-                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
-                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
-                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
-                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">READ MORE</button>` : ''}
-                    `;
-                    grid.appendChild(card);
+    <div class="super-bowl-section">
+        <div class="sb-header-row">
+            <img src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" class="sb-logo" alt="NFL Logo">
+            <div class="sb-title">Super Bowl LX Preview</div>
+            <img src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" class="sb-logo" alt="NFL Logo">
+        </div>
+        
+        <div class="matchup">
+            <div class="team-container">
+                <img src="https://a.espncdn.com/i/teamlogos/nfl/500/sea.png" class="team-logo-lg" alt="Seahawks">
+                <span class="team-name hawks">Seahawks</span>
+            </div>
+            <span class="vs">VS</span>
+            <div class="team-container">
+                <img src="https://a.espncdn.com/i/teamlogos/nfl/500/ne.png" class="team-logo-lg" alt="Patriots">
+                <span class="team-name pats">Patriots</span>
+            </div>
+        </div>
 
-                    tickerHTML += `<div class="ticker-item">${game.sport}: ${game.home} vs ${game.away} [${game.status} ${game.score}]</div>`;
-                });
+        <div class="sb-preview-text">
+            <p><strong>LEVI'S STADIUM, CA</strong> — The stage is set for a clash of generations and narratives. The Seattle Seahawks, led by the career renaissance of veteran quarterback <strong>Sam Darnold</strong>, face the New England Patriots and their sophomore sensation, <strong>Drake Maye</strong>.</p>
+            
+            <p><strong>The Air War:</strong> Darnold has thrown for over 4,000 yards this season, finally fulfilling his draft promise. His primary weapons, <strong>DK Metcalf</strong> and <strong>Jaxon Smith-Njigba</strong>, present a vertical threat that few teams can match. They will test Patriots cornerback <strong>Christian Gonzalez</strong>, who has played at an All-Pro level all year.</p>
+            
+            <p><strong>The Ground Game:</strong> New England’s strategy relies on keeping Darnold off the field. Running back <strong>Rhamondre Stevenson</strong> must establish the run early against a Seattle front seven coached by defensive mastermind <strong>Mike Macdonald</strong>. On the other side, Seattle’s <strong>Kenneth Walker III</strong> remains a home-run threat on every carry.</p>
 
-                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH • YOUR SOURCE FOR SUN DEVIL SPORTS • SUPER BOWL EDITION</div>`;
-                ticker.innerHTML = tickerHTML;
-            }
+            <p><strong>The Verdict:</strong> It comes down to mistakes. Maye has been brilliant, but this is his first Super Bowl. Darnold has the experience and the weapons. If Seattle's defense can confuse the young Patriots QB, the Lombardi Trophy heads to the Pacific Northwest.</p>
+            
+            <p style="text-align: center; font-weight: bold; margin-top: 20px; font-size: 1.2rem; color: #8C1D40;">PREDICTION: SEAHAWKS 27, PATRIOTS 24</p>
+        </div>
+    </div>
 
-            renderUI();
-        </script>
-    </body>
+</div>
+
+</body>
 </html>
