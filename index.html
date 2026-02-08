@@ -3,60 +3,88 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Sunday Final</title>
+        <title>The Tempe Torch | Super Bowl Sunday</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
         <style>
-            :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #f4f1ea; }
+            :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #f4f1ea; --paper-dark: #e8e4d9; }
             body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
             
             /* DYNAMIC TICKER */
             .ticker-wrap { width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; position: fixed; top: 0; z-index: 1000; display: flex; align-items: center; }
-            .ticker-content { display: flex; white-space: nowrap; animation: ticker 45s linear infinite; }
+            .ticker-content { display: flex; white-space: nowrap; animation: ticker 60s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-            .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+            .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
 
             /* BROADSHEET STRUCTURE */
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 60px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
             .masthead { border-bottom: 8px double var(--ink); text-align: center; margin-bottom: 30px; }
-            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 7.5rem; color: var(--asu-maroon); margin: 0; line-height: 1; cursor: pointer; }
-            .section-header { font-family: sans-serif; font-weight: 900; text-transform: uppercase; border-bottom: 4px solid var(--asu-maroon); margin: 40px 0 20px 0; color: var(--asu-maroon); letter-spacing: 1px; }
+            .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 8rem; color: var(--asu-maroon); margin: 0; line-height: 0.8; cursor: pointer; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+            .weather-ear { font-family: sans-serif; font-size: 0.7rem; position: absolute; top: 60px; right: 60px; text-align: right; font-weight: bold; border: 1px solid var(--ink); padding: 5px 10px; }
             
             /* NAVIGATION BAR */
-            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 10px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-            .nav-item { font-family: sans-serif; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: color 0.2s; }
-            .nav-item:hover { color: var(--asu-maroon); text-decoration: underline; }
+            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 12px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; background: var(--paper-dark); }
+            .nav-item { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: all 0.2s; letter-spacing: 1px; }
+            .nav-item:hover { color: var(--asu-maroon); transform: translateY(-2px); }
+            .nav-item.active-nav { color: var(--asu-maroon); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
 
             /* TYPOGRAPHY */
-            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.9; color: var(--ink); letter-spacing: -2px; }
-            .subheadline { font-style: italic; font-size: 1.3rem; color: #333; display: block; margin: 15px 0; border-bottom: 1px solid #bbb; padding-bottom: 15px; }
-            .columns { column-count: 2; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.5; }
-            .dropcap { float: left; font-size: 5rem; line-height: 0.7; padding-top: 10px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+            .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.9; color: var(--ink); letter-spacing: -1px; }
+            .subheadline { font-style: italic; font-size: 1.4rem; color: #444; display: block; margin: 15px 0; border-bottom: 1px solid #bbb; padding-bottom: 15px; font-family: 'Libre Baskerville', serif; }
+            .columns { column-count: 2; column-gap: 40px; text-align: justify; font-size: 1rem; line-height: 1.6; }
+            .dropcap { float: left; font-size: 5.5rem; line-height: 0.7; padding-top: 10px; padding-right: 15px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+            .byline { font-family: sans-serif; font-size: 0.75rem; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 20px; display: block; }
+
+            /* SPECIAL ELEMENTS */
+            .super-bowl-banner { background: var(--ink); color: var(--paper); text-align: center; padding: 15px; font-family: 'Oswald', sans-serif; font-size: 1.5rem; letter-spacing: 3px; margin-bottom: 30px; border: 4px double var(--asu-gold); cursor: pointer; transition: all 0.3s; }
+            .super-bowl-banner:hover { background: var(--asu-maroon); border-color: white; }
 
             /* SCORE CARDS */
-            .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-            .score-card { border: 2px solid var(--ink); background: white; padding: 15px; position: relative; transition: transform 0.2s; }
-            .score-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
-            .card-status { font-family: sans-serif; font-size: 0.65rem; font-weight: 900; letter-spacing: 1px; color: white; background: var(--ink); padding: 4px 8px; display: inline-block; margin-bottom: 10px; }
-            .card-status.final { background: #000; }
-            .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
-            .team-score { font-size: 1.5rem; font-family: 'Playfair Display', serif; }
-            .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 1px solid var(--ink); padding: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-            .card-btn:hover { background: var(--asu-maroon); color: white; }
+            .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+            .score-card { border: 2px solid var(--ink); background: white; padding: 20px; position: relative; transition: transform 0.2s; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+            .score-card:hover { transform: translateY(-3px); box-shadow: 8px 8px 0px rgba(0,0,0,0.15); }
+            .card-status { font-family: 'Oswald', sans-serif; font-size: 0.7rem; text-transform: uppercase; color: white; background: var(--ink); padding: 4px 10px; display: inline-block; margin-bottom: 15px; }
+            .card-status.live { background: #cc0000; animation: pulse 2s infinite; }
+            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+            
+            .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; border-bottom: 1px dashed #ddd; padding-bottom: 8px; }
+            .teams-row:last-child { border-bottom: none; }
+            .team-score { font-size: 1.8rem; font-family: 'Oswald', sans-serif; }
+            .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 2px solid var(--ink); padding: 10px; margin-top: 15px; font-size: 0.75rem; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.2s; }
+            .card-btn:hover { background: var(--asu-maroon); color: white; border-color: var(--asu-maroon); }
 
-            /* INSIDE PAGES */
-            .page-content { display: none; }
+            /* INSIDE PAGE ELEMENTS */
+            .page-content { display: none; animation: fadeIn 0.5s; }
             .page-active { display: block; }
-            .box-score { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.8rem; font-family: sans-serif; }
-            .box-score th { background: #e0e0e0; text-align: left; padding: 8px; border: 1px solid #999; }
-            .box-score td { border: 1px solid #ccc; padding: 8px; }
-            .analysis-box { background: #e9e5db; padding: 25px; border: 1px solid #c5c1b5; margin: 30px 0; position: relative; }
-            .analysis-box:before { content: "THE FROST REPORT"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
-            .three-stars { display: flex; justify-content: space-between; margin-top: 30px; border-top: 4px double var(--ink); pt-4; }
-            .star-player { text-align: center; width: 30%; }
-            .star-name { font-weight: bold; display: block; text-transform: uppercase; font-size: 0.8rem; }
-            .star-stat { font-style: italic; font-size: 0.75rem; color: #555; }
+            
+            .box-score { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.85rem; font-family: 'Oswald', sans-serif; letter-spacing: 0.5px; }
+            .box-score th { background: #e0e0e0; text-align: left; padding: 10px; border-bottom: 2px solid var(--ink); text-transform: uppercase; }
+            .box-score td { border-bottom: 1px solid #ccc; padding: 10px; }
+            .box-score tr:last-child td { font-weight: bold; background: #f9f9f9; }
+
+            .analysis-box { background: #e9e5db; padding: 30px; border: 1px solid #c5c1b5; margin: 30px 0; position: relative; }
+            .analysis-tag { position: absolute; top: -12px; left: 20px; background: var(--asu-maroon); color: white; padding: 4px 15px; font-size: 0.7rem; font-weight: 900; font-family: 'Oswald', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+            
+            .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; text-align: center; }
+            .stat-item { border: 1px solid var(--ink); padding: 10px; background: white; }
+            .stat-val { display: block; font-size: 1.5rem; font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--asu-maroon); }
+            .stat-label { font-size: 0.65rem; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+
+            .three-stars { display: flex; justify-content: space-between; margin-top: 40px; border-top: 1px solid var(--ink); padding-top: 20px; }
+            .star-player { text-align: center; width: 32%; position: relative; }
+            .star-rank { font-size: 2rem; color: #ddd; font-family: 'Oswald', sans-serif; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 0; }
+            .star-content { position: relative; z-index: 1; margin-top: 10px; }
+            .star-name { font-weight: 900; display: block; text-transform: uppercase; font-size: 0.9rem; font-family: 'Oswald', sans-serif; }
+            .star-stat { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 0.8rem; color: #555; }
+
+            /* SUPER BOWL PAGE SPECIFIC */
+            .sb-header { text-align: center; border-bottom: 4px solid var(--ink); padding-bottom: 30px; margin-bottom: 30px; }
+            .sb-matchup { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 30px 0; }
+            .sb-team { font-family: 'UnifrakturMaguntia', serif; font-size: 4rem; }
+            .sb-vs { font-family: 'Oswald', sans-serif; font-size: 2rem; color: #888; }
+            .betting-line { background: #1a1a1a; color: #ffc627; padding: 15px; text-align: center; font-family: 'Oswald', sans-serif; letter-spacing: 2px; margin-top: 20px; }
+
         </style>
     </head>
     <body>
@@ -66,70 +94,74 @@
         </div>
 
         <div class="broadsheet animate__animated animate__fadeIn">
+            <div class="weather-ear">
+                TEMPE: 72°F Sunny<br>
+                SANTA CLARA: 61°F Cloudy
+            </div>
+
             <header class="masthead">
                 <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
-                <div class="date-line">
-                    <span>SUNDAY MORNING POST</span>
-                    <span>FEBRUARY 8, 2026</span>
-                    <span>TEMPE, ARIZONA — EST. 2024</span>
+                <div class="date-line text-sm font-bold tracking-widest mt-2 border-t border-b border-ink py-2">
+                    <span>SUNDAY FINAL</span> • 
+                    <span>FEBRUARY 8, 2026</span> • 
+                    <span>VOL. III NO. 42</span> • 
+                    <span>$2.00</span>
                 </div>
             </header>
 
+            <div class="super-bowl-banner" onclick="navigateTo('superbowl')">
+                ★ SUPER BOWL LX EDITION: KICKOFF 4:30 PM MST ★
+            </div>
+
             <nav class="nav-bar">
-                <span class="nav-item" onclick="navigateTo('feed')">Front Page</span>
-                <span class="nav-item" onclick="navigateTo('scores')">Scoreboard</span>
-                <span class="nav-item" onclick="navigateTo('basketball')">Men's Basketball</span>
-                <span class="nav-item" onclick="navigateTo('hockey')">NCHC Hockey</span>
-                <span class="nav-item" onclick="navigateTo('softball')">Softball</span>
-                <span class="nav-item" onclick="navigateTo('cricket')">Cricket</span>
+                <span class="nav-item" id="nav-feed" onclick="navigateTo('feed')">Front Page</span>
+                <span class="nav-item" id="nav-scores" onclick="navigateTo('scores')">Scoreboard</span>
+                <span class="nav-item" id="nav-sb" onclick="navigateTo('superbowl')">Super Bowl LX</span>
+                <span class="nav-item" id="nav-bball" onclick="navigateTo('basketball')">Men's Hoops</span>
+                <span class="nav-item" id="nav-hock" onclick="navigateTo('hockey')">Hockey</span>
+                <span class="nav-item" id="nav-soft" onclick="navigateTo('softball')">Softball</span>
+                <span class="nav-item" id="nav-crick" onclick="navigateTo('cricket')">Cricket</span>
             </nav>
 
             <main id="feed" class="page-content page-active">
                 
-                <div class="section-header">Men's Basketball</div>
-                <article class="mb-12">
-                    <h2 class="headline text-7xl mb-4">ALTITUDE SICKNESS IN BOULDER</h2>
-                    <span class="subheadline">Devils fade late at CU Events Center, falling 78-70 despite offensive spark.</span>
+                <div class="section-header text-asu-maroon font-black uppercase text-sm mb-2 tracking-widest">NCAA Basketball</div>
+                <article class="mb-12 border-b-2 border-ink pb-12">
+                    <h2 class="headline text-8xl mb-4">ALTITUDE SICKNESS</h2>
+                    <span class="subheadline">Devils fade late in Boulder; Colorado closes on 12-4 run to seal 78-70 victory.</span>
+                    <span class="byline">By THE SPORTS DESK</span>
+                    
                     <div class="columns">
-                        <span class="dropcap">B</span>oulder remains a house of horrors for the Sun Devils. In a game defined by runs, Arizona State (12-12, 3-8 Big 12) couldn't withstand the final surge from the Colorado Buffaloes, dropping a hard-fought 78-70 contest on the road. The Devils held a slim lead with eight minutes remaining, thanks to aggressive penetration from the guards, but Colorado's size advantage in the paint ultimately wore down the smaller ASU lineup. 
+                        <span class="dropcap">B</span>oulder remains a house of horrors for the Sun Devils. In a game defined by thin air and thinner margins, Arizona State (12-12, 3-8 Big 12) withered in the final four minutes at the CU Events Center.
                         <br><br>
-                        "We expended so much energy digging out of that early hole," Head Coach Bobby Hurley said post-game. "When you're playing at 5,000 feet, you can't afford empty possessions in crunch time." Colorado closed the game on a 12-4 run, converting six consecutive free throws to ice the game. The loss puts ASU's tournament hopes on life support, making next week's homestand a mandatory sweep.
+                        Despite a heroic 23-point effort from point guard Moe Odum, who fearlessly attacked the paint against Colorado's towering frontcourt, the Devils simply ran out of gas. With the game tied 66-66 at the 4:10 mark, Colorado's Barrington Hargress (23 pts) took over, hitting a contested mid-range jumper that sparked the decisive run. The Buffaloes converted six consecutive free throws in the final minute to ice the game.
+                        <br><br>
+                        "We expended so much energy digging out of that early hole," Head Coach Bobby Hurley said, his tie loosened and voice raspy. "When you're playing at 5,000 feet against a team that rebounds like that, you can't afford empty possessions in crunch time."
                     </div>
-                    <div class="mt-4"><button class="card-btn" style="width:auto; padding:8px 25px;" onclick="navigateTo('basketball')">FULL BOX SCORE & ANALYSIS &rarr;</button></div>
+                    <button class="card-btn" style="width:auto; padding:12px 30px; margin-top:20px;" onclick="navigateTo('basketball')">See Full Box Score & Analysis &rarr;</button>
                 </article>
 
-                <div class="grid md:grid-cols-2 gap-12 border-t border-ink pt-8">
-                    <div>
-                        <div class="section-header" style="margin-top:0;">NCHC Hockey</div>
-                        <h3 class="headline text-4xl mb-3">Sweep at the Mullett</h3>
-                        <p class="text-sm font-bold text-gray-600 mb-2">FINAL: St. Cloud State 4, ASU 3</p>
-                        <div class="text-sm text-justify mb-4">
-                            A frantic third-period rally wasn't enough to save the weekend. Down 4-1, goals from Schimek and Lucius brought the 5,000 fans to their feet, but SCSU goaltender Patriks Berzins made a sprawling save at the buzzer to deny overtime. The Sun Devils have now lost four straight conference games.
-                        </div>
-                        <button class="card-btn" onclick="navigateTo('hockey')">READ HOCKEY RECAP &rarr;</button>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="border-r border-ink pr-6">
+                        <h4 class="font-bold text-asu-maroon uppercase text-xs mb-2">NCHC Hockey</h4>
+                        <h3 class="headline text-3xl mb-2">Heartbreak at Mullett</h3>
+                        <p class="text-sm mb-3">St. Cloud State goaltender Patriks Berzins made 38 saves, stealing a win in Tempe despite a furious 3rd period rally from the Devils.</p>
+                        <button class="card-btn" onclick="navigateTo('hockey')">Read Recap &rarr;</button>
+                    </div>
+
+                    <div class="border-r border-ink pr-6">
+                        <h4 class="font-bold text-asu-maroon uppercase text-xs mb-2">NCAA Softball</h4>
+                        <h3 class="headline text-3xl mb-2">Mercy Rule in 5</h3>
+                        <p class="text-sm mb-3">Kenzie Brown spun a shutout and the bats exploded for 5 runs in the 3rd inning to crush Northwestern 8-0. A statement win to start the season.</p>
+                        <button class="card-btn" onclick="navigateTo('softball')">Read Recap &rarr;</button>
                     </div>
 
                     <div>
-                        <div class="section-header" style="margin-top:0;">NCAA Softball</div>
-                        <h3 class="headline text-4xl mb-3">Mercy Rule Mastery</h3>
-                        <p class="text-sm font-bold text-gray-600 mb-2">FINAL: ASU 8, Northwestern 0 (5 Innings)</p>
-                        <div class="text-sm text-justify mb-4">
-                            Kenzie Brown was nearly untouchable, and the Sun Devil bats woke up in a big way at Farrington Stadium. A five-run 3rd inning broke the game open, culminating in a walk-off double that invoked the mercy rule. It was a complete performance against a ranked opponent.
-                        </div>
-                        <button class="card-btn" onclick="navigateTo('softball')">READ SOFTBALL RECAP &rarr;</button>
+                        <h4 class="font-bold text-asu-maroon uppercase text-xs mb-2">Super Bowl LX</h4>
+                        <h3 class="headline text-3xl mb-2">Destiny Calls</h3>
+                        <p class="text-sm mb-3">Sam Darnold vs. Drake Maye. Seahawks vs. Patriots. Our expert preview of tonight's clash at Levi's Stadium.</p>
+                        <button class="card-btn" onclick="navigateTo('superbowl')">Read Preview &rarr;</button>
                     </div>
-                </div>
-
-                <div class="border-t border-ink pt-8 mt-12">
-                    <div class="section-header" style="margin-top:0;">International Cricket</div>
-                    <article>
-                        <h2 class="headline text-5xl mb-4">MUMBAI: INDIA SURVIVES USA SCARE</h2>
-                        <span class="subheadline">Suryakumar Yadav rescues hosts after top-order collapse; USA falls short by 29 runs.</span>
-                        <div class="columns">
-                            In a match that was closer than the scorecard suggests, India defeated the USA by 29 runs to open their 2026 World Cup campaign. Suryakumar Yadav was the savior for the hosts, smashing a captain's knock of 84* after the American pacers reduced India to 77/6. The USA chase started brightly with Andries Gous, but crumbled against the spin of Axar Patel (2/16) in the middle overs. "We showed we belong on this stage," USA captain Monank Patel said, "but SKY was the difference today."
-                        </div>
-                        <div class="mt-4"><button class="card-btn" style="width:auto; padding:8px 25px;" onclick="navigateTo('cricket')">FULL MATCH REPORT &rarr;</button></div>
-                    </article>
                 </div>
             </main>
 
@@ -138,85 +170,160 @@
                 <div id="scoreboard-grid" class="score-grid"></div>
             </section>
 
+            <section id="superbowl" class="page-content">
+                <div class="sb-header">
+                    <span class="text-sm font-bold tracking-widest">NFL CHAMPIONSHIP • SANTA CLARA, CA</span>
+                    <h2 class="headline text-7xl mt-4">THE GRAND STAGE</h2>
+                    <span class="subheadline">Seahawks favored by 4.5 as Sam Darnold seeks redemption against the Patriots dynasty reboot.</span>
+                </div>
+
+                <div class="sb-matchup">
+                    <div class="text-center">
+                        <div class="sb-team text-asu-maroon">Seahawks</div>
+                        <div class="font-bold text-xl">14-3 (NFC)</div>
+                    </div>
+                    <div class="sb-vs">VS</div>
+                    <div class="text-center">
+                        <div class="sb-team text-blue-900">Patriots</div>
+                        <div class="font-bold text-xl">14-3 (AFC)</div>
+                    </div>
+                </div>
+
+                <div class="betting-line">
+                    LINE: SEA -4.5 • O/U: 45.5 • MONEYLINE: SEA -230 / NE +190
+                </div>
+
+                <div class="columns mt-8">
+                    <p><strong>The Narrative:</strong> It is a rematch of Super Bowl XLIX, but the faces have changed. The Seattle Seahawks, led by the resurrection of Sam Darnold, arrive in Santa Clara with the league's most balanced attack. Across the field, the New England Patriots have returned to the mountaintop in the post-Belichick era, riding the arm of young sensation Drake Maye.</p>
+                    
+                    <p><strong>The Matchup to Watch:</strong> <em>Seattle's WR Corps vs. Christian Gonzalez.</em> Jaxon Smith-Njigba has been unguardable in the playoffs (22 rec, 3 TDs). If Gonzalez travels with him, it leaves DK Metcalf one-on-one. Darnold has been excellent at identifying the mismatch pre-snap.</p>
+
+                    <div class="analysis-box">
+                        <div class="analysis-tag">VEGAS INSIDER</div>
+                        <h4 class="font-bold text-lg mb-2">Where the Sharp Money is Going</h4>
+                        <p>The line opened at Seattle -3.5 and was quickly bet up to -4.5. The public loves the Patriots underdog story, but the sharps are looking at Seattle's defensive DVOA rankings. The Seahawks rank #1 against the pass, a nightmare scenario for a young QB like Maye in his first Super Bowl.</p>
+                    </div>
+
+                    <p><strong>Prediction:</strong> Defense travels. The Patriots have had a magical run, beating Denver in the snow to get here, but the Seahawks are playing efficient, mistake-free football. Darnold manages the game, Kenneth Walker III controls the clock, and Seattle hoists the Lombardi.</p>
+                    <p class="font-bold text-center mt-4">Pick: Seahawks 27, Patriots 17.</p>
+                </div>
+            </section>
+
             <section id="basketball" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
                 <h2 class="headline text-6xl my-6 uppercase">Hoops Analysis: Paint Problems</h2>
                 
                 <div class="columns">
-                    <p><strong>The Breakdown:</strong> Colorado out-rebounded ASU 42-28, a stat that tells the entire story. While ASU forced 14 turnovers, they gave up 16 second-chance points. The Buffaloes' big men simply camped in the lane, forcing ASU's guards to collapse and leaving shooters open on the perimeter.</p>
-                    <p><strong>Turning Point:</strong> With 3:30 left and the game tied 68-68, ASU committed back-to-back offensive fouls. Colorado capitalized with a corner three and a dunk, swinging momentum permanently. "Discipline in the final four minutes is non-negotiable," Hurley noted.</p>
+                    <p><strong>The Breakdown:</strong> Colorado out-rebounded ASU 42-28. This singular stat decided the game. While ASU forced 14 turnovers and shot a respectable 45% from the field, they gave up 16 second-chance points. The Buffaloes' 6'11" sophomore Sebastian Rancik (17 pts, 11 reb) simply camped in the lane, forcing ASU's guards to collapse and leaving shooters open on the perimeter.</p>
+                    
+                    <div class="analysis-box">
+                        <div class="analysis-tag">THE TURNING POINT</div>
+                        <p class="font-bold mb-2">3:30 Remaining • Tied 68-68</p>
+                        <p class="text-sm">ASU committed back-to-back offensive fouls—one a moving screen by Diop, the other a charge by Johnson. Colorado capitalized immediately with a corner three from Bangot Dak and a transition dunk. That 5-point swing in 40 seconds broke ASU's rhythm permanently.</p>
+                    </div>
+
+                    <p><strong>Coach's Quote:</strong> "We liked the pace. We liked the shots we got. But you can't beat a team like Colorado at altitude if you don't box out on free throws. We gave them three extra possessions in the last two minutes. That's the ballgame." — Bobby Hurley</p>
                 </div>
 
-                <div class="analysis-box">
-                    <h4 class="font-bold uppercase text-sm mb-2">Coach's Corner</h4>
-                    <p class="text-sm italic">"We liked the pace. We liked the shots we got. We just didn't like the result on the glass. You can't beat a team like Colorado if you don't box out on free throws." — Bobby Hurley</p>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-val">42-28</span>
+                        <span class="stat-label">Rebound Margin (CU)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">23</span>
+                        <span class="stat-label">Moe Odum Points</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">12-4</span>
+                        <span class="stat-label">Final CU Run</span>
+                    </div>
                 </div>
 
                 <table class="box-score">
-                    <tr><th>Team</th><th>1st Half</th><th>2nd Half</th><th>Total</th></tr>
-                    <tr><td>Arizona State</td><td>34</td><td>36</td><td><strong>70</strong></td></tr>
-                    <tr><td>Colorado</td><td>38</td><td>40</td><td><strong>78</strong></td></tr>
+                    <tr><th>Player (ASU)</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr>
+                    <tr><td>M. Odum</td><td>36</td><td>23</td><td>2</td><td>5</td></tr>
+                    <tr><td>M. Diop</td><td>28</td><td>19</td><td>7</td><td>1</td></tr>
+                    <tr><td>A. Johnson</td><td>24</td><td>14</td><td>3</td><td>0</td></tr>
+                    <tr><td>**TEAM TOTALS**</td><td>**200**</td><td>**70**</td><td>**28**</td><td>**12**</td></tr>
                 </table>
 
                 <div class="three-stars">
                     <div class="star-player">
-                        <span class="star-name">1. T. da Silva (COLO)</span>
-                        <span class="star-stat">22 Pts, 10 Reb</span>
+                        <div class="star-rank">1</div>
+                        <div class="star-content">
+                            <span class="star-name">B. Hargress (COLO)</span>
+                            <span class="star-stat">23 Pts, Clutch Jumpers</span>
+                        </div>
                     </div>
                     <div class="star-player">
-                        <span class="star-name">2. ASU Guard Play</span>
-                        <span class="star-stat">Combined 38 Pts</span>
+                        <div class="star-rank">2</div>
+                        <div class="star-content">
+                            <span class="star-name">S. Rancik (COLO)</span>
+                            <span class="star-stat">17 Pts, 11 Reb (Double-Double)</span>
+                        </div>
                     </div>
                     <div class="star-player">
-                        <span class="star-name">3. K. Simpson (COLO)</span>
-                        <span class="star-stat">8 Assists, Clutch FTs</span>
+                        <div class="star-rank">3</div>
+                        <div class="star-content">
+                            <span class="star-name">Moe Odum (ASU)</span>
+                            <span class="star-stat">23 Pts, Kept ASU alive</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section id="hockey" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Ice Recap: The Late Surge</h2>
+                <h2 class="headline text-6xl my-6 uppercase">Ice Report: The Wall of St. Cloud</h2>
                 
                 <div class="columns">
-                    <p><strong>The Breakdown:</strong> For 40 minutes, St. Cloud State put on a defensive clinic, trapping ASU in the neutral zone and forcing turnovers. But the third period saw a different Sun Devil team. Coach Powers shifted lines, loading up the top unit, which resulted in two quick goals. The Mullett was rocking, but the clock was the ultimate enemy.</p>
-                    <p><strong>Key Stat:</strong> 1-for-5 on the Power Play. In a one-goal game, the failure to convert on a 5-minute major in the second period haunts the Devils.</p>
+                    <p><strong>The Breakdown:</strong> For 40 minutes, St. Cloud State put on a defensive clinic, trapping ASU in the neutral zone (1-3-1 forecheck) and forcing turnovers at the blue line. But the third period saw a different Sun Devil team. Coach Powers shifted lines, loading up the top unit, which resulted in two quick goals to cut the deficit to 4-3.</p>
+                    <p>The final minute was pure chaos at Mullett Arena. With the goalie pulled, ASU fired four shots in the last 15 seconds. SCSU goalie Patriks Berzins made a sprawling pad save on Bennett Schimek right as the buzzer sounded, preserving the win and silencing the student section.</p>
+                    
+                    <div class="analysis-box">
+                        <div class="analysis-tag">TACTICAL NOTE</div>
+                        <h4 class="font-bold text-lg mb-2">The Royal Road</h4>
+                        <p class="text-sm">ASU struggled all night to move the puck laterally across the center of the offensive zone (the "Royal Road"). Berzins is a positional goalie; if you don't make him move East-West, he stops everything. ASU's third-period goals both came from cross-ice passes. Lesson learned too late.</p>
+                    </div>
                 </div>
 
-                <div class="analysis-box">
-                    <h4 class="font-bold uppercase text-sm mb-2">Tactical Note</h4>
-                    <p class="text-sm italic">ASU finally started moving the puck laterally across the "Royal Road" in the third period. This forced Berzins to move East-West, opening up the five-hole. Too little, too late, but a blueprint for next week.</p>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-val">38</span>
+                        <span class="stat-label">Saves by Berzins</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">1/5</span>
+                        <span class="stat-label">ASU Power Play</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">42</span>
+                        <span class="stat-label">ASU Shots on Goal</span>
+                    </div>
                 </div>
 
                 <table class="box-score">
                     <tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>F</th></tr>
-                    <tr><td>St. Cloud St.</td><td>1</td><td>2</td><td>1</td><td><strong>4</strong></td></tr>
-                    <tr><td>Arizona State</td><td>0</td><td>1</td><td>2</td><td><strong>3</strong></td></tr>
+                    <tr><td>St. Cloud St. (15-6)</td><td>1</td><td>2</td><td>1</td><td><strong>4</strong></td></tr>
+                    <tr><td>Arizona State (10-14)</td><td>0</td><td>1</td><td>2</td><td><strong>3</strong></td></tr>
                 </table>
-
-                <div class="three-stars">
-                    <div class="star-player">
-                        <span class="star-name">1. P. Berzins (SCSU)</span>
-                        <span class="star-stat">38 Saves</span>
-                    </div>
-                    <div class="star-player">
-                        <span class="star-name">2. B. Schimek (ASU)</span>
-                        <span class="star-stat">1 Goal, 1 Assist</span>
-                    </div>
-                    <div class="star-player">
-                        <span class="star-name">3. T. Gross (SCSU)</span>
-                        <span class="star-stat">2 Goals</span>
-                    </div>
-                </div>
             </section>
 
             <section id="softball" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Diamond Report: Run Rule</h2>
+                <h2 class="headline text-6xl my-6 uppercase">Diamond Report: Total Domination</h2>
                 
                 <div class="columns">
-                    <p><strong>The Breakdown:</strong> This was total domination. Northwestern, usually a Big Ten powerhouse, looked lost against the spin of ASU's Kenzie Brown. Offensively, the Sun Devils were aggressive early in the count, jumping on fastballs. The 5-run third inning featured three doubles and a moonshot home run to left field.</p>
-                    <p><strong>The Mercy Rule:</strong> Enacted when a team leads by 8 or more runs after 5 innings. It saved the bullpen arms for tomorrow's double-header.</p>
+                    <p><strong>The Breakdown:</strong> This was a statement. Northwestern, usually a Big Ten powerhouse, looked lost against the rise-ball of ASU ace Kenzie Brown. She struck out 8 of the first 9 batters she faced. Offensively, the Sun Devils were aggressive early in the count, hunting fastballs.</p>
+                    
+                    <div class="analysis-box">
+                        <div class="analysis-tag">KEY SEQUENCE</div>
+                        <p class="font-bold mb-2">Bottom 3rd Inning • 0 Outs</p>
+                        <p class="text-sm">Leading just 3-0, ASU loaded the bases on two walks and a bunt single. Senior Captain Yannira Acuña then ripped a bases-clearing double into the left-center gap. The exit velocity was 104 mph. That swing broke the game open and demoralized the Wildcats.</p>
+                    </div>
+
+                    <p><strong>The Mercy Rule:</strong> Enacted when a team leads by 8 or more runs after 5 innings. By ending the game early, ASU saved their bullpen arms for tomorrow's double-header against Oklahoma State. "Efficiency is the name of the game in February," Coach Ford said.</p>
                 </div>
 
                 <table class="box-score">
@@ -227,16 +334,25 @@
 
                 <div class="three-stars">
                     <div class="star-player">
-                        <span class="star-name">1. Kenzie Brown</span>
-                        <span class="star-stat">CG, Shutout, 8 K</span>
+                        <div class="star-rank">1</div>
+                        <div class="star-content">
+                            <span class="star-name">Kenzie Brown</span>
+                            <span class="star-stat">5.0 IP, 2 H, 0 R, 8 K</span>
+                        </div>
                     </div>
                     <div class="star-player">
-                        <span class="star-name">2. ASU Offense</span>
-                        <span class="star-stat">9 Hits, 5 XBH</span>
+                        <div class="star-rank">2</div>
+                        <div class="star-content">
+                            <span class="star-name">Yannira Acuña</span>
+                            <span class="star-stat">3-for-3, 4 RBI, 2 2B</span>
+                        </div>
                     </div>
                     <div class="star-player">
-                        <span class="star-name">3. The Defense</span>
-                        <span class="star-stat">0 Errors, 2 DPs</span>
+                        <div class="star-rank">3</div>
+                        <div class="star-content">
+                            <span class="star-name">ASU Defense</span>
+                            <span class="star-stat">0 Errors, 2 Double Plays</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -246,53 +362,54 @@
                 <h2 class="headline text-6xl my-6 uppercase">World Cup: SKY's Rescue Act</h2>
                 
                 <div class="columns">
-                    <p><strong>The Breakdown:</strong> The USA had India on the ropes at 77/6. The Wankhede was silent. But Suryakumar Yadav (84 off 48) played an innings of pure class, dragging India to 161. His 360-degree play manipulated the field settings, frustrating the American bowlers who had started so well. USA's chase never got out of second gear against the spin choke.</p>
-                    <p><strong>Key Moment:</strong> The 18th over. SKY hit three sixes off Ali Khan, shifting the momentum entirely and pushing the total from "defendable" to "winning."</p>
+                    <p><strong>The Breakdown:</strong> The USA had India on the ropes at 77/6. The Wankhede Stadium was silent. But Suryakumar Yadav (84* off 48) played an innings of pure genius, dragging India to a competitive 161. His 360-degree play manipulated the field settings, frustrating the American bowlers who had started so well with the new ball.</p>
+                    <p>In response, the USA chase never got out of second gear. Axar Patel (2/16) and Ravi Bishnoi (1/19) applied the "spin choke" in the middle overs, raising the required rate from 8.0 to 14.0 by the 15th over.</p>
+                    
+                    <div class="analysis-box">
+                        <div class="analysis-tag">MATCH TURNING POINT</div>
+                        <h4 class="font-bold text-lg mb-2">The 18th Over</h4>
+                        <p class="text-sm">Ali Khan attempted to bowl yorkers to SKY but missed his length twice. Yadav ramped the first over fine leg for six and carved the second over point for another maximum. 19 runs came off the over, shifting the momentum entirely and pushing the total from "defendable" to "winning."</p>
+                    </div>
                 </div>
 
-                <div class="analysis-box">
-                    <h4 class="font-bold uppercase text-sm mb-2">Pitch Report</h4>
-                    <p class="text-sm italic">The dew factor didn't play as big a role as expected. The pitch slowed down in the second innings, making Axar Patel's arm-balls lethal.</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 text-sm mt-4 border border-ink p-4 bg-white">
+                <div class="grid grid-cols-2 gap-4 text-sm mt-4 border border-ink p-4 bg-white font-mono">
                     <div>
                         <strong>INDIA: 161/6 (20.0)</strong><br>
                         S. Yadav 84* (48)<br>
+                        H. Pandya 22 (15)<br>
                         S. Netravalkar 2/28
                     </div>
                     <div>
                         <strong>USA: 132/8 (20.0)</strong><br>
                         A. Gous 41 (35)<br>
+                        A. Jones 24 (20)<br>
                         M. Siraj 3/22
-                    </div>
-                </div>
-
-                <div class="three-stars">
-                    <div class="star-player">
-                        <span class="star-name">1. S. Yadav (IND)</span>
-                        <span class="star-stat">84 Runs (48 balls)</span>
-                    </div>
-                    <div class="star-player">
-                        <span class="star-name">2. M. Siraj (IND)</span>
-                        <span class="star-stat">3 Wickets</span>
-                    </div>
-                    <div class="star-player">
-                        <span class="star-name">3. A. Gous (USA)</span>
-                        <span class="star-stat">41 Runs</span>
                     </div>
                 </div>
             </section>
 
-            <footer class="mt-12 border-t-4 double border-ink pt-6 text-[11px] uppercase font-bold text-center tracking-widest">
-                CERTIFIED LOCAL COVERAGE — ESTABLISHED 2024 — TEMPE'S JOURNAL OF RECORD
+            <footer class="mt-12 border-t-4 double border-ink pt-6 text-[11px] uppercase font-bold text-center tracking-widest text-gray-500">
+                The Tempe Torch © 2026 • Published in Tempe, Arizona • "Sun Devils First, Everything Else Second"
             </footer>
         </div>
 
         <script>
             function navigateTo(pageId) {
+                // Remove active class from pages
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
+                // Add active class to target page
                 document.getElementById(pageId).classList.add('page-active');
+                
+                // Update Nav Highlights
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+                let navId = 'nav-' + (pageId === 'feed' ? 'feed' : 
+                                      pageId === 'scores' ? 'scores' : 
+                                      pageId === 'superbowl' ? 'sb' :
+                                      pageId === 'basketball' ? 'bball' :
+                                      pageId === 'hockey' ? 'hock' :
+                                      pageId === 'softball' ? 'soft' : 'crick');
+                if(document.getElementById(navId)) document.getElementById(navId).classList.add('active-nav');
+
                 window.scrollTo(0,0);
             }
 
@@ -333,6 +450,15 @@
                     score: "161/6 - 132/8",
                     timeInfo: "India won by 29 runs",
                     detailPage: "cricket"
+                },
+                {
+                    sport: "NFL SUPER BOWL",
+                    home: "Seahawks",
+                    away: "Patriots",
+                    status: "TODAY",
+                    score: "VS",
+                    timeInfo: "Kickoff 4:30 PM MST",
+                    detailPage: "superbowl"
                 }
             ];
 
@@ -343,21 +469,24 @@
                 let tickerHTML = '';
 
                 gamesDatabase.forEach(game => {
+                    const isLive = game.status === "TODAY";
+                    const statusClass = isLive ? "live" : "final";
+                    
                     const card = document.createElement('div');
                     card.className = 'score-card';
                     card.innerHTML = `
-                        <div class="card-status final">${game.status} • ${game.sport}</div>
+                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
                         <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
                         <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
                         <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
-                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Read Report</button>` : ''}
+                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">${isLive ? 'PREVIEW' : 'REPORT'}</button>` : ''}
                     `;
                     grid.appendChild(card);
 
-                    tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
+                    tickerHTML += `<div class="ticker-item">${game.status === 'TODAY' ? 'UPCOMING:' : 'FINAL:'} ${game.home} ${game.score} ${game.away}</div>`;
                 });
 
-                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
+                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — SUNDAY FINAL — FEB 8 2026</div>`;
                 ticker.innerHTML = tickerHTML;
             }
 
