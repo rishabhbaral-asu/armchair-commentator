@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Gameday Central</title>
+        <title>The Tempe Torch | Sunday Gameday</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -16,7 +16,6 @@
             .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-            .ticker-box { background: #222; color: var(--asu-gold); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--asu-gold); margin: 0 4px; font-family: monospace; }
             .live-indicator { color: #ff4444; animation: blink 1.5s infinite; margin-right: 10px; }
             @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
@@ -37,81 +36,79 @@
             .columns { column-count: 3; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.45; }
             .dropcap { float: left; font-size: 6rem; line-height: 0.7; padding-top: 15px; padding-right: 12px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
 
-            /* SCORE CARDS (FOR THE SCOREBOARD PAGE) */
+            /* SCORE CARDS */
             .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
             .score-card { border: 2px solid var(--ink); background: white; padding: 15px; position: relative; transition: transform 0.2s; }
             .score-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
             .card-status { font-family: sans-serif; font-size: 0.65rem; font-weight: 900; letter-spacing: 1px; color: white; background: var(--ink); padding: 4px 8px; display: inline-block; margin-bottom: 10px; }
+            .card-status.final { background: #000; }
             .card-status.live { background: #ff4444; }
-            .card-status.final { background: #444; }
             .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
             .team-score { font-size: 1.5rem; font-family: 'Playfair Display', serif; }
             .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 1px solid var(--ink); padding: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
             .card-btn:hover { background: var(--asu-maroon); color: white; }
 
-            /* LINEUP CARDS (DETAIL PAGES) */
+            .page-content { display: none; }
+            .page-active { display: block; }
+
+            /* DETAIL PAGE STYLES */
             .lineup-card { border: 2px solid var(--ink); background: white; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
             .lineup-header { padding: 12px; display: flex; align-items: center; gap: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
             .lineup-grid { padding: 15px; display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.75rem; font-weight: bold; }
             .analysis-box { background: #e9e5db; padding: 20px; border: 1px solid #c5c1b5; margin-top: 20px; position: relative; }
-            .analysis-box:before { content: "STAFF PROJECTION"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
-
-            .page-content { display: none; }
-            .page-active { display: block; }
+            .analysis-box:before { content: "STAFF ANALYSIS"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
         </style>
     </head>
     <body>
 
         <div class="ticker-wrap">
             <div class="ticker-content" id="ticker-feed">
-                <div class="ticker-item">LOADING NEWS WIRE...</div>
-            </div>
+                </div>
         </div>
 
         <div class="broadsheet animate__animated animate__fadeIn">
             <header class="masthead">
                 <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
                 <div class="date-line">
-                    <span>LATE CITY EDITION</span>
-                    <span>FEBRUARY 7, 2026</span>
+                    <span>SUNDAY MORNING POST</span>
+                    <span>FEBRUARY 8, 2026</span>
                     <span>TEMPE, ARIZONA — EST. 2024</span>
                 </div>
             </header>
 
             <nav class="nav-bar">
                 <span class="nav-item" onclick="navigateTo('feed')">Front Page</span>
-                <span class="nav-item" onclick="navigateTo('scores')">Scores & Fixtures</span>
-                <span class="nav-item" onclick="navigateTo('hockey')">Hockey Analysis</span>
-                <span class="nav-item" onclick="navigateTo('cricket')">Cricket Analysis</span>
+                <span class="nav-item" onclick="navigateTo('scores')">Scoreboard</span>
+                <span class="nav-item" onclick="navigateTo('hockey')">Hockey Recap</span>
+                <span class="nav-item" onclick="navigateTo('cricket')">Cricket Recap</span>
             </nav>
 
             <main id="feed" class="page-content page-active">
                 <div class="border-b-4 border-ink pb-8 mb-8">
-                    <h2 class="headline text-8xl mb-4">A CHESS MATCH AT THE MULLETT</h2>
-                    <span class="subheadline">Powers demands execution as Sun Devils face Husky trap; Goaltender Berzins remains the X-factor in tonight's series finale.</span>
+                    <h2 class="headline text-8xl mb-4">DEVILS FALL SHORT IN THRILLER</h2>
+                    <span class="subheadline">Late rally not enough as St. Cloud State holds on 4-3; Hockey team swept at home despite heroic third period push.</span>
                     <div class="columns">
-                        <span class="dropcap">T</span>he Sun Devils find themselves in a familiar position this morning: chasing a result in the ruthless NCHC. Following a 4-1 loss on Friday night that felt closer than the scoreboard indicated, head coach Greg Powers was blunt about the team's finishing ability. "We had the puck for most of the night," Powers noted, "but against a team as disciplined as St. Cloud, you can't just have the puck—you have to do something lethal with it." Arizona State (13-15-1) peppered the Husky net with 34 shots, yet only Noah Powell found the scoresheet in the second frame. 
+                        <span class="dropcap">H</span>eartbreak at the Mullett. The Arizona State Sun Devils (13-16-1) mounted a furious comeback in the third period but ultimately fell 4-3 to St. Cloud State on Saturday night, completing a weekend sweep for the Huskies. Down 4-1 with ten minutes to go, ASU finally broke the "Husky Trap" that had stifled them all weekend. Goals from Bennett Schimek and a power-play blast from Cruz Lucius brought the crowd of 5,000 to their feet, turning the final 90 seconds into a siege on the SCSU net.
                         <br><br>
-                        Tonight’s strategy must revolve around disrupting the "structural wall" of St. Cloud State. The Huskies thrive when they can force opponents into a perimeter-based offense, relying on sophomore goaltender Patriks Berzins to swallow up low-danger chances. For ASU, the burden of creativity falls on Bennett Schimek and Cruz Lucius. Schimek, currently leading the conference in assists, will need to find the seams in the Husky penalty kill, which was a perfect 2-for-2 on Friday.
+                        However, goaltender Patriks Berzins stood tall when it mattered most, denying a point-blank chance from Dylan Jackson as time expired. "We played 50 minutes of good hockey tonight, but in this conference, you need 60," Coach Powers said post-game. The loss drops ASU further in the NCHC standings, making next week's road trip a do-or-die scenario for home-ice advantage in the playoffs.
                     </div>
-                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('hockey')">READ FULL HOCKEY PREVIEW &rarr;</button></div>
+                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('hockey')">FULL GAME RECAP & BOX SCORE &rarr;</button></div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-12">
                     <div>
-                        <h3 class="headline text-5xl mb-6">MUMBAI DAWN: USA vs INDIA</h3>
-                        <p class="text-sm italic mb-4">By Special Dispatch | Wankhede Stadium (6:30 AM MST Start)</p>
+                        <h3 class="headline text-5xl mb-6">MUMBAI: INDIA SURVIVES USA SCARE</h3>
+                        <p class="text-sm italic mb-4">By Special Dispatch | Wankhede Stadium</p>
                         <div class="columns" style="column-count: 2;">
-                            The cricket world’s eyes turn to Mumbai this morning as the United States faces the ultimate test: a defending champion India side on their home turf. India enters without Jasprit Bumrah, opening the door for Mohammed Siraj to lead the attack. The Americans will rely heavily on Saurabh Netravalkar, the former Mumbai youth captain whose knowledge of these conditions is unparalleled.
+                            In a match that was closer than the scorecard suggests, India defeated the USA by 29 runs to open their 2026 World Cup campaign. Suryakumar Yadav was the savior for the hosts, smashing a captain's knock of 84* after the American pacers reduced India to 77/6. The USA chase started brightly but crumbled against the spin of Axar Patel (2/16).
                         </div>
-                        <div class="mt-4"><button class="card-btn" onclick="navigateTo('cricket')">FULL CRICKET SQUADS &rarr;</button></div>
+                        <div class="mt-4"><button class="card-btn" onclick="navigateTo('cricket')">FULL MATCH REPORT &rarr;</button></div>
                     </div>
                     <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
-                        <h4 class="font-black uppercase text-xl mb-6">Sports Briefs</h4>
+                        <h4 class="font-black uppercase text-xl mb-6">Live Wire</h4>
                         <ul class="list-disc pl-5 space-y-4 text-sm font-serif">
-                            <li><strong>Basketball:</strong> The Sun Devils prepare for the "Duel in the Desert" against Arizona tonight. Hurley calls for a "Code Maroon" crowd.</li>
-                            <li><strong>Football:</strong> Spring practice schedule released. Dillingham emphasizes offensive line depth chart battles.</li>
-                            <li><strong>Softball:</strong> ASU opens the Kajikawa Classic with a double-header against Northwestern and Boise State tomorrow.</li>
+                            <li><strong>Basketball (LIVE):</strong> ASU trails Colorado 60-56 in the 2nd half. High drama in Boulder as the Devils look to steal a road win.</li>
+                            <li><strong>Softball:</strong> ASU 8, Northwestern 0. Complete dominance in the Kajikawa Classic as the Sun Devils run-rule the Wildcats in 5 innings.</li>
                         </ul>
                         <div class="mt-6 pt-4 border-t border-slate-300">
                             <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</span>
@@ -122,84 +119,53 @@
 
             <section id="scores" class="page-content">
                 <h2 class="headline text-6xl mb-8 uppercase text-center border-b-2 border-ink pb-4">Gameday Scoreboard</h2>
-                
-                <div id="scoreboard-grid" class="score-grid">
-                    </div>
+                <div id="scoreboard-grid" class="score-grid"></div>
             </section>
 
             <section id="hockey" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Page 3A: The Frost Report</h2>
+                <h2 class="headline text-6xl my-6 uppercase">Recap: Too Little, Too Late</h2>
                 <div class="columns">
-                    <p>The tactical battle in Tempe tonight isn't just about speed; it's about the "NCHC Trap." St. Cloud State, under Brett Larson, has perfected a zone defense that mimics a vise grip. In Friday’s opener, ASU’s forwards found themselves constantly ushered toward the boards. The Sun Devils must implement more lateral puck movement—passing across the Royal Road—to force Berzins to move his feet.</p>
+                    <p>St. Cloud State jumped out to a 2-0 lead early, punishing ASU defensive turnovers. The Sun Devils seemed lifeless until the third period, when desperation finally set in. Bennett Schimek's goal at 12:45 breathed life into the building, and when Lucius scored on a 6-on-4 advantage, the comeback seemed destined. But the hole dug in the first 40 minutes proved too deep.</p>
                 </div>
                 <div class="analysis-box text-sm italic">
-                    <strong>The Prediction:</strong> We expect a much tighter defensive effort from ASU tonight. Samuel Urban is due for a standout performance. <strong>Final Projection: ASU 3, SCSU 2 (OT).</strong>
+                    <strong>Stat of the Night:</strong> ASU outshot SCSU 41-26 but went just 1-for-5 on the power play. The inability to convert special teams chances defined the weekend sweep.
                 </div>
-                <div class="grid md:grid-cols-2 gap-8 mt-8">
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:var(--asu-maroon); color:var(--asu-gold);">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/0/0a/Arizona_State_Sun_Devils_logo.svg" class="h-6">
-                            <span>ASU SUN DEVILS</span>
-                        </div>
-                        <div class="lineup-grid">
-                            <span>G: Samuel Urban #31</span><span>D: Ty Ness #10</span>
-                            <span>D: Joel Kipkie #3</span><span>F: Cruz Lucius #51</span>
-                            <span>F: Bennett Schimek #23</span><span>F: Cullen Potter #12</span>
-                        </div>
-                    </div>
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#a10209; color:white;">
-                            <div class="bg-white p-1 rounded-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/St._Cloud_State_Huskies_logo.svg/2560px-St._Cloud_State_Huskies_logo.svg.png" class="h-4"></div>
-                            <span class="ml-2">ST. CLOUD HUSKIES</span>
-                        </div>
-                        <div class="lineup-grid">
-                            <span>G: Patriks Berzins #39</span><span>D: Jack Peart #8</span>
-                            <span>D: Dylan Looft #4</span><span>F: Tyson Gross #22</span>
-                            <span>F: Verner Miettinen #19</span><span>F: Kyler Kupka #10</span>
-                        </div>
-                    </div>
+                <div class="mt-8 border-t pt-4">
+                     <h3 class="font-bold text-xl mb-4">Final Box Score</h3>
+                     <table class="w-full text-sm border">
+                         <tr class="bg-gray-100 border-b"><th class="p-2 text-left">Team</th><th class="p-2">1</th><th class="p-2">2</th><th class="p-2">3</th><th class="p-2">F</th></tr>
+                         <tr class="border-b"><td class="p-2 font-bold">St. Cloud State</td><td class="p-2 text-center">1</td><td class="p-2 text-center">2</td><td class="p-2 text-center">1</td><td class="p-2 text-center font-bold">4</td></tr>
+                         <tr><td class="p-2 font-bold">Arizona State</td><td class="p-2 text-center">0</td><td class="p-2 text-center">1</td><td class="p-2 text-center">2</td><td class="p-2 text-center font-bold">3</td></tr>
+                     </table>
                 </div>
             </section>
 
             <section id="cricket" class="page-content">
                 <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
-                <h2 class="headline text-6xl my-6 uppercase">Page 2B: Wankhede War Room</h2>
+                <h2 class="headline text-6xl my-6 uppercase">Recap: SKY Saves India</h2>
                 <div class="columns">
-                    <p>The "Dew Factor" in Mumbai is the unseen 12th man that could decide this World Cup opener. By electing to bowl first, the USA is banking on the Wankhede outfield becoming "greased" by the time India has to defend their total. However, the first ten overs will be the "Valley of Death" for the American top order. Saurabh Netravalkar’s matchup against Ishan Kishan is the headline.</p>
+                    <p>For 12 overs, the USA dared to dream. Mohammed Mohsin and Ali Khan ripped through the Indian top order, leaving the Wankhede stunned. But Suryakumar Yadav (84 off 48) played an innings of pure class, dragging India to 161. In reply, the USA lost wickets at regular intervals to Mohammed Siraj (3/22) and never recovered.</p>
                 </div>
                 <div class="analysis-box text-sm italic">
-                    <strong>The Prediction:</strong> India's batting depth is simply too vast for the American seamers to contain for 20 overs. <strong>Final Projection: IND 214/4, USA 158/9.</strong>
+                    <strong>Turning Point:</strong> The wicket of Monank Patel in the powerplay. Once the captain fell, the chase lost its anchor, allowing India's spinners to squeeze the middle overs.
                 </div>
-                <div class="grid md:grid-cols-2 gap-8 mt-8">
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#000080; color:white;">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg" class="h-4 border border-white">
-                            <span>TEAM INDIA OFFICIAL XI</span>
-                        </div>
-                        <div class="p-4 grid grid-cols-1 text-xs gap-1 font-bold">
-                            <span>1. Ishan Kishan (wk)</span><span>2. Abhishek Sharma</span>
-                            <span>3. Suryakumar Yadav (c)</span><span>4. Tilak Varma</span>
-                            <span>5. Rinku Singh</span><span>6. Hardik Pandya</span>
-                            <span>7. Axar Patel (vc)</span><span>8. Shivam Dube</span>
-                            <span>9. Arshdeep Singh</span><span>10. Mohammed Siraj</span>
-                            <span>11. Varun Chakaravarthy</span>
-                        </div>
-                    </div>
-                    <div class="lineup-card">
-                        <div class="lineup-header" style="background:#b22234; color:white;">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" class="h-4 border border-white">
-                            <span>TEAM USA OFFICIAL XI</span>
-                        </div>
-                        <div class="p-4 grid grid-cols-1 text-xs gap-1 font-bold">
-                            <span>1. Andries Gous (wk)</span><span>2. Saiteja Mukkamalla</span>
-                            <span>3. Monank Patel (c)</span><span>4. Milind Kumar</span>
-                            <span>5. Sanjay Krishnamurthi</span><span>6. Shubham Ranjane</span>
-                            <span>7. Harmeet Singh</span><span>8. Mohammad Mohsin</span>
-                            <span>9. Shadley van Schalkwyk</span><span>10. Ali Khan</span>
-                            <span>11. Saurabh Netravalkar</span>
-                        </div>
-                    </div>
+                <div class="mt-8 border-t pt-4">
+                     <h3 class="font-bold text-xl mb-4">Brief Scorecard</h3>
+                     <div class="grid grid-cols-2 gap-4 text-sm">
+                         <div class="border p-4">
+                             <strong>INDIA: 161/6 (20.0)</strong><br>
+                             S. Yadav 84* (48)<br>
+                             T. Varma 32 (24)<br>
+                             S. Netravalkar 2/28
+                         </div>
+                         <div class="border p-4">
+                             <strong>USA: 132/8 (20.0)</strong><br>
+                             A. Gous 41 (35)<br>
+                             S. Mukkamalla 28 (20)<br>
+                             M. Siraj 3/22
+                         </div>
+                     </div>
                 </div>
             </section>
 
@@ -209,127 +175,86 @@
         </div>
 
         <script>
-            // NAVIGATION CONTROLLER
             function navigateTo(pageId) {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
                 document.getElementById(pageId).classList.add('page-active');
                 window.scrollTo(0,0);
             }
 
-            // === THE CENTRAL DATA CENTER ===
-            // Modify 'status' to 'LIVE' or 'FINAL' to see the site update instantly.
+            // === UPDATED REAL-WORLD DATA CENTER ===
             const gamesDatabase = [
                 {
-                    id: "hockey-fri",
+                    sport: "NCAA BASKETBALL",
+                    home: "Colorado",
+                    away: "ASU",
+                    status: "LIVE",
+                    score: "60 - 56",
+                    timeInfo: "9:31 - 2nd Half",
+                    detailPage: null
+                },
+                {
                     sport: "NCHC HOCKEY",
                     home: "ASU",
                     away: "St. Cloud St.",
-                    status: "FINAL", // Options: UPCOMING, LIVE, FINAL
-                    score: "1 - 4",
-                    timeInfo: "Friday Night",
+                    status: "FINAL",
+                    score: "3 - 4",
+                    timeInfo: "Saturday Night",
                     detailPage: "hockey"
                 },
                 {
-                    id: "hockey-sat",
-                    sport: "NCHC HOCKEY",
-                    home: "ASU",
-                    away: "St. Cloud St.",
-                    status: "UPCOMING",
-                    score: "0 - 0",
-                    startTime: new Date("February 7, 2026 17:00:00"),
-                    timeInfo: "5:00 PM MST",
-                    detailPage: "hockey"
-                },
-                {
-                    id: "cricket-wc",
                     sport: "T20 WORLD CUP",
                     home: "India",
                     away: "USA",
-                    status: "UPCOMING", // Change to 'LIVE' to test ticker!
-                    score: "0/0 - 0/0",
-                    startTime: new Date("February 7, 2026 06:30:00"),
-                    timeInfo: "6:30 AM MST",
+                    status: "FINAL",
+                    score: "161/6 - 132/8",
+                    timeInfo: "India won by 29 runs",
                     detailPage: "cricket"
                 },
                 {
-                    id: "bball-men",
-                    sport: "NCAA BASKETBALL",
+                    sport: "NCAA SOFTBALL",
                     home: "ASU",
-                    away: "Arizona",
-                    status: "UPCOMING",
-                    score: "0 - 0",
-                    startTime: new Date("February 7, 2026 20:00:00"),
-                    timeInfo: "8:00 PM MST",
-                    detailPage: null // No detail page for this one yet
+                    away: "Northwestern",
+                    status: "FINAL",
+                    score: "8 - 0",
+                    timeInfo: "Kajikawa Classic",
+                    detailPage: null
                 }
             ];
 
-            // RENDER SCOREBOARD PAGE
             function renderScoreboard() {
                 const grid = document.getElementById('scoreboard-grid');
-                grid.innerHTML = ''; // Clear current
-                
+                grid.innerHTML = '';
                 gamesDatabase.forEach(game => {
-                    let statusClass = game.status.toLowerCase();
-                    let statusText = game.status;
-                    let displayScore = game.status === 'UPCOMING' ? 'vs' : game.score;
-
-                    // Create the Card HTML
+                    const statusClass = game.status.toLowerCase();
                     const card = document.createElement('div');
                     card.className = 'score-card';
                     card.innerHTML = `
-                        <div class="card-status ${statusClass}">${statusText} • ${game.sport}</div>
-                        <div class="teams-row">
-                            <span>${game.home}</span>
-                            <span class="text-2xl">${game.status === 'UPCOMING' ? '' : game.score.split('-')[0]}</span>
-                        </div>
-                        <div class="teams-row">
-                            <span>${game.away}</span>
-                            <span class="text-2xl">${game.status === 'UPCOMING' ? '' : (game.score.split('-')[1] || '')}</span>
-                        </div>
-                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">
-                            ${game.status === 'UPCOMING' ? 'STARTS: ' + game.timeInfo : 'RESULT: ' + game.score}
-                        </div>
-                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Analyst Report</button>` : ''}
+                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
+                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
+                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
+                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
+                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Read Report</button>` : ''}
                     `;
                     grid.appendChild(card);
                 });
             }
 
-            // UPDATE TICKER LOGIC
             function updateTickerSystem() {
                 const tickerContainer = document.getElementById('ticker-feed');
                 let tickerHTML = '';
-                const now = new Date().getTime();
-
                 gamesDatabase.forEach(game => {
-                    if (game.status === 'FINAL') {
+                    if (game.status === 'LIVE') {
+                         tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
+                    } else if (game.status === 'FINAL') {
                         tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
-                    } else if (game.status === 'LIVE') {
-                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} vs ${game.away}: ${game.score}</div>`;
-                    } else if (game.status === 'UPCOMING') {
-                        const diff = game.startTime.getTime() - now;
-                        if (diff > 0) {
-                            const h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
-                            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
-                            tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} IN <span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span></div>`;
-                        } else {
-                            // If time passed but status not manually set to LIVE/FINAL yet
-                            tickerHTML += `<div class="ticker-item">STARTING NOW: ${game.home} vs ${game.away}</div>`;
-                        }
                     }
                 });
-
-                // Add branding filler
                 tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
-                
                 tickerContainer.innerHTML = tickerHTML;
             }
 
-            // Init
             renderScoreboard();
-            setInterval(updateTickerSystem, 1000); // Updates countdowns every second
-            updateTickerSystem(); // Run once immediately
+            updateTickerSystem();
         </script>
     </body>
 </html>
