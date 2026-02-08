@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch</title>
+        <title>The Tempe Torch | Gameday Central</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -11,19 +11,25 @@
             :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #f4f1ea; }
             body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
             
-            /* LIVE TICKER */
+            /* DYNAMIC TICKER */
             .ticker-wrap { width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; position: fixed; top: 0; z-index: 1000; display: flex; align-items: center; }
             .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-            .ticker-item { display: flex; align-items: center; padding: 0 50px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+            .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
             .ticker-box { background: #222; color: var(--asu-gold); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--asu-gold); margin: 0 4px; font-family: monospace; }
-            .live-score { color: #ff4444; text-shadow: 0 0 5px rgba(255,0,0,0.5); }
+            .live-indicator { color: #ff4444; animation: blink 1.5s infinite; margin-right: 10px; }
+            @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
             /* BROADSHEET STRUCTURE */
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 60px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
             .masthead { border-bottom: 8px double var(--ink); text-align: center; margin-bottom: 30px; }
             .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 7.5rem; color: var(--asu-maroon); margin: 0; line-height: 1; cursor: pointer; }
-            .date-line { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 8px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; display: flex; justify-content: space-between; margin-top: 10px; }
+            
+            /* NAVIGATION BAR */
+            .nav-bar { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 10px 0; margin-bottom: 40px; display: flex; justify-content: center; gap: 40px; }
+            .nav-item { font-family: sans-serif; font-weight: 900; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; color: var(--ink); transition: color 0.2s; }
+            .nav-item:hover { color: var(--asu-maroon); text-decoration: underline; }
+            .nav-item.active { color: var(--asu-maroon); text-decoration: underline; }
 
             /* TYPOGRAPHY */
             .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.9; color: var(--ink); letter-spacing: -2px; }
@@ -31,40 +37,53 @@
             .columns { column-count: 3; column-gap: 35px; text-align: justify; font-size: 0.9rem; line-height: 1.45; }
             .dropcap { float: left; font-size: 6rem; line-height: 0.7; padding-top: 15px; padding-right: 12px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
 
-            /* LINEUP CARDS */
+            /* SCORE CARDS (FOR THE SCOREBOARD PAGE) */
+            .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+            .score-card { border: 2px solid var(--ink); background: white; padding: 15px; position: relative; transition: transform 0.2s; }
+            .score-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+            .card-status { font-family: sans-serif; font-size: 0.65rem; font-weight: 900; letter-spacing: 1px; color: white; background: var(--ink); padding: 4px 8px; display: inline-block; margin-bottom: 10px; }
+            .card-status.live { background: #ff4444; }
+            .card-status.final { background: #444; }
+            .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
+            .team-score { font-size: 1.5rem; font-family: 'Playfair Display', serif; }
+            .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 1px solid var(--ink); padding: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+            .card-btn:hover { background: var(--asu-maroon); color: white; }
+
+            /* LINEUP CARDS (DETAIL PAGES) */
             .lineup-card { border: 2px solid var(--ink); background: white; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
             .lineup-header { padding: 12px; display: flex; align-items: center; gap: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
             .lineup-grid { padding: 15px; display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.75rem; font-weight: bold; }
-
-            /* ANALYSIS BOXES */
             .analysis-box { background: #e9e5db; padding: 20px; border: 1px solid #c5c1b5; margin-top: 20px; position: relative; }
             .analysis-box:before { content: "STAFF PROJECTION"; position: absolute; top: -10px; left: 20px; background: var(--asu-maroon); color: white; padding: 2px 10px; font-size: 0.65rem; font-weight: 900; }
 
-            /* NAV */
             .page-content { display: none; }
             .page-active { display: block; }
-            .nav-link { font-weight: bold; text-transform: uppercase; font-size: 0.75rem; text-decoration: underline; cursor: pointer; color: var(--asu-maroon); }
         </style>
     </head>
     <body>
 
         <div class="ticker-wrap">
-            <div class="ticker-content">
-                <div class="ticker-item" id="ticker-hockey"><span>LOADING PUCK DROP...</span></div>
-                <div class="ticker-item" id="ticker-cricket"><span>LOADING FIRST BALL...</span></div>
-                <div class="ticker-item"><span>THE TEMPE TORCH — EST. 2024 — INDEPENDENT DEVIL COVERAGE</span></div>
+            <div class="ticker-content" id="ticker-feed">
+                <div class="ticker-item">LOADING NEWS WIRE...</div>
             </div>
         </div>
 
         <div class="broadsheet animate__animated animate__fadeIn">
             <header class="masthead">
-                <h1 onclick="showPage('feed')">The Tempe Torch</h1>
+                <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
                 <div class="date-line">
-                    <span>LATE CITY EDITION — LOCAL MST</span>
+                    <span>LATE CITY EDITION</span>
                     <span>FEBRUARY 7, 2026</span>
                     <span>TEMPE, ARIZONA — EST. 2024</span>
                 </div>
             </header>
+
+            <nav class="nav-bar">
+                <span class="nav-item" onclick="navigateTo('feed')">Front Page</span>
+                <span class="nav-item" onclick="navigateTo('scores')">Scores & Fixtures</span>
+                <span class="nav-item" onclick="navigateTo('hockey')">Hockey Analysis</span>
+                <span class="nav-item" onclick="navigateTo('cricket')">Cricket Analysis</span>
+            </nav>
 
             <main id="feed" class="page-content page-active">
                 <div class="border-b-4 border-ink pb-8 mb-8">
@@ -73,57 +92,55 @@
                     <div class="columns">
                         <span class="dropcap">T</span>he Sun Devils find themselves in a familiar position this morning: chasing a result in the ruthless NCHC. Following a 4-1 loss on Friday night that felt closer than the scoreboard indicated, head coach Greg Powers was blunt about the team's finishing ability. "We had the puck for most of the night," Powers noted, "but against a team as disciplined as St. Cloud, you can't just have the puck—you have to do something lethal with it." Arizona State (13-15-1) peppered the Husky net with 34 shots, yet only Noah Powell found the scoresheet in the second frame. 
                         <br><br>
-                        Tonight’s strategy must revolve around disrupting the "structural wall" of St. Cloud State. The Huskies thrive when they can force opponents into a perimeter-based offense, relying on sophomore goaltender Patriks Berzins to swallow up low-danger chances. For ASU, the burden of creativity falls on Bennett Schimek and Cruz Lucius. Schimek, currently leading the conference in assists, will need to find the seams in the Husky penalty kill, which was a perfect 2-for-2 on Friday. If the Sun Devils can strike early and force St. Cloud to abandon their defensive shell, the atmosphere at Mullett Arena could become the sixth man they need to even the series.
+                        Tonight’s strategy must revolve around disrupting the "structural wall" of St. Cloud State. The Huskies thrive when they can force opponents into a perimeter-based offense, relying on sophomore goaltender Patriks Berzins to swallow up low-danger chances. For ASU, the burden of creativity falls on Bennett Schimek and Cruz Lucius. Schimek, currently leading the conference in assists, will need to find the seams in the Husky penalty kill, which was a perfect 2-for-2 on Friday.
                     </div>
-                    <div class="mt-6"><span class="nav-link" onclick="showPage('hockey')">CONTINUE TO HOCKEY ANALYSIS PAGE 3A &rarr;</span></div>
+                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('hockey')">READ FULL HOCKEY PREVIEW &rarr;</button></div>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-12">
-                    <div class="md:col-span-2">
-                        <h3 class="headline text-6xl mb-6">MUMBAI DAWN: TEAM USA EYE GOLIATH</h3>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="headline text-5xl mb-6">MUMBAI DAWN: USA vs INDIA</h3>
                         <p class="text-sm italic mb-4">By Special Dispatch | Wankhede Stadium (6:30 AM MST Start)</p>
-                        <div class="columns">
-                            The cricket world’s eyes turn to Mumbai this morning as the United States of America faces the ultimate test: a defending champion India side on their home turf. For the local Tempe audience, the 6:30 AM MST start time means a sunrise showdown for the American squad. Captain Monank Patel led the team onto the field after winning a crucial toss, electing to bowl first in hopes of exploiting early moisture in the Wankhede pitch. 
-                            <br><br>
-                            India, led by the enigmatic Suryakumar Yadav, enters without their pace spearhead Jasprit Bumrah. This absence opens the door for Mohammed Siraj to lead the attack alongside Arshdeep Singh. The Americans will rely heavily on Saurabh Netravalkar, the former Mumbai youth captain whose knowledge of these specific conditions is unparalleled within the US camp. While the odds are heavily stacked in India's favor, the US middle order has shown they can resist elite spin—a skill that will be tested to its absolute limit today.
+                        <div class="columns" style="column-count: 2;">
+                            The cricket world’s eyes turn to Mumbai this morning as the United States faces the ultimate test: a defending champion India side on their home turf. India enters without Jasprit Bumrah, opening the door for Mohammed Siraj to lead the attack. The Americans will rely heavily on Saurabh Netravalkar, the former Mumbai youth captain whose knowledge of these conditions is unparalleled.
                         </div>
-                        <div class="mt-6"><span class="nav-link" onclick="showPage('cricket')">FULL SQUADS & TACTICAL ANALYSIS 2B &rarr;</span></div>
+                        <div class="mt-4"><button class="card-btn" onclick="navigateTo('cricket')">FULL CRICKET SQUADS &rarr;</button></div>
                     </div>
-
                     <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
-                        <h4 class="font-black uppercase text-xs mb-4">OFFICIAL GAMEDAY TIMES (MST)</h4>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-[10px] font-bold text-asu-maroon">PUCK DROP</p>
-                                <p class="text-sm font-black">5:00 PM — FEB 7, 2026</p>
-                            </div>
-                            <div class="border-t border-slate-400 pt-2">
-                                <p class="text-[10px] font-bold text-asu-maroon">FIRST BALL (LOCAL TIME)</p>
-                                <p class="text-sm font-black">6:30 AM — FEB 7, 2026</p>
-                                <p class="text-[9px] italic">Note: 7:00 PM IST is 6:30 AM MST.</p>
-                            </div>
+                        <h4 class="font-black uppercase text-xl mb-6">Sports Briefs</h4>
+                        <ul class="list-disc pl-5 space-y-4 text-sm font-serif">
+                            <li><strong>Basketball:</strong> The Sun Devils prepare for the "Duel in the Desert" against Arizona tonight. Hurley calls for a "Code Maroon" crowd.</li>
+                            <li><strong>Football:</strong> Spring practice schedule released. Dillingham emphasizes offensive line depth chart battles.</li>
+                            <li><strong>Softball:</strong> ASU opens the Kajikawa Classic with a double-header against Northwestern and Boise State tomorrow.</li>
+                        </ul>
+                        <div class="mt-6 pt-4 border-t border-slate-300">
+                            <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</span>
                         </div>
                     </div>
                 </div>
             </main>
 
+            <section id="scores" class="page-content">
+                <h2 class="headline text-6xl mb-8 uppercase text-center border-b-2 border-ink pb-4">Gameday Scoreboard</h2>
+                
+                <div id="scoreboard-grid" class="score-grid">
+                    </div>
+            </section>
+
             <section id="hockey" class="page-content">
-                <span class="nav-link" onclick="showPage('feed')">&larr; FRONT PAGE</span>
-                <h2 class="headline text-6xl my-8 uppercase">Page 3A: The Frost Report</h2>
+                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
+                <h2 class="headline text-6xl my-6 uppercase">Page 3A: The Frost Report</h2>
                 <div class="columns">
-                    <p>The tactical battle in Tempe tonight isn't just about speed; it's about the "NCHC Trap." St. Cloud State, under Brett Larson, has perfected a zone defense that mimics a vise grip. In Friday’s opener, ASU’s forwards found themselves constantly ushered toward the boards, resulting in 34 shots that mostly lacked a high-danger profile. "If we're just shooting into Berzins' chest protector, we're doing the Huskies' work for them," said one scout in attendance. The Sun Devils must implement more lateral puck movement—passing across the Royal Road—to force Berzins to move his feet.</p>
-                    <p>On the other side of the puck, the Sun Devils’ penalty kill will be under the microscope. Despite a generally strong season, the mental lapse that led to Tyson Gross’s shorthanded goal on Friday cannot be repeated. ASU's Samuel Urban remains one of the most consistent backstops in the conference, but he requires his blueliners to clear the porch. If Ty Ness and Joel Kipkie can keep the slot clear, ASU has a fighting chance to salvage the weekend split.</p>
+                    <p>The tactical battle in Tempe tonight isn't just about speed; it's about the "NCHC Trap." St. Cloud State, under Brett Larson, has perfected a zone defense that mimics a vise grip. In Friday’s opener, ASU’s forwards found themselves constantly ushered toward the boards. The Sun Devils must implement more lateral puck movement—passing across the Royal Road—to force Berzins to move his feet.</p>
                 </div>
-
                 <div class="analysis-box text-sm italic">
-                    <strong>The Prediction:</strong> We expect a much tighter defensive effort from ASU tonight. Samuel Urban is due for a standout performance, and we predict a late power-play goal from Cruz Lucius to force overtime. <strong>Final Projection: ASU 3, SCSU 2 (OT).</strong>
+                    <strong>The Prediction:</strong> We expect a much tighter defensive effort from ASU tonight. Samuel Urban is due for a standout performance. <strong>Final Projection: ASU 3, SCSU 2 (OT).</strong>
                 </div>
-
                 <div class="grid md:grid-cols-2 gap-8 mt-8">
                     <div class="lineup-card">
                         <div class="lineup-header" style="background:var(--asu-maroon); color:var(--asu-gold);">
                             <img src="https://upload.wikimedia.org/wikipedia/en/0/0a/Arizona_State_Sun_Devils_logo.svg" class="h-6">
-                            <span>ASU SUN DEVILS STARTING VI</span>
+                            <span>ASU SUN DEVILS</span>
                         </div>
                         <div class="lineup-grid">
                             <span>G: Samuel Urban #31</span><span>D: Ty Ness #10</span>
@@ -134,7 +151,7 @@
                     <div class="lineup-card">
                         <div class="lineup-header" style="background:#a10209; color:white;">
                             <div class="bg-white p-1 rounded-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/St._Cloud_State_Huskies_logo.svg/2560px-St._Cloud_State_Huskies_logo.svg.png" class="h-4"></div>
-                            <span class="ml-2">ST. CLOUD HUSKIES STARTING VI</span>
+                            <span class="ml-2">ST. CLOUD HUSKIES</span>
                         </div>
                         <div class="lineup-grid">
                             <span>G: Patriks Berzins #39</span><span>D: Jack Peart #8</span>
@@ -146,17 +163,14 @@
             </section>
 
             <section id="cricket" class="page-content">
-                <span class="nav-link" onclick="showPage('feed')">&larr; FRONT PAGE</span>
-                <h2 class="headline text-6xl my-8 uppercase">Page 2B: Wankhede War Room</h2>
+                <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('feed')">&larr; BACK TO FRONT PAGE</span>
+                <h2 class="headline text-6xl my-6 uppercase">Page 2B: Wankhede War Room</h2>
                 <div class="columns">
-                    <p>The "Dew Factor" in Mumbai is the unseen 12th man that could decide this World Cup opener. By electing to bowl first, the USA is banking on the Wankhede outfield becoming "greased" by the time India has to defend their total. A wet ball is notoriously difficult for spinners like Axar Patel to grip. However, the first ten overs will be the "Valley of Death" for the American top order. Saurabh Netravalkar’s matchup against Ishan Kishan is the headline: the Mumbai-born engineer knows exactly how much the sea breeze will swing the ball at Wankhede.</p>
-                    <p>India’s transition era is now fully underway. Without the anchoring presence of Kohli, the onus of strike-rotation falls on Tilak Varma. The middle-order depth provided by Hardik Pandya and Rinku Singh is designed to counter-punch if the USA finds early breakthroughs. For the USA, the inclusion of Ali Khan provides the "X-factor" pace needed to rattle the world-class Indian batters. If Ali Khan can maintain his 145kph+ clip, the USA might just push the champions to a final-over finish.</p>
+                    <p>The "Dew Factor" in Mumbai is the unseen 12th man that could decide this World Cup opener. By electing to bowl first, the USA is banking on the Wankhede outfield becoming "greased" by the time India has to defend their total. However, the first ten overs will be the "Valley of Death" for the American top order. Saurabh Netravalkar’s matchup against Ishan Kishan is the headline.</p>
                 </div>
-
                 <div class="analysis-box text-sm italic">
-                    <strong>The Prediction:</strong> While the USA's toss win is strategic, India's batting depth is simply too vast for the American seamers to contain for 20 overs. We expect a massive total from Surya and Tilak. <strong>Final Projection: IND 214/4, USA 158/9.</strong>
+                    <strong>The Prediction:</strong> India's batting depth is simply too vast for the American seamers to contain for 20 overs. <strong>Final Projection: IND 214/4, USA 158/9.</strong>
                 </div>
-
                 <div class="grid md:grid-cols-2 gap-8 mt-8">
                     <div class="lineup-card">
                         <div class="lineup-header" style="background:#000080; color:white;">
@@ -195,55 +209,127 @@
         </div>
 
         <script>
-            function showPage(id) {
+            // NAVIGATION CONTROLLER
+            function navigateTo(pageId) {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
-                document.getElementById(id).classList.add('page-active');
+                document.getElementById(pageId).classList.add('page-active');
                 window.scrollTo(0,0);
             }
 
-            const events = {
-                hockey: {
-                    name: "ASU vs ST. CLOUD",
-                    startTime: new Date("February 7, 2026 17:00:00"),
-                    prediction: "PROJECTED: ASU 3 - 2 SCSU (OT)"
+            // === THE CENTRAL DATA CENTER ===
+            // Modify 'status' to 'LIVE' or 'FINAL' to see the site update instantly.
+            const gamesDatabase = [
+                {
+                    id: "hockey-fri",
+                    sport: "NCHC HOCKEY",
+                    home: "ASU",
+                    away: "St. Cloud St.",
+                    status: "FINAL", // Options: UPCOMING, LIVE, FINAL
+                    score: "1 - 4",
+                    timeInfo: "Friday Night",
+                    detailPage: "hockey"
                 },
-                cricket: {
-                    name: "INDIA vs USA",
+                {
+                    id: "hockey-sat",
+                    sport: "NCHC HOCKEY",
+                    home: "ASU",
+                    away: "St. Cloud St.",
+                    status: "UPCOMING",
+                    score: "0 - 0",
+                    startTime: new Date("February 7, 2026 17:00:00"),
+                    timeInfo: "5:00 PM MST",
+                    detailPage: "hockey"
+                },
+                {
+                    id: "cricket-wc",
+                    sport: "T20 WORLD CUP",
+                    home: "India",
+                    away: "USA",
+                    status: "UPCOMING", // Change to 'LIVE' to test ticker!
+                    score: "0/0 - 0/0",
                     startTime: new Date("February 7, 2026 06:30:00"),
-                    prediction: "PROJECTED: IND 214/4 - USA 158/9"
+                    timeInfo: "6:30 AM MST",
+                    detailPage: "cricket"
+                },
+                {
+                    id: "bball-men",
+                    sport: "NCAA BASKETBALL",
+                    home: "ASU",
+                    away: "Arizona",
+                    status: "UPCOMING",
+                    score: "0 - 0",
+                    startTime: new Date("February 7, 2026 20:00:00"),
+                    timeInfo: "8:00 PM MST",
+                    detailPage: null // No detail page for this one yet
                 }
-            };
+            ];
 
-            function updateTickers() {
-                const now = new Date().getTime();
+            // RENDER SCOREBOARD PAGE
+            function renderScoreboard() {
+                const grid = document.getElementById('scoreboard-grid');
+                grid.innerHTML = ''; // Clear current
+                
+                gamesDatabase.forEach(game => {
+                    let statusClass = game.status.toLowerCase();
+                    let statusText = game.status;
+                    let displayScore = game.status === 'UPCOMING' ? 'vs' : game.score;
 
-                // Hockey Ticker
-                const hDiff = events.hockey.startTime.getTime() - now;
-                const hTicker = document.getElementById('ticker-hockey');
-                if (hDiff <= 0) {
-                    hTicker.innerHTML = `<span class="live-score">LIVE SCORE PREDICTION: ${events.hockey.prediction}</span>`;
-                } else {
-                    const h = Math.floor((hDiff % 86400000) / 3600000).toString().padStart(2, "0");
-                    const m = Math.floor((hDiff % 3600000) / 60000).toString().padStart(2, "0");
-                    const s = Math.floor((hDiff % 60000) / 1000).toString().padStart(2, "0");
-                    hTicker.innerHTML = `<span>PUCK DROP: ${events.hockey.name} IN</span><span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span>:<span class="ticker-box">${s}</span>`;
-                }
-
-                // Cricket Ticker
-                const cDiff = events.cricket.startTime.getTime() - now;
-                const cTicker = document.getElementById('ticker-cricket');
-                if (cDiff <= 0) {
-                    cTicker.innerHTML = `<span class="live-score">LIVE SCORE PREDICTION: ${events.cricket.prediction}</span>`;
-                } else {
-                    const h = Math.floor((cDiff % 86400000) / 3600000).toString().padStart(2, "0");
-                    const m = Math.floor((cDiff % 3600000) / 60000).toString().padStart(2, "0");
-                    const s = Math.floor((cDiff % 60000) / 1000).toString().padStart(2, "0");
-                    cTicker.innerHTML = `<span>FIRST BALL: ${events.cricket.name} IN</span><span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span>:<span class="ticker-box">${s}</span>`;
-                }
+                    // Create the Card HTML
+                    const card = document.createElement('div');
+                    card.className = 'score-card';
+                    card.innerHTML = `
+                        <div class="card-status ${statusClass}">${statusText} • ${game.sport}</div>
+                        <div class="teams-row">
+                            <span>${game.home}</span>
+                            <span class="text-2xl">${game.status === 'UPCOMING' ? '' : game.score.split('-')[0]}</span>
+                        </div>
+                        <div class="teams-row">
+                            <span>${game.away}</span>
+                            <span class="text-2xl">${game.status === 'UPCOMING' ? '' : (game.score.split('-')[1] || '')}</span>
+                        </div>
+                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">
+                            ${game.status === 'UPCOMING' ? 'STARTS: ' + game.timeInfo : 'RESULT: ' + game.score}
+                        </div>
+                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Analyst Report</button>` : ''}
+                    `;
+                    grid.appendChild(card);
+                });
             }
 
-            setInterval(updateTickers, 1000);
-            updateTickers();
+            // UPDATE TICKER LOGIC
+            function updateTickerSystem() {
+                const tickerContainer = document.getElementById('ticker-feed');
+                let tickerHTML = '';
+                const now = new Date().getTime();
+
+                gamesDatabase.forEach(game => {
+                    if (game.status === 'FINAL') {
+                        tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
+                    } else if (game.status === 'LIVE') {
+                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} vs ${game.away}: ${game.score}</div>`;
+                    } else if (game.status === 'UPCOMING') {
+                        const diff = game.startTime.getTime() - now;
+                        if (diff > 0) {
+                            const h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, "0");
+                            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, "0");
+                            tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} IN <span class="ticker-box">${h}</span>:<span class="ticker-box">${m}</span></div>`;
+                        } else {
+                            // If time passed but status not manually set to LIVE/FINAL yet
+                            tickerHTML += `<div class="ticker-item">STARTING NOW: ${game.home} vs ${game.away}</div>`;
+                        }
+                    }
+                });
+
+                // Add branding filler
+                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
+                
+                tickerContainer.innerHTML = tickerHTML;
+            }
+
+            // Init
+            renderScoreboard();
+            setInterval(updateTickerSystem, 1000); // Updates countdowns every second
+            updateTickerSystem(); // Run once immediately
         </script>
     </body>
 </html>
