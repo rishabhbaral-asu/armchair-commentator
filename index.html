@@ -45,6 +45,7 @@
             .score-card:hover { transform: translateY(-3px); box-shadow: 8px 8px 0px rgba(0,0,0,0.15); }
             .card-status { font-family: 'Oswald', sans-serif; font-size: 0.7rem; text-transform: uppercase; color: white; background: var(--ink); padding: 4px 10px; display: inline-block; margin-bottom: 15px; }
             .card-status.live { background: #cc0000; animation: pulse 2s infinite; }
+            .card-status.upcoming { background: #004d99; }
             @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
             
             .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; border-bottom: 1px dashed #ddd; padding-bottom: 8px; }
@@ -395,6 +396,15 @@
             // FINAL DATABASE
             const gamesDatabase = [
                 {
+                    sport: "NFL SUPER BOWL",
+                    home: "Seahawks",
+                    away: "Patriots",
+                    status: "TODAY",
+                    score: "VS",
+                    timeInfo: "Kickoff 4:30 PM MST",
+                    detailPage: "superbowl"
+                },
+                {
                     sport: "NCAA BASKETBALL",
                     home: "Colorado",
                     away: "ASU",
@@ -402,6 +412,33 @@
                     score: "78 - 70",
                     timeInfo: "Final - Boulder, CO",
                     detailPage: "basketball"
+                },
+                {
+                    sport: "NCAA MEN'S BB",
+                    home: "Minnesota",
+                    away: "Maryland",
+                    status: "UPCOMING",
+                    score: "VS",
+                    timeInfo: "12:00 PM MST - Big Ten Network",
+                    detailPage: null
+                },
+                 {
+                    sport: "NCAA SOFTBALL",
+                    home: "ASU",
+                    away: "Memphis",
+                    status: "UPCOMING",
+                    score: "VS",
+                    timeInfo: "12:30 PM MST - Kajikawa Classic",
+                    detailPage: null
+                },
+                {
+                    sport: "NCAA SOFTBALL",
+                    home: "UCF",
+                    away: "Maryland",
+                    status: "UPCOMING",
+                    score: "VS",
+                    timeInfo: "1:00 PM EST - Orlando, FL",
+                    detailPage: null
                 },
                 {
                     sport: "NCAA SOFTBALL",
@@ -429,15 +466,6 @@
                     score: "161/6 - 132/8",
                     timeInfo: "India won by 29 runs",
                     detailPage: "cricket"
-                },
-                {
-                    sport: "NFL SUPER BOWL",
-                    home: "Seahawks",
-                    away: "Patriots",
-                    status: "TODAY",
-                    score: "VS",
-                    timeInfo: "Kickoff 4:30 PM MST",
-                    detailPage: "superbowl"
                 }
             ];
 
@@ -449,7 +477,8 @@
 
                 gamesDatabase.forEach(game => {
                     const isLive = game.status === "TODAY";
-                    const statusClass = isLive ? "live" : "final";
+                    const isUpcoming = game.status === "UPCOMING";
+                    const statusClass = isLive ? "live" : (isUpcoming ? "upcoming" : "final");
                     
                     const card = document.createElement('div');
                     card.className = 'score-card';
@@ -462,7 +491,7 @@
                     `;
                     grid.appendChild(card);
 
-                    tickerHTML += `<div class="ticker-item">${game.status === 'TODAY' ? 'UPCOMING:' : 'FINAL:'} ${game.home} ${game.score} ${game.away}</div>`;
+                    tickerHTML += `<div class="ticker-item">${game.status === 'TODAY' || game.status === 'UPCOMING' ? 'UPCOMING:' : 'FINAL:'} ${game.home} ${game.score} ${game.away}</div>`;
                 });
 
                 tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — SUNDAY FINAL — FEB 8 2026</div>`;
