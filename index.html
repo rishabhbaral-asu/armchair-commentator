@@ -16,7 +16,6 @@
             .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-            .ticker-box { background: #222; color: var(--asu-gold); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--asu-gold); margin: 0 4px; font-family: monospace; }
             .live-indicator { color: #ff4444; animation: blink 1.5s infinite; margin-right: 10px; }
             @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
@@ -71,8 +70,8 @@
             <header class="masthead">
                 <h1 onclick="navigateTo('feed')">The Tempe Torch</h1>
                 <div class="date-line">
-                    <span>LATE EDITION</span>
-                    <span>FEBRUARY 7, 2026</span>
+                    <span>SUNDAY MORNING POST</span>
+                    <span>FEBRUARY 8, 2026</span>
                     <span>TEMPE, ARIZONA — EST. 2024</span>
                 </div>
             </header>
@@ -108,7 +107,7 @@
                     <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
                         <h4 class="font-black uppercase text-xl mb-6">Live Wire</h4>
                         <ul class="list-disc pl-5 space-y-4 text-sm font-serif">
-                            <li><strong>Basketball (LIVE):</strong> ASU trails Colorado 60-56 in the 2nd half. High drama in Boulder as the Devils look to steal a road win.</li>
+                            <li><strong>Basketball (LIVE):</strong> ASU vs Colorado. High drama in Boulder as the Devils look to steal a road win.</li>
                             <li><strong>Softball:</strong> ASU 8, Northwestern 0. Complete dominance in the Kajikawa Classic as the Sun Devils run-rule the Wildcats in 5 innings.</li>
                         </ul>
                         <div class="mt-6 pt-4 border-t border-slate-300">
@@ -182,122 +181,126 @@
                 window.scrollTo(0,0);
             }
 
-            // === AUTOMATED DATA FETCHER ===
-            // We use a CORS proxy to allow fetching ESPN data from a browser script.
-            // If the proxy fails, it falls back to the hardcoded data you provided.
-            const CORS_PROXY = "https://corsproxy.io/?"; 
+            // === ROBUST DATA CENTER (PROXY ROTATION SYSTEM) ===
+            const CORS_PROXIES = [
+                "https://corsproxy.io/?",
+                "https://api.allorigins.win/raw?url="
+            ];
             
-            // ESPN API Endpoints
             const APIS = {
                 hockey: "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard",
                 basketball: "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
-                softball: "https://site.api.espn.com/apis/site/v2/sports/baseball/softball/scoreboard",
-                cricket: "https://site.api.espn.com/apis/site/v2/sports/cricket/19304/scoreboard" 
+                softball: "https://site.api.espn.com/apis/site/v2/sports/baseball/softball/scoreboard"
             };
 
-            // Team IDs to filter for
             const TEAMS = {
                 ASU_HOCKEY: "58",
                 ASU_BBALL: "9",
                 ASU_SOFTBALL: "9"
             };
 
-            // Central Game State
-            let gamesDatabase = [];
-
-            // FALLBACK DATA (Used initially or if API fails)
-            const fallbackData = [
-                {
-                    sport: "NCAA BASKETBALL",
-                    home: "Colorado",
-                    away: "ASU",
-                    status: "LIVE",
-                    score: "60 - 56",
-                    timeInfo: "9:31 - 2nd",
-                    detailPage: null
-                },
-                {
-                    sport: "NCHC HOCKEY",
-                    home: "ASU",
-                    away: "St. Cloud St.",
-                    status: "FINAL",
-                    score: "3 - 4",
-                    timeInfo: "Final",
-                    detailPage: "hockey"
-                },
-                {
-                    sport: "T20 WORLD CUP",
-                    home: "India",
-                    away: "USA",
-                    status: "FINAL",
-                    score: "161/6 - 132/8",
-                    timeInfo: "Final",
-                    detailPage: "cricket"
-                },
-                {
-                    sport: "NCAA SOFTBALL",
-                    home: "ASU",
-                    away: "Northwestern",
-                    status: "FINAL",
-                    score: "8 - 0",
-                    timeInfo: "Final",
-                    detailPage: null
-                }
+            // SAFE FALLBACK: If everything fails, these specific hardcoded scores will show.
+            const SAFE_DATA = [
+                { sport: "NCAA BASKETBALL", home: "Colorado", away: "ASU", status: "LIVE", score: "60 - 56", timeInfo: "9:31 - 2nd", detailPage: null },
+                { sport: "NCHC HOCKEY", home: "ASU", away: "St. Cloud St.", status: "FINAL", score: "3 - 4", timeInfo: "Saturday Night", detailPage: "hockey" },
+                { sport: "T20 WORLD CUP", home: "India", away: "USA", status: "FINAL", score: "161/6 - 132/8", timeInfo: "India won by 29 runs", detailPage: "cricket" },
+                { sport: "NCAA SOFTBALL", home: "ASU", away: "Northwestern", status: "FINAL", score: "8 - 0", timeInfo: "Kajikawa Classic", detailPage: null }
             ];
 
-            // 1. MAIN FETCH FUNCTION
+            let gamesDatabase = [...SAFE_DATA];
+
+            // RENDER UI
+            function renderUI() {
+                const grid = document.getElementById('scoreboard-grid');
+                const ticker = document.getElementById('ticker-feed');
+                grid.innerHTML = '';
+                let tickerHTML = '';
+
+                gamesDatabase.forEach(game => {
+                    let statusClass = game.status.toLowerCase();
+                    if(game.status === 'LIVE') statusClass = 'live';
+
+                    // Card
+                    const card = document.createElement('div');
+                    card.className = 'score-card';
+                    card.innerHTML = `
+                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
+                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
+                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
+                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
+                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Read Report</button>` : ''}
+                    `;
+                    grid.appendChild(card);
+
+                    // Ticker
+                    if (game.status === 'LIVE') {
+                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
+                    } else if (game.status === 'FINAL') {
+                        tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
+                    } else {
+                        tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} (${game.timeInfo})</div>`;
+                    }
+                });
+
+                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
+                ticker.innerHTML = tickerHTML;
+            }
+
+            // ROBUST FETCHER
+            async function fetchWithRetry(url) {
+                for (const proxy of CORS_PROXIES) {
+                    try {
+                        const res = await fetch(proxy + encodeURIComponent(url));
+                        if (res.ok) return await res.json();
+                    } catch (e) {
+                        console.warn(`Proxy ${proxy} failed, trying next...`);
+                    }
+                }
+                throw new Error("All proxies failed");
+            }
+
             async function fetchLiveSports() {
                 console.log("Fetching live data...");
-                const newGames = [];
-
+                let newGames = [];
+                
                 try {
-                    // Fetch Hockey
-                    const hRes = await fetch(CORS_PROXY + APIS.hockey);
-                    const hData = await hRes.json();
-                    const asuHockey = findGame(hData, TEAMS.ASU_HOCKEY);
-                    if(asuHockey) newGames.push(formatESPNData(asuHockey, "NCHC HOCKEY", "hockey"));
-
-                    // Fetch Basketball
-                    const bRes = await fetch(CORS_PROXY + APIS.basketball);
-                    const bData = await bRes.json();
+                    // Try fetch Basketball (Highest Priority for Live)
+                    const bData = await fetchWithRetry(APIS.basketball);
                     const asuBball = findGame(bData, TEAMS.ASU_BBALL);
                     if(asuBball) newGames.push(formatESPNData(asuBball, "NCAA BASKETBALL", null));
 
-                    // Fetch Softball
-                    const sRes = await fetch(CORS_PROXY + APIS.softball);
-                    const sData = await sRes.json();
+                    // Try fetch Hockey
+                    const hData = await fetchWithRetry(APIS.hockey);
+                    const asuHockey = findGame(hData, TEAMS.ASU_HOCKEY);
+                    if(asuHockey) newGames.push(formatESPNData(asuHockey, "NCHC HOCKEY", "hockey"));
+
+                    // Try fetch Softball
+                    const sData = await fetchWithRetry(APIS.softball);
                     const asuSoftball = findGame(sData, TEAMS.ASU_SOFTBALL);
                     if(asuSoftball) newGames.push(formatESPNData(asuSoftball, "NCAA SOFTBALL", null));
 
-                    // Cricket is usually hard to get free API for, so we keep the fallback
-                    newGames.push(fallbackData.find(g => g.sport === "T20 WORLD CUP"));
+                    // Keep Hardcoded Cricket (No reliable API)
+                    newGames.push(SAFE_DATA.find(g => g.sport === "T20 WORLD CUP"));
 
-                    // If we found live games, use them. If not, stick to fallback.
-                    if (newGames.length > 1) {
-                         gamesDatabase = newGames;
-                    } else {
-                         // Merge found games with missing fallbacks
-                         gamesDatabase = [...newGames, ...fallbackData.filter(f => !newGames.some(n => n.sport === f.sport))];
+                    if(newGames.length > 0) {
+                        // Merge with safe data to ensure nothing is missing
+                        gamesDatabase = newGames;
+                        // Add missing safe data if API didn't return them (e.g. if season ended)
+                        SAFE_DATA.forEach(safe => {
+                            if(!gamesDatabase.some(g => g.sport === safe.sport)) gamesDatabase.push(safe);
+                        });
+                        renderUI();
                     }
-                    
-                    renderScoreboard();
-                    updateTickerSystem();
-
-                } catch (error) {
-                    console.error("API Fetch Error (Using Fallback):", error);
-                    gamesDatabase = fallbackData;
-                    renderScoreboard();
-                    updateTickerSystem();
+                } catch (e) {
+                    console.log("Live fetch failed, using fallback.");
                 }
             }
 
-            // 2. HELPER: Find Game in JSON
             function findGame(data, teamId) {
                 if(!data || !data.events) return null;
                 return data.events.find(e => e.competitions[0].competitors.some(c => c.id === teamId));
             }
 
-            // 3. HELPER: Format Data
             function formatESPNData(game, sportLabel, linkId) {
                 const comp = game.competitions[0];
                 const home = comp.competitors.find(c => c.homeAway === 'home');
@@ -329,49 +332,10 @@
                 };
             }
 
-            // 4. RENDER UI
-            function renderScoreboard() {
-                const grid = document.getElementById('scoreboard-grid');
-                grid.innerHTML = '';
-                gamesDatabase.forEach(game => {
-                    let statusClass = game.status.toLowerCase();
-                    if(game.status === 'LIVE') statusClass = 'live';
-
-                    const card = document.createElement('div');
-                    card.className = 'score-card';
-                    card.innerHTML = `
-                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
-                        <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0]}</span></div>
-                        <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] || ''}</span></div>
-                        <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
-                        ${game.detailPage ? `<button class="card-btn" onclick="navigateTo('${game.detailPage}')">Read Report</button>` : ''}
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            function updateTickerSystem() {
-                const tickerContainer = document.getElementById('ticker-feed');
-                let tickerHTML = '';
-                gamesDatabase.forEach(game => {
-                    if (game.status === 'FINAL') {
-                        tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
-                    } else if (game.status === 'LIVE') {
-                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
-                    } else {
-                         tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} (${game.timeInfo})</div>`;
-                    }
-                });
-                tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
-                tickerContainer.innerHTML = tickerHTML;
-            }
-
             // INIT
-            gamesDatabase = fallbackData; // Load instant data first
-            renderScoreboard();
-            updateTickerSystem();
-            fetchLiveSports(); // Try to fetch real data
-            setInterval(fetchLiveSports, 60000); // Refresh every 60s
+            renderUI(); // Render fallback immediately
+            fetchLiveSports(); // Try fetch
+            setInterval(fetchLiveSports, 60000); // Poll every 60s
         </script>
     </body>
 </html>
