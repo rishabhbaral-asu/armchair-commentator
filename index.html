@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>The Tempe Torch | Gameday Central</title>
+        <title>The Tempe Torch | Sunday Final</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
@@ -16,8 +16,6 @@
             .ticker-content { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
             @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
             .ticker-item { display: flex; align-items: center; padding: 0 40px; color: var(--asu-gold); font-family: sans-serif; font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-            .live-indicator { color: #ff4444; animation: blink 1.5s infinite; margin-right: 10px; }
-            @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
             /* BROADSHEET STRUCTURE */
             .broadsheet { background: var(--paper); max-width: 1200px; margin: 30px auto; padding: 60px; box-shadow: 0 0 70px rgba(0,0,0,0.7); border: 1px solid #d1cfc8; position: relative; }
@@ -42,7 +40,6 @@
             .score-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
             .card-status { font-family: sans-serif; font-size: 0.65rem; font-weight: 900; letter-spacing: 1px; color: white; background: var(--ink); padding: 4px 8px; display: inline-block; margin-bottom: 10px; }
             .card-status.final { background: #000; }
-            .card-status.live { background: #ff4444; }
             .teams-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
             .team-score { font-size: 1.5rem; font-family: 'Playfair Display', serif; }
             .card-btn { display: block; width: 100%; text-align: center; background: var(--paper); border: 1px solid var(--ink); padding: 8px; margin-top: 10px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
@@ -85,14 +82,14 @@
 
             <main id="feed" class="page-content page-active">
                 <div class="border-b-4 border-ink pb-8 mb-8">
-                    <h2 class="headline text-8xl mb-4">DEVILS FALL SHORT IN THRILLER</h2>
-                    <span class="subheadline">Late rally not enough as St. Cloud State holds on 4-3; Hockey team swept at home despite heroic third period push.</span>
+                    <h2 class="headline text-8xl mb-4">DEVILS FALL IN BOULDER</h2>
+                    <span class="subheadline">Colorado pulls away late to defeat ASU 78-70; Softball provides bright spot with 8-0 mercy-rule victory over Northwestern.</span>
                     <div class="columns">
-                        <span class="dropcap">H</span>eartbreak at the Mullett. The Arizona State Sun Devils (13-16-1) mounted a furious comeback in the third period but ultimately fell 4-3 to St. Cloud State on Saturday night, completing a weekend sweep for the Huskies. Down 4-1 with ten minutes to go, ASU finally broke the "Husky Trap" that had stifled them all weekend. Goals from Bennett Schimek and a power-play blast from Cruz Lucius brought the crowd of 5,000 to their feet, turning the final 90 seconds into a siege on the SCSU net.
+                        <span class="dropcap">T</span>he road woes continue for Bobby Hurley's squad. Despite a competitive first 30 minutes, the Sun Devils faded down the stretch, falling to the Colorado Buffaloes 78-70 at the CU Events Center. Arizona State (12-12, 3-8 Big 12) cut the deficit to four points late in the second half but couldn't get the critical stops when needed. "We fought hard, but you can't have empty possessions in the final four minutes on the road," Hurley noted post-game.
                         <br><br>
-                        However, goaltender Patriks Berzins stood tall when it mattered most, denying a point-blank chance from Dylan Jackson as time expired. "We played 50 minutes of good hockey tonight, but in this conference, you need 60," Coach Powers said post-game. The loss drops ASU further in the NCHC standings, making next week's road trip a do-or-die scenario for home-ice advantage in the playoffs.
+                        Across the sports complex, the mood was far brighter. The Sun Devil softball team delivered a statement win at the Kajikawa Classic, run-ruling Northwestern 8-0 in just five innings. Kenzie Brown was electric in the circle, while the offense exploded for a five-run 3rd inning that put the game out of reach early. It was the complete performance Coach Ford has been demanding all week.
                     </div>
-                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('hockey')">FULL GAME RECAP & BOX SCORE &rarr;</button></div>
+                    <div class="mt-6"><button class="card-btn" style="width:auto; padding:10px 30px;" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</button></div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-12">
@@ -105,10 +102,10 @@
                         <div class="mt-4"><button class="card-btn" onclick="navigateTo('cricket')">FULL MATCH REPORT &rarr;</button></div>
                     </div>
                     <div class="bg-slate-100 p-6 border-l-4 border-asu-maroon">
-                        <h4 class="font-black uppercase text-xl mb-6">Live Wire</h4>
+                        <h4 class="font-black uppercase text-xl mb-6">Final Scores</h4>
                         <ul class="list-disc pl-5 space-y-4 text-sm font-serif">
-                            <li><strong>Basketball (LIVE):</strong> ASU vs Colorado. High drama in Boulder as the Devils look to steal a road win.</li>
-                            <li><strong>Softball:</strong> ASU 8, Northwestern 0. Complete dominance in the Kajikawa Classic as the Sun Devils run-rule the Wildcats in 5 innings.</li>
+                            <li><strong>Basketball:</strong> Colorado 78, ASU 70. The Buffs secure the home win despite a late push from the Devils.</li>
+                            <li><strong>Softball:</strong> ASU 8, Northwestern 0. Complete dominance in the Kajikawa Classic (5 Innings).</li>
                         </ul>
                         <div class="mt-6 pt-4 border-t border-slate-300">
                             <span class="text-xs font-bold text-asu-maroon cursor-pointer hover:underline" onclick="navigateTo('scores')">VIEW FULL SCOREBOARD &rarr;</span>
@@ -181,33 +178,46 @@
                 window.scrollTo(0,0);
             }
 
-            // === ROBUST DATA CENTER (PROXY ROTATION SYSTEM) ===
-            const CORS_PROXIES = [
-                "https://corsproxy.io/?",
-                "https://api.allorigins.win/raw?url="
+            // === FINAL "HARDCODED" DATABASE ===
+            // This is the only way to guarantee correct scores on a static site.
+            const gamesDatabase = [
+                {
+                    sport: "NCAA BASKETBALL",
+                    home: "Colorado",
+                    away: "ASU",
+                    status: "FINAL",
+                    score: "78 - 70",
+                    timeInfo: "Final - Boulder, CO",
+                    detailPage: null
+                },
+                {
+                    sport: "NCAA SOFTBALL",
+                    home: "ASU",
+                    away: "Northwestern",
+                    status: "FINAL",
+                    score: "8 - 0",
+                    timeInfo: "Final (5 Innings)",
+                    detailPage: null
+                },
+                {
+                    sport: "NCHC HOCKEY",
+                    home: "ASU",
+                    away: "St. Cloud St.",
+                    status: "FINAL",
+                    score: "3 - 4",
+                    timeInfo: "Final - Mullett Arena",
+                    detailPage: "hockey"
+                },
+                {
+                    sport: "T20 WORLD CUP",
+                    home: "India",
+                    away: "USA",
+                    status: "FINAL",
+                    score: "161/6 - 132/8",
+                    timeInfo: "India won by 29 runs",
+                    detailPage: "cricket"
+                }
             ];
-            
-            const APIS = {
-                hockey: "https://site.api.espn.com/apis/site/v2/sports/hockey/mens-college-hockey/scoreboard",
-                basketball: "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard",
-                softball: "https://site.api.espn.com/apis/site/v2/sports/baseball/softball/scoreboard"
-            };
-
-            const TEAMS = {
-                ASU_HOCKEY: "58",
-                ASU_BBALL: "9",
-                ASU_SOFTBALL: "9"
-            };
-
-            // SAFE FALLBACK: If everything fails, these specific hardcoded scores will show.
-            const SAFE_DATA = [
-                { sport: "NCAA BASKETBALL", home: "Colorado", away: "ASU", status: "LIVE", score: "60 - 56", timeInfo: "9:31 - 2nd", detailPage: null },
-                { sport: "NCHC HOCKEY", home: "ASU", away: "St. Cloud St.", status: "FINAL", score: "3 - 4", timeInfo: "Saturday Night", detailPage: "hockey" },
-                { sport: "T20 WORLD CUP", home: "India", away: "USA", status: "FINAL", score: "161/6 - 132/8", timeInfo: "India won by 29 runs", detailPage: "cricket" },
-                { sport: "NCAA SOFTBALL", home: "ASU", away: "Northwestern", status: "FINAL", score: "8 - 0", timeInfo: "Kajikawa Classic", detailPage: null }
-            ];
-
-            let gamesDatabase = [...SAFE_DATA];
 
             // RENDER UI
             function renderUI() {
@@ -217,14 +227,10 @@
                 let tickerHTML = '';
 
                 gamesDatabase.forEach(game => {
-                    let statusClass = game.status.toLowerCase();
-                    if(game.status === 'LIVE') statusClass = 'live';
-
-                    // Card
                     const card = document.createElement('div');
                     card.className = 'score-card';
                     card.innerHTML = `
-                        <div class="card-status ${statusClass}">${game.status} • ${game.sport}</div>
+                        <div class="card-status final">${game.status} • ${game.sport}</div>
                         <div class="teams-row"><span>${game.home}</span><span class="team-score">${game.score.split('-')[0].trim()}</span></div>
                         <div class="teams-row"><span>${game.away}</span><span class="team-score">${game.score.split('-')[1] ? game.score.split('-')[1].trim() : ''}</span></div>
                         <div class="text-xs text-center text-gray-500 font-sans border-t pt-2 mt-2">${game.timeInfo}</div>
@@ -232,110 +238,15 @@
                     `;
                     grid.appendChild(card);
 
-                    // Ticker
-                    if (game.status === 'LIVE') {
-                        tickerHTML += `<div class="ticker-item"><span class="live-indicator">● LIVE</span> ${game.home} ${game.score} ${game.away} (${game.timeInfo})</div>`;
-                    } else if (game.status === 'FINAL') {
-                        tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
-                    } else {
-                        tickerHTML += `<div class="ticker-item">UPCOMING: ${game.home} vs ${game.away} (${game.timeInfo})</div>`;
-                    }
+                    tickerHTML += `<div class="ticker-item">FINAL: ${game.home} ${game.score} ${game.away}</div>`;
                 });
 
                 tickerHTML += `<div class="ticker-item" style="color:white">THE TEMPE TORCH — EST. 2024</div>`;
                 ticker.innerHTML = tickerHTML;
             }
 
-            // ROBUST FETCHER
-            async function fetchWithRetry(url) {
-                for (const proxy of CORS_PROXIES) {
-                    try {
-                        const res = await fetch(proxy + encodeURIComponent(url));
-                        if (res.ok) return await res.json();
-                    } catch (e) {
-                        console.warn(`Proxy ${proxy} failed, trying next...`);
-                    }
-                }
-                throw new Error("All proxies failed");
-            }
-
-            async function fetchLiveSports() {
-                console.log("Fetching live data...");
-                let newGames = [];
-                
-                try {
-                    // Try fetch Basketball (Highest Priority for Live)
-                    const bData = await fetchWithRetry(APIS.basketball);
-                    const asuBball = findGame(bData, TEAMS.ASU_BBALL);
-                    if(asuBball) newGames.push(formatESPNData(asuBball, "NCAA BASKETBALL", null));
-
-                    // Try fetch Hockey
-                    const hData = await fetchWithRetry(APIS.hockey);
-                    const asuHockey = findGame(hData, TEAMS.ASU_HOCKEY);
-                    if(asuHockey) newGames.push(formatESPNData(asuHockey, "NCHC HOCKEY", "hockey"));
-
-                    // Try fetch Softball
-                    const sData = await fetchWithRetry(APIS.softball);
-                    const asuSoftball = findGame(sData, TEAMS.ASU_SOFTBALL);
-                    if(asuSoftball) newGames.push(formatESPNData(asuSoftball, "NCAA SOFTBALL", null));
-
-                    // Keep Hardcoded Cricket (No reliable API)
-                    newGames.push(SAFE_DATA.find(g => g.sport === "T20 WORLD CUP"));
-
-                    if(newGames.length > 0) {
-                        // Merge with safe data to ensure nothing is missing
-                        gamesDatabase = newGames;
-                        // Add missing safe data if API didn't return them (e.g. if season ended)
-                        SAFE_DATA.forEach(safe => {
-                            if(!gamesDatabase.some(g => g.sport === safe.sport)) gamesDatabase.push(safe);
-                        });
-                        renderUI();
-                    }
-                } catch (e) {
-                    console.log("Live fetch failed, using fallback.");
-                }
-            }
-
-            function findGame(data, teamId) {
-                if(!data || !data.events) return null;
-                return data.events.find(e => e.competitions[0].competitors.some(c => c.id === teamId));
-            }
-
-            function formatESPNData(game, sportLabel, linkId) {
-                const comp = game.competitions[0];
-                const home = comp.competitors.find(c => c.homeAway === 'home');
-                const away = comp.competitors.find(c => c.homeAway === 'away');
-                const statusState = game.status.type.state; 
-
-                let statusText = "UPCOMING";
-                let scoreText = "vs";
-                let timeText = new Date(game.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                if (statusState === 'in') {
-                    statusText = "LIVE";
-                    scoreText = `${home.score} - ${away.score}`;
-                    timeText = game.status.type.shortDetail; 
-                } else if (statusState === 'post') {
-                    statusText = "FINAL";
-                    scoreText = `${home.score} - ${away.score}`;
-                    timeText = "Final";
-                }
-
-                return {
-                    sport: sportLabel,
-                    home: home.team.abbreviation,
-                    away: away.team.abbreviation,
-                    status: statusText,
-                    score: scoreText,
-                    timeInfo: timeText,
-                    detailPage: linkId
-                };
-            }
-
-            // INIT
-            renderUI(); // Render fallback immediately
-            fetchLiveSports(); // Try fetch
-            setInterval(fetchLiveSports, 60000); // Poll every 60s
+            // Init
+            renderUI();
         </script>
     </body>
 </html>
