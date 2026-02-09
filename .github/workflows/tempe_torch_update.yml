@@ -26,6 +26,9 @@ jobs:
       - name: Run unified live score fetcher
         run: python scripts/update_scores.py
 
+      - name: Generate newspaper stories
+        run: python scripts/generate_stories.py
+
       - name: Commit updated data
         run: |
           git config user.name "github-actions"
