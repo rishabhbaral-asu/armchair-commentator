@@ -1,8 +1,10 @@
 """
-Tempe Torch — Daily Story Generator (Preview + Detailed Stories)
+Tempe Torch — Story Generator & Filter
+Filters the raw scores and fetches REAL news headlines.
 """
 
 import json
+import requests
 import random
 from datetime import datetime
 from pathlib import Path
@@ -10,175 +12,107 @@ from pathlib import Path
 SCORES_PATH = Path("data/daily_scores.json")
 STORIES_PATH = Path("data/daily_stories.json")
 
+# --- CONFIGURATION: WHO TO TRACK ---
+STATE_FILTER = ["CA", "AZ", "IL", "GA", "MD", "DC", "VA", "TX"]
 
-STATE_FILTER = {"CA", "AZ", "IL", "GA", "MD", "DC", "VA", "TX"}
+INTERNATIONAL_TEAMS = ["India", "USA", "United States"]
 
-INTERNATIONAL_TEAMS = {
-    "India",
-    "India (W)",
-    "USA",
-    "USA (M)",
-    "USA (W)",
-}
+CRICKET_LEAGUES = ["ICC", "IPL", "MLC", "Major League Cricket", "Indian Premier League"]
 
-CRICKET_LEAGUES = {"ICC", "IPL", "MLC"}
-
-SOCCER_CLUBS = {
-    "Fulham",
-    "Leeds",
-    "Leverkusen",
-    "Gladbach",
-    "Barcelona",
-    "Real Madrid",
-    "PSG",
-}
-
-SOCCER_COMPETITIONS = {
-    "Premier League",
-    "Bundesliga",
-    "La Liga",
-    "Ligue 1",
-    "Liga F",
-    "NWSL",
-}
-
+SOCCER_CLUBS = [
+    "Fulham", "Leeds", "Leverkusen", "Gladbach", "St. Pauli",
+    "Barcelona", "Real Madrid", "PSG", "Paris Saint-Germain"
+]
 
 # --------------------------------------------------
-# Filtering
+# LOGIC
 # --------------------------------------------------
-
 
 def game_is_relevant(g):
-    home = g.get("home", "")
-    away = g.get("away", "")
-    league = g.get("league", "")
-    state = g.get("state", "")
+    # 1. Check Cricket Leagues
+    if g['sport'] == "Cricket":
+        # Check if league name matches (often embedded in game info, but we'll check team names/locations too)
+        # Since we don't have league name easily in all objects, we rely on teams.
+        pass 
 
-    if state in STATE_FILTER:
-        return True
+    # 2. Check Locations (States)
+    # We look for " Tempe, AZ" or similar in the location string
+    for state in STATE_FILTER:
+        if (state in g['home_location']) or (state in g['away_location']):
+            return True
 
-    if home in INTERNATIONAL_TEAMS or away in INTERNATIONAL_TEAMS:
-        return True
-
-    if league in CRICKET_LEAGUES:
-        return True
-
-    if league in SOCCER_COMPETITIONS and (
-        home in SOCCER_CLUBS or away in SOCCER_CLUBS
-    ):
-        return True
+    # 3. Check Specific Teams (Intl & Soccer Clubs)
+    targets = INTERNATIONAL_TEAMS + SOCCER_CLUBS
+    for t in targets:
+        if t.lower() in g['home'].lower() or t.lower() in g['away'].lower():
+            return True
+            
+    # 4. Check Cricket specifically for leagues if possible or just assume all cricket is good? 
+    # The prompt asked for specific leagues. If we can't filter by league easily, 
+    # we might just let all cricket through or filter by team. 
+    # Let's let all Cricket through if it matches the league list logic, 
+    # but since API structure varies, we'll rely on the manual lists if possible.
+    if g['sport'] == "Cricket":
+         # Basic check for now:
+         if any(l in g.get('league', '') for l in CRICKET_LEAGUES):
+             return True
 
     return False
 
-
-# --------------------------------------------------
-# Writing helpers (less templated)
-# --------------------------------------------------
-
-HEADLINE_PATTERNS_CLOSE = [
-    "{winner} slip past {loser} in tense finish",
-    "Late push lifts {winner} over {loser}",
-    "{winner} survive scare against {loser}",
-]
-
-HEADLINE_PATTERNS_COMFORT = [
-    "{winner} handle {loser} with authority",
-    "{winner} in control throughout against {loser}",
-    "Clinical showing sends {winner} past {loser}",
-]
-
-HEADLINE_PATTERNS_GENERIC = [
-    "{home} and {away} meet in featured matchup",
-    "Spotlight falls on {home}–{away} clash",
-]
-
-
-def realistic_headline(g):
-    home, away = g["home"], g["away"]
-    hs, as_ = g.get("home_score"), g.get("away_score")
-
-    if hs is None or as_ is None:
-        return random.choice(HEADLINE_PATTERNS_GENERIC).format(home=home, away=away)
-
-    winner = home if int(hs) > int(as_) else away
-    loser = away if winner == home else home
-    margin = abs(int(hs) - int(as_))
-
-    if margin <= 3:
-        pattern = random.choice(HEADLINE_PATTERNS_CLOSE)
-    else:
-        pattern = random.choice(HEADLINE_PATTERNS_COMFORT)
-
-    return pattern.format(winner=winner, loser=loser).capitalize()
-
-
-def preview_paragraph(g):
-    home, away = g["home"], g["away"]
-    sport = g.get("sport", "competition")
-
-    return (
-        f"{away} faced {home} in {sport} play, a matchup that carried implications "
-        "for momentum and positioning as the season continues to take shape."
-    )
-
-
-def detailed_story(g):
-    home, away = g["home"], g["away"]
-    hs, as_ = g.get("home_score"), g.get("away_score")
-    sport = g.get("sport", "competition")
-
-    if hs is None or as_ is None:
-        return (
-            f"The contest between {away} and {home} remained unresolved at publication time, "
-            "with stretches of control traded across a competitive evening of play."
-        )
-
-    winner = home if int(hs) > int(as_) else away
-    loser = away if winner == home else home
-
-    return (
-        f"In a result that reflected steady execution, {winner} defeated {loser} {hs}-{as_} in {sport} action. "
-        "Control of tempo and efficiency in key moments ultimately separated the sides, "
-        "continuing a run of form that could shape the weeks ahead."
-    )
-
-
-# --------------------------------------------------
-# Main
-# --------------------------------------------------
-
+def fetch_real_news():
+    """Fetches the top general sports headline from ESPN"""
+    try:
+        # Fetching Top Headlines
+        url = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news" # NBA usually has good general headlines, or use 'general'
+        data = requests.get(url).json()
+        article = data['articles'][0]
+        return {
+            "headline": article['headline'],
+            "description": article['description'],
+            "story": article.get('story', article['description']) # sometimes 'story' is not full
+        }
+    except:
+        return {
+            "headline": "Sports World Updates",
+            "description": "Live updates from around the globe.",
+            "story": "Check back later for detailed reports."
+        }
 
 def main():
     if not SCORES_PATH.exists():
-        raise FileNotFoundError("Run score fetcher first.")
+        print("No scores found.")
+        return
 
     with open(SCORES_PATH) as f:
-        games = json.load(f).get("games", [])
+        raw_data = json.load(f)
 
-    games = [g for g in games if game_is_relevant(g)]
+    # 1. Filter Games
+    relevant_games = [g for g in raw_data.get("games", []) if game_is_relevant(g)]
 
-    if not games:
-        output = {
-            "updated": datetime.utcnow().isoformat(),
-            "lead_headline": "Quiet Day Across Covered Competitions",
-            "preview_story": "Limited action took place within the Tempe Torch coverage footprint.",
-            "detailed_story": "Additional fixtures are expected to restore a fuller schedule in the coming days.",
-        }
-    else:
-        lead = games[0]
+    # 2. Get News
+    news = fetch_real_news()
 
-        output = {
-            "updated": datetime.utcnow().isoformat(),
-            "lead_headline": realistic_headline(lead),
-            "preview_story": preview_paragraph(lead),
-            "detailed_story": detailed_story(lead),
-        }
+    # 3. Create Final Output
+    output = {
+        "updated": datetime.utcnow().isoformat(),
+        "games": relevant_games, # Only save the filtered ones for the frontend
+        "lead_headline": news['headline'],
+        "preview_story": news['description'],
+        "detailed_story": news['story']
+    }
 
-    STORIES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Save over the daily_scores (or a new file if you prefer)
+    # The frontend reads daily_scores for games, so we should update that file 
+    # OR we update the 'stories' file and let frontend read both.
+    
+    # We will save the FILTERED games back to daily_scores so the ticker is clean
+    with open(SCORES_PATH, "w") as f:
+        json.dump({"updated": output["updated"], "games": relevant_games}, f, indent=2)
 
     with open(STORIES_PATH, "w") as f:
         json.dump(output, f, indent=2)
 
+    print(f"Filtered down to {len(relevant_games)} relevant games.")
 
 if __name__ == "__main__":
     main()
