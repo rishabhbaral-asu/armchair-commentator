@@ -180,4 +180,23 @@ def main():
             # Convert filtered live games into Story Objects
             for g in raw_data.get("games", []):
                 # Only add if it's not a duplicate of our pinned stories (basic check)
-                if g['home'] not
+                if g['home'] not in ["Colorado", "Minnesota", "Arizona St", "India", "Seahawks"]:
+                    live_stories.append(generate_live_narrative(g))
+
+    # 2. Merge Pinned + Live
+    # We put pinned stories first so they take the "Prime" spots in the layout
+    all_stories = PINNED_STORIES + live_stories
+
+    output = {
+        "meta": INSIDE_FLAP_DATA,
+        "stories": all_stories
+    }
+
+    STORIES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(STORIES_PATH, "w") as f:
+        json.dump(output, f, indent=2)
+
+    print(f"Generated {len(all_stories)} hybrid stories.")
+
+if __name__ == "__main__":
+    main()
