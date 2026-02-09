@@ -12,7 +12,8 @@
     },
     "staff": [
       "Editor: R. Baral",
-      "Photo: Getty Images"
+      "Photo: Getty Images",
+      "Stats: ESPN Stats & Info"
     ],
     "date": "Monday, February 9, 2026"
   },
@@ -22,9 +23,9 @@
       "type": "lead",
       "sport": "NFL \u2022 Super Bowl LX",
       "headline": "DEFENSE REIGNS SUPREME",
-      "subhead": "Seahawks dismantle Patriots 29-13...",
+      "subhead": "Seahawks dismantle Patriots 29-13; Macdonald's scheme suffocates Maye to capture franchise's second title.",
       "dateline": "SANTA CLARA, Calif.",
-      "body": "The dynasty talk was premature...",
+      "body": "SANTA CLARA, Calif. \u2014 The dynasty talk was premature. The coronation was cancelled. In a defensive masterclass that suffocated the league's highest-flying offense, the Seattle Seahawks defeated the New England Patriots 29-13 to win Super Bowl LX, capturing the franchise's second Lombardi Trophy in a game that felt like a throwback to a different era of football.\n\nIt wasn't the shootout the pundits predicted. It wasn't the passing clinic the betting markets anticipated. Instead, Mike Macdonald's defense turned Drake Maye's dream season into a recurring nightmare under the lights of Levi's Stadium. The Seahawks sacked the Patriots' sophomore quarterback seven times, holding New England to a season-low 240 total yards and forcing three critical turnovers that sucked the life out of the Patriots' sideline.\n\n\"We heard the noise,\" Macdonald said, clutching the trophy, his voice cracking with emotion. \"For two weeks, all we heard was 'Drake Maye this' and 'New England Offense that.' Nobody talked about our front seven. Nobody talked about our discipline. I think they're talking now.\"\n\nThe narrative entering the week focused on the Patriots' explosive youth, but it was Seattle's veteran castoffs who defined the evening. Sam Darnold, completing one of the most remarkable career renaissance arcs in NFL history, was surgical. He finished 22-of-28 for 215 yards and two touchdowns, avoiding the critical mistakes that once plagued his tenure in New York and Carolina.\n\nHis 15-yard strike to Jaxon Smith-Njigba in the third quarter\u2014a laser thrown into a tight window against double coverage\u2014opened up a 22-10 lead that felt insurmountable against a Seattle defense playing at a historic level.\n\n\"They wrote me off,\" Darnold said. \"They said I saw ghosts. Tonight, the only ghost out there was the history we just buried.\"\n\nThe turning point came late in the second quarter. Trailing 9-6, the Patriots drove to the Seattle 5-yard line, poised to take the lead. On 3rd-and-goal, Maye dropped back, looked for his favorite target Rome Odunze, and was immediately swallowed up by Leonard Williams for a 12-yard sack. New England was forced to settle for a field goal.\n\nSeattle responded with a methodical, soul-crushing 75-yard touchdown drive. Kenneth Walker III (112 yards, 1 TD) bludgeoned the Patriots' defensive front, ripping off runs of 12, 8, and 15 yards before punching it in. That swing\u2014from a potential Patriots lead to a Seahawks dominance\u2014broke New England's spirit.\n\nBy the fourth quarter, the Patriots looked exhausted. Their offensive line, which had been stellar all postseason, crumbled under the weight of Seattle's simulated pressures. As the clock hit zero, blue and green confetti rained down, burying the Patriots' hopes and signaling the dawn of a new era in the NFC West.",
       "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
       "game_data": {
         "home": "Seahawks",
@@ -34,6 +35,31 @@
         "away_score": "13",
         "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png",
         "status": "FINAL"
+      },
+      "box_score": {
+        "title": "Super Bowl LX Stats",
+        "headers": [
+          "Player",
+          "Stats",
+          "Impact"
+        ],
+        "rows": [
+          [
+            "S. Darnold",
+            "22/28",
+            "MVP"
+          ],
+          [
+            "K. Walker",
+            "112 yds",
+            "1 TD"
+          ],
+          [
+            "D. Maye",
+            "18/41",
+            "7 Sacks"
+          ]
+        ]
       }
     },
     {
@@ -42,7 +68,8 @@
       "sport": "NBA \u2022 PREVIEW",
       "headline": "Clash of Styles",
       "subhead": "Suns host Lakers in pivotal West matchup",
-      "body": "Tonight at the Footprint Center...",
+      "dateline": "PHOENIX",
+      "body": "PHOENIX \u2014 Tonight at the Footprint Center (8:00 PM MST), two teams with diametrically opposing basketball philosophies collide in a game that could reshape the Western Conference playoff picture. The Phoenix Suns (32-20) host the Los Angeles Lakers (30-22) in a matchup that pits mid-range precision against brute force in the paint.\n\nThe Suns enter the contest riding a wave of offensive efficiency. Under Mike Budenholzer, they have transformed into the league's premier jump-shooting team, leading the NBA in shooting percentage from 10-16 feet (48%). Devin Booker has been the catalyst, averaging 34.5 points per game in February while acting as the primary playmaker.\n\n\"We know who they are,\" Booker said at shootaround this morning. \"They want to muddy the game up. They want to get to the free-throw line and slow the pace. Our job is to keep the ball moving and make them chase us.\"\n\nConversely, the Lakers live in the restricted area. They average a league-high 58 points in the paint, utilizing the sheer size of Anthony Davis and the driving ability of LeBron James to collapse defenses.\n\nThe matchup to watch is undeniably Anthony Davis vs. Jusuf Nurkic. In their last meeting, Nurkic's physicality frustrated Davis, holding him to a 6-for-19 shooting night. However, Davis has been on a tear since the All-Star break, averaging 32 points and 14 rebounds. If Phoenix is forced to send double-teams at Davis, it leaves them vulnerable to Austin Reaves and D'Angelo Russell on the perimeter.\n\nInjury Report: Bradley Beal is a game-time decision with an ankle sprain, which could force Grayson Allen into the starting lineup. For the Lakers, Jarred Vanderbilt remains out, putting pressure on Rui Hachimura to defend Kevin Durant.",
       "game_data": {
         "home": "Suns",
         "home_score": "VS",
@@ -54,12 +81,13 @@
       }
     },
     {
-      "id": "live-10913",
+      "id": "live-49855",
       "type": "grid",
       "sport": "NCAA Football",
       "headline": "North Texas Mean Green vs Indiana Hoosiers",
-      "subhead": "9/5 - TBD",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "9/5 - TBD \u2022 NCAA Football",
+      "dateline": "Indiana",
+      "body": "For Indiana Hoosiers, it was a night of missed opportunities. For North Texas Mean Green, it was a testament to execution. North Texas Mean Green defeated Indiana Hoosiers 0-0 at Indiana, capitalizing on a dominant second-half performance.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Indiana Hoosiers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, North Texas Mean Green responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the North Texas Mean Green head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, North Texas Mean Green found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Indiana Hoosiers defense that looked a step slow.\n\nWith this result, North Texas Mean Green adds a quality win to their resume as they look to build momentum for the remainder of the season. For Indiana Hoosiers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "NCAA Football",
         "league": "NCAA Football",
@@ -81,12 +109,13 @@
       "box_score": null
     },
     {
-      "id": "live-73964",
+      "id": "live-79737",
       "type": "grid",
       "sport": "NCAA Football",
       "headline": "Indiana State Sycamores vs Purdue Boilermakers",
-      "subhead": "9/5 - TBD",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "9/5 - TBD \u2022 NCAA Football",
+      "dateline": "Purdue",
+      "body": "The atmosphere at Purdue was electric as Purdue Boilermakers and Indiana State Sycamores clashed in a pivotal NCAA Football showdown. When the dust settled, it was Indiana State Sycamores who stood tall, securing a 0-0 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Purdue Boilermakers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Indiana State Sycamores responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Indiana State Sycamores head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Indiana State Sycamores found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Purdue Boilermakers defense that looked a step slow.\n\nWith this result, Indiana State Sycamores adds a quality win to their resume as they look to build momentum for the remainder of the season. For Purdue Boilermakers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "NCAA Football",
         "league": "NCAA Football",
@@ -108,12 +137,13 @@
       "box_score": null
     },
     {
-      "id": "live-70500",
+      "id": "live-80342",
       "type": "grid",
       "sport": "NCAA Baseball",
       "headline": "Indiana Hoosiers vs North Carolina Tar Heels",
-      "subhead": "Fri, February 13th at 4:00 PM EST",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "Fri, February 13th at 4:00 PM EST \u2022 NCAA Baseball",
+      "dateline": "North Carolina",
+      "body": "The anticipation is palpable in North Carolina as North Carolina Tar Heels prepares to host Indiana Hoosiers in a matchup that carries significant implications for the standings. As the teams wrap up their final shootarounds, the focus is squarely on tempo. North Carolina Tar Heels has been looking to push the pace in recent weeks, hoping to catch opponents in transition. Conversely, Indiana Hoosiers has found success by slowing the game down and executing in the half-court.\n\n\"We know it's going to be a battle,\" said a source close to the North Carolina Tar Heels coaching staff. \"They bring a level of physicality that we have to match from the opening tip.\"\n\nHistorically, this matchup has provided fireworks. In their last three meetings, the margin of victory has been less than eight points. Fans arriving at North Carolina are expecting another tightly contested affair. Key injuries could play a role, as depth will be tested on both sides. The coaching staff for Indiana Hoosiers emphasized the need for bench production during pre-game media availability.\n\nAs tip-off approaches, all eyes will be on the star matchups. If North Carolina Tar Heels can control the interior, they like their chances. However, if Indiana Hoosiers gets hot from the perimeter, it could be a long night for the home crowd.",
       "game_data": {
         "sport": "NCAA Baseball",
         "league": "NCAA Baseball",
@@ -135,12 +165,13 @@
       "box_score": null
     },
     {
-      "id": "live-72139",
+      "id": "live-77392",
       "type": "grid",
       "sport": "NCAA Baseball",
       "headline": "Southern Indiana Screaming Eagles vs Cal State Bakersfield Roadrunners",
-      "subhead": "Fri, February 13th at 9:30 PM EST",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "Fri, February 13th at 9:30 PM EST \u2022 NCAA Baseball",
+      "dateline": "Cal State Bakersfield",
+      "body": "The anticipation is palpable in Cal State Bakersfield as Cal State Bakersfield Roadrunners prepares to host Southern Indiana Screaming Eagles in a matchup that carries significant implications for the standings. As the teams wrap up their final shootarounds, the focus is squarely on tempo. Cal State Bakersfield Roadrunners has been looking to push the pace in recent weeks, hoping to catch opponents in transition. Conversely, Southern Indiana Screaming Eagles has found success by slowing the game down and executing in the half-court.\n\n\"We know it's going to be a battle,\" said a source close to the Cal State Bakersfield Roadrunners coaching staff. \"They bring a level of physicality that we have to match from the opening tip.\"\n\nHistorically, this matchup has provided fireworks. In their last three meetings, the margin of victory has been less than eight points. Fans arriving at Cal State Bakersfield are expecting another tightly contested affair. Key injuries could play a role, as depth will be tested on both sides. The coaching staff for Southern Indiana Screaming Eagles emphasized the need for bench production during pre-game media availability.\n\nAs tip-off approaches, all eyes will be on the star matchups. If Cal State Bakersfield Roadrunners can control the interior, they like their chances. However, if Southern Indiana Screaming Eagles gets hot from the perimeter, it could be a long night for the home crowd.",
       "game_data": {
         "sport": "NCAA Baseball",
         "league": "NCAA Baseball",
@@ -162,12 +193,13 @@
       "box_score": null
     },
     {
-      "id": "live-89832",
+      "id": "live-99087",
       "type": "grid",
       "sport": "NCAA Hockey",
       "headline": "Boston College Eagles vs Boston University Terriers",
-      "subhead": "Mon, February 9th at 7:30 PM EST",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "Mon, February 9th at 7:30 PM EST \u2022 NCAA Hockey",
+      "dateline": "Boston University",
+      "body": "The anticipation is palpable in Boston University as Boston University Terriers prepares to host Boston College Eagles in a matchup that carries significant implications for the standings. As the teams wrap up their final shootarounds, the focus is squarely on tempo. Boston University Terriers has been looking to push the pace in recent weeks, hoping to catch opponents in transition. Conversely, Boston College Eagles has found success by slowing the game down and executing in the half-court.\n\n\"We know it's going to be a battle,\" said a source close to the Boston University Terriers coaching staff. \"They bring a level of physicality that we have to match from the opening tip.\"\n\nHistorically, this matchup has provided fireworks. In their last three meetings, the margin of victory has been less than eight points. Fans arriving at Boston University are expecting another tightly contested affair. Key injuries could play a role, as depth will be tested on both sides. The coaching staff for Boston College Eagles emphasized the need for bench production during pre-game media availability.\n\nAs tip-off approaches, all eyes will be on the star matchups. If Boston University Terriers can control the interior, they like their chances. However, if Boston College Eagles gets hot from the perimeter, it could be a long night for the home crowd.",
       "game_data": {
         "sport": "NCAA Hockey",
         "league": "NCAA Hockey",
@@ -189,12 +221,13 @@
       "box_score": null
     },
     {
-      "id": "live-86327",
+      "id": "live-53441",
       "type": "grid",
       "sport": "Premier League",
       "headline": "Leeds United vs Chelsea",
-      "subhead": "Tue, February 10th at 2:30 PM EST",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "Tue, February 10th at 2:30 PM EST \u2022 Premier League",
+      "dateline": "Chelsea",
+      "body": "The anticipation is palpable in Chelsea as Chelsea prepares to host Leeds United in a matchup that carries significant implications for the standings. As the teams wrap up their final shootarounds, the focus is squarely on tempo. Chelsea has been looking to push the pace in recent weeks, hoping to catch opponents in transition. Conversely, Leeds United has found success by slowing the game down and executing in the half-court.\n\n\"We know it's going to be a battle,\" said a source close to the Chelsea coaching staff. \"They bring a level of physicality that we have to match from the opening tip.\"\n\nHistorically, this matchup has provided fireworks. In their last three meetings, the margin of victory has been less than eight points. Fans arriving at Chelsea are expecting another tightly contested affair. Key injuries could play a role, as depth will be tested on both sides. The coaching staff for Leeds United emphasized the need for bench production during pre-game media availability.\n\nAs tip-off approaches, all eyes will be on the star matchups. If Chelsea can control the interior, they like their chances. However, if Leeds United gets hot from the perimeter, it could be a long night for the home crowd.",
       "game_data": {
         "sport": "Premier League",
         "league": "Premier League",
@@ -216,12 +249,13 @@
       "box_score": null
     },
     {
-      "id": "live-12772",
+      "id": "live-52550",
       "type": "grid",
       "sport": "Ligue 1",
       "headline": "Marseille vs Paris Saint-Germain",
-      "subhead": "FT",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "FT \u2022 Ligue 1",
+      "dateline": "Paris Saint-Germain",
+      "body": "The atmosphere at Paris Saint-Germain was electric as Paris Saint-Germain and Marseille clashed in a pivotal Ligue 1 showdown. When the dust settled, it was Paris Saint-Germain who stood tall, securing a 5-0 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Marseille appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Paris Saint-Germain responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Paris Saint-Germain head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Paris Saint-Germain found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Marseille defense that looked a step slow.\n\nWith this result, Paris Saint-Germain adds a quality win to their resume as they look to build momentum for the remainder of the season. For Marseille, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "Ligue 1",
         "league": "Ligue 1",
@@ -243,12 +277,13 @@
       "box_score": null
     },
     {
-      "id": "live-48241",
+      "id": "live-54005",
       "type": "grid",
       "sport": "Liga F",
       "headline": "Espanyol vs Real Madrid",
-      "subhead": "FT",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "FT \u2022 Liga F",
+      "dateline": "Real Madrid",
+      "body": "It was a night of high drama at Real Madrid, where Real Madrid proved their mettle against a resilient Espanyol squad. In a contest that ebbed and flowed with the intensity of a playoff matchup, Real Madrid emerged victorious, 3-0.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Espanyol appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Real Madrid responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Real Madrid head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Real Madrid found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Espanyol defense that looked a step slow.\n\nWith this result, Real Madrid adds a quality win to their resume as they look to build momentum for the remainder of the season. For Espanyol, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "Liga F",
         "league": "Liga F",
@@ -270,12 +305,13 @@
       "box_score": null
     },
     {
-      "id": "live-83900",
+      "id": "live-32753",
       "type": "grid",
       "sport": "Liga F",
       "headline": "Barcelona vs Dux Logro\u00f1o",
-      "subhead": "FT",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "FT \u2022 Liga F",
+      "dateline": "Dux Logro\u00f1o",
+      "body": "The atmosphere at Dux Logro\u00f1o was electric as Dux Logro\u00f1o and Barcelona clashed in a pivotal Liga F showdown. When the dust settled, it was Barcelona who stood tall, securing a 0-3 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Dux Logro\u00f1o appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Barcelona responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Barcelona head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Barcelona found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Dux Logro\u00f1o defense that looked a step slow.\n\nWith this result, Barcelona adds a quality win to their resume as they look to build momentum for the remainder of the season. For Dux Logro\u00f1o, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "Liga F",
         "league": "Liga F",
@@ -297,12 +333,13 @@
       "box_score": null
     },
     {
-      "id": "live-76209",
+      "id": "live-89226",
       "type": "grid",
       "sport": "NWSL",
       "headline": "Portland Thorns FC vs Washington Spirit",
-      "subhead": "Fri, March 13th at 8:00 PM EDT",
-      "body": "Live coverage provided by The Tempe Torch.",
+      "subhead": "Fri, March 13th at 8:00 PM EDT \u2022 NWSL",
+      "dateline": "Washington Spirit",
+      "body": "The anticipation is palpable in Washington Spirit as Washington Spirit prepares to host Portland Thorns FC in a matchup that carries significant implications for the standings. As the teams wrap up their final shootarounds, the focus is squarely on tempo. Washington Spirit has been looking to push the pace in recent weeks, hoping to catch opponents in transition. Conversely, Portland Thorns FC has found success by slowing the game down and executing in the half-court.\n\n\"We know it's going to be a battle,\" said a source close to the Washington Spirit coaching staff. \"They bring a level of physicality that we have to match from the opening tip.\"\n\nHistorically, this matchup has provided fireworks. In their last three meetings, the margin of victory has been less than eight points. Fans arriving at Washington Spirit are expecting another tightly contested affair. Key injuries could play a role, as depth will be tested on both sides. The coaching staff for Portland Thorns FC emphasized the need for bench production during pre-game media availability.\n\nAs tip-off approaches, all eyes will be on the star matchups. If Washington Spirit can control the interior, they like their chances. However, if Portland Thorns FC gets hot from the perimeter, it could be a long night for the home crowd.",
       "game_data": {
         "sport": "NWSL",
         "league": "NWSL",
