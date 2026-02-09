@@ -1,6 +1,59 @@
 {
-  "updated": "2026-02-09T17:56:35.620043",
-  "lead_headline": "Quiet Day Across Covered Competitions",
-  "preview_story": "Limited action took place within the Tempe Torch coverage footprint.",
-  "detailed_story": "Additional fixtures are expected to restore a fuller schedule in the coming days."
+  "updated": "2026-02-09T18:27:14.372806",
+  "games": [
+    {
+      "sport": "Ligue 1",
+      "league": "Ligue 1",
+      "date": "2026-02-08T19:45Z",
+      "status": "FT",
+      "is_live": false,
+      "home": "Paris Saint-Germain",
+      "home_abbr": "PSG",
+      "home_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/160.png",
+      "home_score": "5",
+      "home_location": "Paris Saint-Germain",
+      "away": "Marseille",
+      "away_abbr": "OLM",
+      "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/176.png",
+      "away_score": "0",
+      "away_location": "Marseille"
+    },
+    {
+      "sport": "Liga F",
+      "league": "Liga F",
+      "date": "2026-02-08T15:00Z",
+      "status": "FT",
+      "is_live": false,
+      "home": "Real Madrid",
+      "home_abbr": "RMA",
+      "home_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/21128.png",
+      "home_score": "3",
+      "home_location": "Real Madrid",
+      "away": "Espanyol",
+      "away_abbr": "ESP",
+      "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/21154.png",
+      "away_score": "0",
+      "away_location": "Espanyol"
+    },
+    {
+      "sport": "Liga F",
+      "league": "Liga F",
+      "date": "2026-02-08T17:00Z",
+      "status": "FT",
+      "is_live": false,
+      "home": "Dux Logro\u00f1o",
+      "home_abbr": "DUX",
+      "home_logo": "",
+      "home_score": "0",
+      "home_location": "Dux Logro\u00f1o",
+      "away": "Barcelona",
+      "away_abbr": "BAR",
+      "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/20091.png",
+      "away_score": "3",
+      "away_location": "Barcelona"
+    }
+  ],
+  "lead_headline": "Fantasy basketball picks, DFS and betting tips for Monday's NBA games",
+  "preview_story": "Andr\u00e9 Snellings breaks down Monday's NBA games and offers his top fantasy streamers as well as his favorite bets and DFS plays.",
+  "detailed_story": "Andr\u00e9 Snellings breaks down Monday's NBA games and offers his top fantasy streamers as well as his favorite bets and DFS plays."
 }
