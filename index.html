@@ -1,4 +1,150 @@
-function renderLayout(stories) {
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Tempe Torch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #fdfbf7; --paper-dark: #ebe7de; }
+        body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
+        
+        /* Ticker */
+        .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; z-index: 1000; display: flex; align-items: center; }
+        .ticker-content { display: flex; white-space: nowrap; animation: ticker 60s linear infinite; width: max-content; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-item { display: inline-flex; align-items: center; padding: 0 30px; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; }
+        .ticker-item:hover { color: var(--asu-gold); }
+        .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; display: inline-block; margin-right: 6px; animation: flash 1.5s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Layout */
+        .broadsheet { background: var(--paper); max-width: 1300px; margin: 30px auto; padding: 20px; box-shadow: 0 0 70px rgba(0,0,0,0.7); position: relative; }
+        @media (min-width: 768px) { .broadsheet { padding: 50px; } }
+
+        .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 14vw; md:font-size: 7rem; color: var(--asu-maroon); margin: 0; line-height: 0.8; text-align: center; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+        @media (min-width: 768px) { .masthead h1 { font-size: 7rem; } }
+        
+        /* Typography */
+        .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.95; color: var(--ink); letter-spacing: -1px; }
+        .subheadline { font-style: italic; font-size: 1.1rem; color: #444; display: block; margin: 10px 0; border-bottom: 1px solid #bbb; padding-bottom: 10px; }
+        .story-text { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 15px; white-space: pre-line; }
+        .dropcap { float: left; font-size: 4.5rem; line-height: 0.7; padding-top: 5px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+        
+        /* Components */
+        .btn-read { display: inline-block; background: var(--ink); color: white; padding: 8px 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; transition: background 0.2s; margin-top: 10px; }
+        .btn-read:hover { background: var(--asu-maroon); }
+        
+        /* Box Score */
+        .box-score { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; margin-top: 10px; background: white; border: 1px solid black; }
+        .box-score th { background: #eee; border-bottom: 2px solid black; text-align: left; padding: 4px; }
+        .box-score td { border-bottom: 1px solid #ddd; padding: 4px; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--paper); padding: 40px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 10px solid var(--ink); position: relative; }
+        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--asu-maroon); font-weight: bold; }
+
+        /* Flap */
+        .flap-header { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 2px solid black; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker-content" id="ticker-feed"></div>
+    </div>
+
+    <div class="broadsheet">
+        
+        <header class="masthead mb-8">
+            <h1>The Tempe Torch</h1>
+            <div class="flex justify-between items-center border-t border-b border-black py-2 mt-2 px-4 font-sans text-xs font-bold uppercase tracking-widest text-gray-600" id="meta-bar">
+                <span>Tempe, Arizona</span>
+                <span id="meta-date">Loading...</span>
+                <span>$1.50</span>
+            </div>
+        </header>
+
+        <div id="banner-container"></div>
+
+        <div class="grid lg:grid-cols-12 gap-8">
+            
+            <div class="hidden lg:block lg:col-span-2 border-r-2 border-double border-gray-400 pr-6" id="inside-flap">
+                </div>
+
+            <div class="lg:col-span-7 border-r border-gray-300 pr-6" id="lead-container">
+                </div>
+
+            <div class="lg:col-span-3 flex flex-col gap-6" id="sidebar-container">
+                </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t-4 double border-black">
+            <h3 class="font-oswald text-2xl uppercase mb-6 text-center bg-gray-100 py-2">Scoreboard & Analysis</h3>
+            <div class="grid md:grid-cols-3 gap-6" id="grid-container">
+                </div>
+        </div>
+    </div>
+
+    <div id="storyModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-content-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let allStories = [];
+
+        async function init() {
+            try {
+                // Fetch the JSON generated by Python
+                const res = await fetch('data/daily_stories.json');
+                const data = await res.json();
+                allStories = data.stories;
+                
+                renderMeta(data.meta);
+                renderTicker(allStories);
+                renderLayout(allStories);
+            } catch (e) {
+                console.error("Data load failed", e);
+                document.getElementById('lead-container').innerHTML = `<p style='color:red; font-weight:bold;'>Error loading stories. Ensure generate_stories.py has run.</p>`;
+            }
+        }
+
+        function renderMeta(meta) {
+            document.getElementById('meta-date').textContent = meta.date;
+            
+            const flap = document.getElementById('inside-flap');
+            flap.innerHTML = `
+                <div class="mb-8">
+                    <div class="flap-header">Weather</div>
+                    <div class="flex items-center mb-2">
+                        <span class="text-4xl mr-3">☀</span>
+                        <div>
+                            <div class="text-2xl font-bold font-oswald">${meta.weather.temp}</div>
+                            <div class="text-xs uppercase tracking-wide">Tempe</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600">${meta.weather.desc}</p>
+                </div>
+                <div class="mb-8">
+                    <div class="flap-header">Quote</div>
+                    <blockquote class="text-xs italic text-gray-700 my-2">"${meta.quote.text}"</blockquote>
+                    <cite class="text-xs font-bold not-italic">— ${meta.quote.author}</cite>
+                </div>
+                <div class="mb-8">
+                    <div class="flap-header">Staff</div>
+                    <div class="text-xs space-y-1 text-gray-600">
+                        ${meta.staff.map(s => `<div>${s}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLayout(stories) {
             const bannerDiv = document.getElementById('banner-container');
             const leadDiv = document.getElementById('lead-container');
             const sidebarDiv = document.getElementById('sidebar-container');
@@ -75,3 +221,71 @@ function renderLayout(stories) {
                 }
             });
         }
+
+        function renderTicker(stories) {
+            const track = document.getElementById('ticker-feed');
+            const items = stories.map(s => {
+                const gd = s.game_data;
+                const liveDot = s.is_live ? '<span class="live-dot"></span>' : '';
+                return `
+                    <div class="ticker-item">
+                        ${liveDot} <span class="text-asu-gold mr-2 font-bold">${s.sport}:</span> 
+                        ${gd.away} ${gd.away_score} @ ${gd.home} ${gd.home_score} 
+                        <span class="ml-2 text-xs opacity-70">(${gd.status})</span>
+                    </div>
+                `;
+            }).join('');
+            track.innerHTML = items + items; 
+        }
+
+        function openStory(index) {
+            const s = allStories[index];
+            const modal = document.getElementById('storyModal');
+            const content = document.getElementById('modal-content-body');
+            
+            let boxHtml = '';
+            if (s.box_score) {
+                const rows = s.box_score.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+                const heads = s.box_score.headers.map(h => `<th>${h}</th>`).join('');
+                boxHtml = `
+                    <div class="mt-8">
+                        <div class="font-oswald uppercase font-bold bg-black text-white px-2 py-1">${s.box_score.title}</div>
+                        <table class="box-score"><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6 border-b border-gray-300 pb-4">
+                    <img src="${s.game_data.home_logo}" class="h-16">
+                    <div>
+                        <div class="text-xs font-bold uppercase text-asu-maroon tracking-widest">${s.sport} • ${s.dateline || 'Tempe, AZ'}</div>
+                        <h1 class="headline text-4xl md:text-5xl">${s.headline}</h1>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2 story-text text-lg">
+                        ${s.body}
+                    </div>
+                    <div>
+                        <div class="bg-gray-100 p-4 border border-gray-300">
+                            <div class="text-center font-bold text-xl mb-4 border-b border-gray-400 pb-2">${s.game_data.status}</div>
+                            <div class="flex justify-between text-lg mb-2"><span>${s.game_data.away}</span> <strong>${s.game_data.away_score}</strong></div>
+                            <div class="flex justify-between text-lg"><span>${s.game_data.home}</span> <strong>${s.game_data.home_score}</strong></div>
+                        </div>
+                        ${boxHtml}
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('storyModal').style.display = 'none';
+        }
+
+        // Run
+        init();
+    </script>
+</body>
+</html>
