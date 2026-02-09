@@ -13,7 +13,6 @@
     :root {
       --asu-maroon: #8c1d40;
       --asu-gold: #ffc627;
-      --ink: #1a1a1a;
       --paper: #fdfbf7;
     }
 
@@ -41,27 +40,17 @@
       padding: 40px;
       box-shadow: 0 0 60px rgba(0,0,0,0.7);
       min-height: 80vh;
+      position: relative;
     }
 
-    .headline {
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      line-height: 1.05;
-    }
-
-    .story-text {
-      font-size: 1.05rem;
-      line-height: 1.7;
-      text-align: justify;
-    }
-
+    .headline { font-family: 'Playfair Display', serif; font-weight: 900; }
+    .story-text { font-size: 1.05rem; line-height: 1.7; text-align: justify; }
     .columns { column-count: 2; column-gap: 28px; }
 
     .ticker {
-      position: fixed; top: 0; left: 0; width: 100%;
-      background: black; color: white; height: 48px;
-      display: flex; align-items: center; overflow: hidden;
-      border-bottom: 3px solid var(--asu-gold); z-index: 1000;
+      position: fixed; top: 0; left: 0; width: 100%; height: 48px;
+      background: black; color: white; display: flex; align-items: center;
+      overflow: hidden; border-bottom: 3px solid var(--asu-gold); z-index: 1000;
     }
 
     .ticker-track {
@@ -72,8 +61,6 @@
 
     @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-    .ticker span { margin-right: 40px; }
-
     .score-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px; margin-top: 20px;
@@ -81,18 +68,24 @@
 
     .score-card { border: 1px solid #ccc; padding: 14px; background: white; }
 
-    .score-top {
-      font-family: 'Oswald', sans-serif; font-size: 0.75rem; text-transform: uppercase;
-      display: flex; justify-content: space-between; margin-bottom: 6px;
+    .nav-buttons {
+      position: absolute; bottom: 20px; left: 40px; right: 40px;
+      display: flex; justify-content: space-between;
     }
 
-    .score-row { display: flex; justify-content: space-between; font-family: 'Oswald', sans-serif; font-size: 1.05rem; }
-
-    .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; }
-
     .nav-buttons button {
-      background: var(--asu-maroon); color: white; border: none; padding: 10px 18px;
-      font-family: 'Oswald', sans-serif; cursor: pointer; border-radius: 8px;
+      background: var(--asu-maroon); color: white; border: none;
+      padding: 10px 18px; font-family: 'Oswald', sans-serif;
+      cursor: pointer; border-radius: 8px;
+    }
+
+    .section-label {
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+      color: #555;
     }
   </style>
 </head>
@@ -105,11 +98,12 @@
 
     <header class="masthead">
       <h1 onclick="showPage(0)">The Tempe Torch</h1>
-      <p class="text-center uppercase text-xs tracking-widest mt-2">Auto-Updating Sports Edition</p>
+      <p class="text-center uppercase text-xs tracking-widest mt-2">Digital Print Edition</p>
     </header>
 
-    <!-- PAGE 1: FRONT -->
+    <!-- PAGE 0: FRONT -->
     <section id="page0">
+      <div class="section-label">Front Page</div>
       <h2 id="leadHeadline" class="headline text-5xl mb-3"></h2>
       <p id="previewStory" class="story-text columns"></p>
 
@@ -117,10 +111,21 @@
       <div id="scoreGrid" class="score-grid"></div>
     </section>
 
-    <!-- PAGE 2: FULL STORY -->
+    <!-- PAGE 1: FULL STORY -->
     <section id="page1" style="display:none">
-      <h2 class="headline text-5xl mb-6" id="detailHeadline"></h2>
+      <div class="section-label">Inside</div>
+      <h2 id="detailHeadline" class="headline text-5xl mb-6"></h2>
       <p id="detailedStory" class="story-text columns"></p>
+    </section>
+
+    <!-- PAGE 2: PREDICTIONS -->
+    <section id="page2" style="display:none">
+      <div class="section-label">Tomorrow</div>
+      <h2 class="headline text-4xl mb-4">Looking Ahead</h2>
+      <p class="story-text columns" id="predictionText">
+        Projections and analytical previews will appear here in future editions, highlighting expected results,
+        players to watch, and potential upsets across covered competitions.
+      </p>
     </section>
 
     <div class="nav-buttons">
@@ -132,7 +137,7 @@
 
   <script>
     let currentPage = 0;
-    const pages = ["page0", "page1"];
+    const pages = ["page0", "page1", "page2"];
 
     function showPage(i) {
       pages.forEach((p, idx) => {
@@ -172,9 +177,12 @@
         const card = document.createElement('div');
         card.className = 'score-card';
         card.innerHTML = `
-          <div class="score-top"><span>${g.sport}</span><span>${g.status}</span></div>
-          <div class="score-row"><span>${g.away}</span><span>${g.away_score ?? ''}</span></div>
-          <div class="score-row"><span>${g.home}</span><span>${g.home_score ?? ''}</span></div>
+          <div class="text-xs uppercase flex justify-between mb-1">
+            <span>${g.sport}</span>
+            <span>${g.status}</span>
+          </div>
+          <div class="flex justify-between"><span>${g.away}</span><span>${g.away_score ?? ''}</span></div>
+          <div class="flex justify-between"><span>${g.home}</span><span>${g.home_score ?? ''}</span></div>
         `;
         grid.appendChild(card);
       });
