@@ -1,6 +1,6 @@
 """
-Tempe Torch — Hybrid Narrative Generator
-Merges "Pinned" legacy stories with Live ESPN data.
+Tempe Torch — Monday Edition Generator
+Detailed "Day After" analysis and "Game Day" previews.
 """
 
 import json
@@ -11,144 +11,143 @@ from pathlib import Path
 SCORES_PATH = Path("data/daily_scores.json")
 STORIES_PATH = Path("data/daily_stories.json")
 
-# --- 1. PINNED CONTENT (The "2026" Portfolio Stories) ---
-# These are treated as "Real" data objects by the frontend.
+# --- MONDAY EDITION CONTENT ---
 
 PINNED_STORIES = [
     {
-        "id": "lead-bball-loss",
-        "type": "lead", # determines layout position: 'lead', 'sidebar', 'grid'
-        "sport": "NCAA Men's BB",
-        "headline": "THIN AIR, THIN MARGINS",
-        "subhead": "Devils collapse late in Boulder; Colorado closes on 12-4 run to spoil Odum's big night.",
-        "dateline": "BOULDER, Colo.",
-        "body": "The altitude in Boulder is undefeated, and for 36 minutes, the Arizona State Sun Devils (12-12, 3-8 Big 12) looked like they might be the exception. They held a three-point lead with four minutes remaining, silencing the CU Events Center. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against the Buffaloes.\n\nSenior point guard Moe Odum was electric, pouring in 23 points and dishing 5 assists. He repeatedly attacked Colorado's 7-foot interior, finding freshman center Massamba Diop (19 pts, 7 rebs) for easy dunks. But when the game tightened, Colorado's depth took over.",
-        "image_url": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", # Fallback logo
+        "id": "sb-recap-main",
+        "type": "lead", 
+        "sport": "NFL • Super Bowl LX",
+        "headline": "DEFENSE REIGNS SUPREME",
+        "subhead": "Seahawks dismantle Patriots 29-13; Macdonald's scheme suffocates Maye to capture franchise's second title.",
+        "dateline": "SANTA CLARA, Calif.",
+        "body": """The dynasty talk was premature. The coronation was cancelled. In a defensive masterclass that suffocated the league's highest-flying offense, the Seattle Seahawks defeated the New England Patriots 29-13 to win Super Bowl LX.
+
+It wasn't the shootout pundits predicted. Instead, Mike Macdonald's defense turned Drake Maye's dream season into a nightmare. The Seahawks sacked the Patriots' sophomore quarterback seven times, holding New England to a season-low 240 total yards.
+
+"We heard the noise," Macdonald said, clutching the Lombardi Trophy. "Everyone talked about their offense. Nobody talked about our front seven. I think they're talking now."
+
+Sam Darnold, completing his remarkable career renaissance, was efficient and poised. He finished 22-of-28 for 215 yards and two touchdowns, avoiding the critical mistakes that once plagued him. His 15-yard strike to Jaxon Smith-Njigba in the third quarter opened up a 22-10 lead that feels insurmountable against this defense.
+
+The turning point came late in the second quarter. Trailing 9-6, the Patriots drove to the Seattle 5-yard line. On 3rd-and-goal, Maye was swallowed up by Leonard Williams for a 12-yard sack. New England settled for a field goal, and Seattle responded with a methodical 75-yard touchdown drive—capped by a Kenneth Walker III run—to take control before the half.
+
+Walker finished with 112 yards on the ground, wearing down a Patriots front that looked exhausted by the fourth quarter. As the clock hit zero, blue and green confetti fell, signaling the dawn of a new era in the NFC West.""",
+        "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
+        "game_data": {
+            "home": "Seahawks", "home_score": "29", "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
+            "away": "Patriots", "away_score": "13", "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png",
+            "status": "FINAL"
+        },
+        "box_score": {
+            "title": "Super Bowl LX Stats",
+            "headers": ["Player", "Stats", "Impact"],
+            "rows": [
+                ["S. Darnold", "22/28, 2 TD", "Super Bowl MVP"],
+                ["K. Walker", "22 car, 112 yds", "1 TD"],
+                ["D. Maye", "18/41, 1 INT", "7 Sacks Taken"],
+                ["SEA Def", "7 Sacks", "220 Yds Allowed"]
+            ]
+        }
+    },
+    {
+        "id": "preview-suns-lakers",
+        "type": "sidebar",
+        "sport": "NBA • PREVIEW",
+        "is_live": False,
+        "headline": "Clash of Styles",
+        "subhead": "Suns host Lakers in pivotal West matchup",
+        "body": """Tonight at the Footprint Center (8:00 PM MST), two teams with opposing philosophies collide. The Suns (32-20) rely on mid-range efficiency, leading the league in shooting percentage from 10-16 feet (48%). The Lakers (30-22), conversely, live in the paint, averaging 58 points in the restricted area.
+
+**The Matchup to Watch:** Anthony Davis vs. Jusuf Nurkic. In their last meeting, Nurkic's physicality forced Davis into a 6-for-19 shooting night. However, Davis has averaged 32 points since the All-Star break. If Phoenix doubles Davis, they leave themselves vulnerable to Austin Reaves and D'Angelo Russell on the perimeter.
+
+**Stat of the Night:** The Suns are 18-2 when Devin Booker records 8+ assists. Ball movement will be key against a long Lakers defense.""",
+        "game_data": {
+            "home": "Suns", "home_score": "VS", "home_logo": "https://a.espncdn.com/i/teamlogos/nba/500/phx.png",
+            "away": "Lakers", "away_score": "VS", "away_logo": "https://a.espncdn.com/i/teamlogos/nba/500/lal.png",
+            "status": "TONIGHT 8:00 PM"
+        },
+        "box_score": {
+            "title": "Team Comparison",
+            "headers": ["Stat", "PHX", "LAL"],
+            "rows": [
+                ["PPG", "116.4", "115.8"],
+                ["DEF RTG", "112.1", "113.5"],
+                ["PACE", "98.5", "101.2"]
+            ]
+        }
+    },
+    {
+        "id": "recap-asu-colo",
+        "type": "sidebar", 
+        "sport": "NCAA M.BB • ANALYSIS",
+        "is_live": False,
+        "headline": "Altitude Sickness",
+        "subhead": "Fatigue, not talent, cost Devils in Boulder",
+        "body": """Sunday's 78-70 loss wasn't a mystery; it was a metabolic failure. Advanced tracking data shows ASU's average defensive speed dropped by 18% in the final 8 minutes.
+
+"We stopped cutting," Coach Hurley noted. "We settled for jumpers because we didn't have the legs to drive."
+
+**The Breakdown:** With 3:12 left, ASU led 66-64. They proceeded to miss 5 straight shots—all jumpers. Colorado, meanwhile, attacked the rim on 6 consecutive possessions, drawing fouls on 4 of them. Until ASU builds the depth to rotate heavily at altitude, the mountain road trip will remain a graveyard.""",
         "game_data": {
             "home": "Colorado", "home_score": "78", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png",
             "away": "Arizona St", "away_score": "70", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-            "status": "FINAL"
+            "status": "FINAL (SUN)"
         },
         "box_score": {
-            "title": "Box Score: ASU vs Colorado",
-            "headers": ["Player", "PTS", "REB", "AST"],
+            "title": "Last 4 Minutes",
+            "headers": ["Stat", "ASU", "COLO"],
             "rows": [
-                ["M. Odum", "23", "2", "5"],
-                ["M. Diop", "19", "7", "1"],
-                ["B. Ford", "12", "3", "2"],
-                ["TOTAL", "70", "23", "10"]
+                ["FG", "1-8", "4-5"],
+                ["Paint Pts", "2", "8"],
+                ["FT Att", "0", "8"]
             ]
         }
     },
     {
-        "id": "sb-preview",
-        "type": "special", # Special Super Bowl Banner
-        "sport": "NFL",
-        "headline": "Super Bowl LX",
-        "subhead": "Kickoff at 4:30 PM. Complete coverage of Seahawks vs Patriots.",
-        "body": "It is a battle of narratives as much as football. On one sideline stands Sam Darnold, the once-discarded prospect who found salvation in Seattle. Under Mike Macdonald's system, Darnold threw for 4,200 yards and 32 touchdowns this season.\n\nOpposite him is the future: Drake Maye. The Patriots' sophomore sensation has evoked memories of Brady, leading New England back to the promised land in just his second year.",
+        "id": "preview-nhl",
+        "type": "grid",
+        "sport": "NHL • PREVIEW",
+        "headline": "Monday Night Hockey",
+        "subhead": "Leafs' Power Play vs Habs' Discipline",
+        "body": "Toronto (3rd in Atlantic) hosts Montreal (7th) in a classic rivalry. The key: Toronto's Power Play is operating at 28.5% (2nd in NHL), while Montreal takes the most minor penalties in the league (4.2 per game). If the Canadiens can't stay out of the box, Matthews and Marner will feast.",
         "game_data": {
-            "home": "Seahawks", "home_score": "VS", "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
-            "away": "Patriots", "away_score": "VS", "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png",
-            "status": "TODAY 4:30 PM"
-        }
-    },
-    {
-        "id": "live-minn-md",
-        "type": "sidebar",
-        "sport": "NCAA M.BB",
-        "is_live": True,
-        "headline": "Crunch Time",
-        "subhead": "Stephens hits HUGE three",
-        "body": "The Barn is shaking! Moments ago, Chance Stephens drilled a corner three—his fifth of the night—to reclaim the lead for Minnesota. The Gophers (11-12) now lead Maryland (8-14) 68-65 with just over a minute to play.\n\nThis has been a revenge game for the ages. Stephens, the former Maryland guard, has torched his old team for 17 points.",
-        "game_data": {
-            "home": "Minnesota", "home_score": "68", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/135.png",
-            "away": "Maryland", "away_score": "65", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/120.png",
-            "status": "LIVE (1:12 2nd)"
+            "home": "Leafs", "home_score": "VS", "home_logo": "https://a.espncdn.com/i/teamlogos/nhl/500/tor.png",
+            "away": "Canadiens", "away_score": "VS", "away_logo": "https://a.espncdn.com/i/teamlogos/nhl/500/mtl.png",
+            "status": "5:00 PM MST"
         },
         "box_score": {
-            "title": "Live Leaders",
-            "headers": ["Player", "Stat", "Val"],
+            "title": "Special Teams",
+            "headers": ["Unit", "TOR", "MTL"],
             "rows": [
-                ["Stephens", "PTS", "17"],
-                ["Payne", "REB", "9"]
+                ["PP%", "28.5%", "16.2%"],
+                ["PK%", "78.4%", "74.1%"]
             ]
         }
     },
     {
-        "id": "live-softball",
-        "type": "sidebar",
-        "sport": "Softball",
-        "is_live": True,
-        "headline": "Devils Lead Early",
-        "subhead": "Windle doubles in the 2nd",
-        "body": "The Sun Devils have wasted no time. After ace Aissa Silva struck out the side in the top of the 1st, the offense went to work. Senior Tanya Windle ripped a double down the left-field line, scoring two.",
-        "game_data": {
-            "home": "Arizona St", "home_score": "3", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-            "away": "Memphis", "away_score": "0", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/235.png",
-            "status": "LIVE (Bot 2nd)"
-        },
-        "box_score": {
-            "title": "Scorecard",
-            "headers": ["Tm", "1", "2", "R", "H"],
-            "rows": [
-                ["MEM", "0", "0", "0", "0"],
-                ["ASU", "0", "3", "3", "3"]
-            ]
-        }
-    },
-    {
-        "id": "cricket-india",
-        "type": "sidebar",
-        "sport": "T20 WC",
-        "headline": "SKY's The Limit",
-        "subhead": "Yadav rescues India vs USA",
-        "body": "The 2026 T20 World Cup nearly saw its biggest upset. Captain Suryakumar Yadav exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse against the hosts in Mumbai.",
+        "id": "recap-cricket",
+        "type": "grid",
+        "sport": "T20 WC • ANALYSIS",
+        "headline": "SKY Saves India",
+        "subhead": "Captain's knock averts disaster",
+        "body": "At 34/4, India stared into the abyss. The USA seamers utilized the early moisture perfectly. But Suryakumar Yadav (84*) adjusted his game, abandoning his trademark scoops for ground strokes until the spinners arrived. His partnership with Pandya (32) was a masterclass in risk management.",
         "game_data": {
             "home": "India", "home_score": "161/9", "home_logo": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
             "away": "USA", "away_score": "132/8", "away_logo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg",
-            "status": "FINAL"
+            "status": "FINAL (SUN)"
         },
-        "box_score": {
-            "title": "Match Summary",
-            "headers": ["Batter", "R", "B"],
-            "rows": [
-                ["S. Yadav", "84", "48"],
-                ["M. Patel", "45", "38"]
-            ]
-        }
-    },
-    {
-        "id": "hockey-stcloud",
-        "type": "grid",
-        "sport": "NCAA Hockey",
-        "headline": "Berzins Robs Devils",
-        "subhead": "38 saves deny comeback",
-        "body": "St. Cloud State goalie Patriks Berzins turned away 38 shots to preserve a 4-3 victory for the Huskies. ASU pulled within one in the final minute but could not find the equalizer.",
-        "game_data": {
-            "home": "St Cloud", "home_score": "4", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png",
-            "away": "Arizona St", "away_score": "3", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-            "status": "FINAL"
-        },
-        "box_score": {
-            "title": "Period Score",
-            "headers": ["Tm", "1", "2", "3", "F"],
-            "rows": [
-                ["SCSU", "1", "3", "0", "4"],
-                ["ASU", "0", "1", "2", "3"]
-            ]
-        }
+        "box_score": None
     }
 ]
 
 INSIDE_FLAP_DATA = {
-    "weather": {"temp": "76°F", "desc": "Clear skies, light SW winds.", "high": "78", "low": "52"},
-    "quote": {"text": "The altitude is undefeated.", "author": "Coach Hurley"},
-    "staff": ["Editor: R. Baral", "Sports: The Armchair Team", "Photo: Getty Images"],
-    "date": "Sunday, February 8, 2026"
+    "weather": {"temp": "68°F", "desc": "Morning clouds clearing to sun.", "high": "72", "low": "48"},
+    "quote": {"text": "Nobody talked about our front seven. I think they're talking now.", "author": "Mike Macdonald"},
+    "staff": ["Editor: R. Baral", "Analysis: The Armchair Team", "Photo: Getty Images"],
+    "date": "Monday, February 9, 2026"
 }
 
-# --- 2. LOGIC ---
+# --- LOGIC ---
 
 def generate_live_narrative(game):
     """Generates simple stories for REAL live games fetched from ESPN"""
@@ -156,18 +155,17 @@ def generate_live_narrative(game):
     away = game['away']
     sport = game['sport']
     
-    # Simple template logic
     headline = f"{away} vs {home}"
-    body = f"Full coverage of {away} taking on {home} in {sport} action."
+    body = f"Live coverage of {away} taking on {home} in {sport} action. Check back for post-game analysis."
     
     return {
         "id": f"live-{random.randint(1000,9999)}",
-        "type": "grid", # Default live games go to the bottom grid
+        "type": "grid", 
         "sport": sport,
         "headline": headline,
         "subhead": f"{game['status']} - {game['league']}",
         "body": body,
-        "game_data": game, # Pass full ESPN data
+        "game_data": game, 
         "box_score": None 
     }
 
@@ -177,14 +175,12 @@ def main():
     if SCORES_PATH.exists():
         with open(SCORES_PATH) as f:
             raw_data = json.load(f)
-            # Convert filtered live games into Story Objects
             for g in raw_data.get("games", []):
-                # Only add if it's not a duplicate of our pinned stories (basic check)
-                if g['home'] not in ["Colorado", "Minnesota", "Arizona St", "India", "Seahawks"]:
+                # Filter out our pinned teams to avoid duplicates
+                if g['home'] not in ["Suns", "Lakers", "Leafs", "Seahawks", "Colorado"]:
                     live_stories.append(generate_live_narrative(g))
 
     # 2. Merge Pinned + Live
-    # We put pinned stories first so they take the "Prime" spots in the layout
     all_stories = PINNED_STORIES + live_stories
 
     output = {
@@ -196,7 +192,7 @@ def main():
     with open(STORIES_PATH, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"Generated {len(all_stories)} hybrid stories.")
+    print(f"Generated Monday Edition with {len(all_stories)} stories.")
 
 if __name__ == "__main__":
     main()
