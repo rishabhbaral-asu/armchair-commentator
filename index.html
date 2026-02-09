@@ -1,209 +1,284 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Tempe Torch</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Tempe Torch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #fdfbf7; --paper-dark: #ebe7de; }
+        body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
+        
+        /* Ticker */
+        .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; z-index: 1000; display: flex; align-items: center; }
+        .ticker-content { display: flex; white-space: nowrap; animation: ticker 60s linear infinite; width: max-content; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } /* Move -50% because we duplicate content */
+        .ticker-item { display: inline-flex; align-items: center; padding: 0 30px; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; }
+        .ticker-item:hover { color: var(--asu-gold); }
+        .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; display: inline-block; margin-right: 6px; animation: flash 1.5s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+        /* Layout */
+        .broadsheet { background: var(--paper); max-width: 1300px; margin: 30px auto; padding: 20px; box-shadow: 0 0 70px rgba(0,0,0,0.7); position: relative; }
+        @media (min-width: 768px) { .broadsheet { padding: 50px; } }
 
-  <style>
-    :root {
-      --asu-maroon: #8c1d40;
-      --asu-gold: #ffc627;
-      --paper: #fdfbf7;
-    }
+        .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 14vw; md:font-size: 7rem; color: var(--asu-maroon); margin: 0; line-height: 0.8; text-align: center; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+        @media (min-width: 768px) { .masthead h1 { font-size: 7rem; } }
+        
+        /* Typography */
+        .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.95; color: var(--ink); letter-spacing: -1px; }
+        .subheadline { font-style: italic; font-size: 1.1rem; color: #444; display: block; margin: 10px 0; border-bottom: 1px solid #bbb; padding-bottom: 10px; }
+        .story-text { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 15px; white-space: pre-line; }
+        .dropcap { float: left; font-size: 4.5rem; line-height: 0.7; padding-top: 5px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+        
+        /* Components */
+        .btn-read { display: inline-block; background: var(--ink); color: white; padding: 8px 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; transition: background 0.2s; margin-top: 10px; }
+        .btn-read:hover { background: var(--asu-maroon); }
+        
+        /* Box Score */
+        .box-score { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; margin-top: 10px; background: white; border: 1px solid black; }
+        .box-score th { background: #eee; border-bottom: 2px solid black; text-align: left; padding: 4px; }
+        .box-score td { border-bottom: 1px solid #ddd; padding: 4px; }
 
-    body {
-      font-family: 'Libre Baskerville', serif;
-      background: var(--asu-maroon);
-      margin: 0;
-      padding-bottom: 90px; /* Space for ticker at bottom */
-    }
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--paper); padding: 40px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 10px solid var(--ink); position: relative; }
+        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--asu-maroon); font-weight: bold; }
 
-    /* --- NEW TICKER STYLES --- */
-    .ticker-wrap {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 85px;
-      background-color: #111;
-      border-top: 4px solid var(--asu-gold);
-      overflow: hidden;
-      z-index: 1000;
-      color: white;
-      font-family: 'Oswald', sans-serif;
-    }
-
-    .ticker-move {
-      display: flex;
-      height: 100%;
-      animation: ticker-scroll 60s linear infinite;
-      width: max-content;
-    }
-    
-    .ticker-move:hover { animation-play-state: paused; }
-
-    .ticker-item {
-      display: flex;
-      align-items: center;
-      min-width: 240px;
-      padding: 0 20px;
-      border-right: 1px solid #333;
-      background: linear-gradient(to bottom, #222, #1a1a1a);
-    }
-
-    .game-info { width: 100%; }
-    
-    .team-row {
-      display: flex; justify-content: space-between; align-items: center;
-      margin: 3px 0; font-size: 0.95rem;
-    }
-    
-    .team-meta { display: flex; align-items: center; }
-    .team-logo { width: 22px; height: 22px; margin-right: 8px; object-fit: contain; }
-
-    .game-status {
-      font-size: 0.75rem; color: #aaa; text-align: right; margin-top: 4px; letter-spacing: 1px;
-    }
-    
-    .live-indicator { color: #ff4444; font-weight: bold; animation: pulse 2s infinite; }
-
-    @keyframes ticker-scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-    /* --- NEWSPAPER STYLES --- */
-    .broadsheet {
-      background: var(--paper);
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 50px;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5);
-      min-height: 80vh;
-    }
-
-    .masthead h1 {
-      font-family: 'Playfair Display', serif; font-weight: 900; font-size: 5rem;
-      color: var(--asu-maroon); text-align: center; margin: 0; cursor: pointer;
-    }
-
-    .headline { font-family: 'Playfair Display', serif; font-weight: 900; }
-    .story-text { font-size: 1.1rem; line-height: 1.8; text-align: justify; }
-    .columns { column-count: 2; column-gap: 40px; }
-    
-    .nav-buttons {
-      display: flex; justify-content: center; gap: 20px; margin-top: 40px;
-    }
-    
-    button {
-      background: var(--asu-maroon); color: white; padding: 10px 20px;
-      border: none; cursor: pointer; font-family: 'Oswald', sans-serif;
-    }
-  </style>
+        /* Flap */
+        .flap-header { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 2px solid black; margin-bottom: 8px; }
+    </style>
 </head>
-
 <body>
 
-  <div class="broadsheet">
-    <header class="masthead">
-      <h1 onclick="showPage(0)">The Tempe Torch</h1>
-      <p class="text-center uppercase text-xs tracking-widest mt-2 border-b-2 border-black pb-4 mb-8">Digital Print Edition</p>
-    </header>
-
-    <section id="page0">
-      <h2 id="leadHeadline" class="headline text-6xl mb-6 leading-tight">Loading...</h2>
-      <div id="previewStory" class="story-text columns mb-8"></div>
-    </section>
-
-    <section id="page1" style="display:none">
-      <h2 id="detailHeadline" class="headline text-5xl mb-6"></h2>
-      <div id="detailedStory" class="story-text columns"></div>
-    </section>
-
-    <div class="nav-buttons">
-      <button onclick="prevPage()">Previous</button>
-      <button onclick="nextPage()">Next</button>
+    <div class="ticker-wrap">
+        <div class="ticker-content" id="ticker-feed"></div>
     </div>
-  </div>
 
-  <div class="ticker-wrap">
-    <div class="ticker-move" id="tickerTrack">
-      </div>
-  </div>
-
-  <script>
-    let currentPage = 0;
-    const pages = ["page0", "page1"];
-
-    function showPage(i) {
-      pages.forEach((p, idx) => {
-        document.getElementById(p).style.display = idx === i ? "block" : "none";
-      });
-      currentPage = i;
-    }
-
-    function nextPage() { if (currentPage < pages.length - 1) showPage(currentPage + 1); }
-    function prevPage() { if (currentPage > 0) showPage(currentPage - 1); }
-
-    async function loadData() {
-      // Load Games
-      try {
-        const scoreRes = await fetch('data/daily_scores.json');
-        const scoreData = await scoreRes.json();
-        renderTicker(scoreData.games);
-      } catch (e) { console.error("Error loading scores", e); }
-
-      // Load Stories
-      try {
-        const storyRes = await fetch('data/daily_stories.json');
-        const storyData = await storyRes.json();
+    <div class="broadsheet">
         
-        document.getElementById('leadHeadline').textContent = storyData.lead_headline;
-        document.getElementById('detailHeadline').textContent = storyData.lead_headline;
-        
-        // Use innerHTML in case we want to support basic formatting from the API
-        document.getElementById('previewStory').innerHTML = storyData.preview_story;
-        document.getElementById('detailedStory').innerHTML = storyData.detailed_story;
-      } catch (e) { console.error("Error loading stories", e); }
-    }
-
-    function renderTicker(games) {
-      const track = document.getElementById('tickerTrack');
-      
-      if (!games || games.length === 0) {
-        track.innerHTML = '<div class="ticker-item">No games matching your criteria today.</div>';
-        return;
-      }
-
-      track.innerHTML = games.map(g => `
-        <div class="ticker-item">
-            <div class="game-info">
-                <div class="team-row">
-                    <div class="team-meta">
-                        <img src="${g.away_logo}" class="team-logo" onerror="this.style.display='none'">
-                        <span>${g.away_abbr}</span>
-                    </div>
-                    <span>${g.away_score}</span>
-                </div>
-                <div class="team-row">
-                    <div class="team-meta">
-                        <img src="${g.home_logo}" class="team-logo" onerror="this.style.display='none'">
-                        <span>${g.home_abbr}</span>
-                    </div>
-                    <span>${g.home_score}</span>
-                </div>
-                <div class="game-status ${g.is_live ? 'live-indicator' : ''}">
-                    ${g.status}
-                </div>
+        <header class="masthead mb-8">
+            <h1>The Tempe Torch</h1>
+            <div class="flex justify-between items-center border-t border-b border-black py-2 mt-2 px-4 font-sans text-xs font-bold uppercase tracking-widest text-gray-600" id="meta-bar">
+                <span>Tempe, Arizona</span>
+                <span id="meta-date">Loading...</span>
+                <span>$1.50</span>
             </div>
+        </header>
+
+        <div id="banner-container"></div>
+
+        <div class="grid lg:grid-cols-12 gap-8">
+            
+            <div class="hidden lg:block lg:col-span-2 border-r-2 border-double border-gray-400 pr-6" id="inside-flap">
+                </div>
+
+            <div class="lg:col-span-7 border-r border-gray-300 pr-6" id="lead-container">
+                </div>
+
+            <div class="lg:col-span-3 flex flex-col gap-6" id="sidebar-container">
+                </div>
         </div>
-      `).join('');
-    }
 
-    loadData();
-  </script>
+        <div class="mt-12 pt-8 border-t-4 double border-black">
+            <h3 class="font-oswald text-2xl uppercase mb-6 text-center bg-gray-100 py-2">Scoreboard & Analysis</h3>
+            <div class="grid md:grid-cols-3 gap-6" id="grid-container">
+                </div>
+        </div>
+    </div>
 
+    <div id="storyModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-content-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let allStories = [];
+
+        async function init() {
+            try {
+                const res = await fetch('data/daily_stories.json');
+                const data = await res.json();
+                allStories = data.stories;
+                
+                renderMeta(data.meta);
+                renderTicker(allStories);
+                renderLayout(allStories);
+            } catch (e) {
+                console.error("Data load failed", e);
+                // Fallback UI could go here
+            }
+        }
+
+        function renderMeta(meta) {
+            document.getElementById('meta-date').textContent = meta.date;
+            
+            const flap = document.getElementById('inside-flap');
+            flap.innerHTML = `
+                <div class="mb-8">
+                    <div class="flap-header">Weather</div>
+                    <div class="flex items-center mb-2">
+                        <span class="text-4xl mr-3">☀</span>
+                        <div>
+                            <div class="text-2xl font-bold font-oswald">${meta.weather.temp}</div>
+                            <div class="text-xs uppercase tracking-wide">Tempe</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600">${meta.weather.desc}</p>
+                </div>
+                <div class="mb-8">
+                    <div class="flap-header">Quote</div>
+                    <blockquote class="text-xs italic text-gray-700 my-2">"${meta.quote.text}"</blockquote>
+                    <cite class="text-xs font-bold not-italic">— ${meta.quote.author}</cite>
+                </div>
+                <div class="mb-8">
+                    <div class="flap-header">Staff</div>
+                    <div class="text-xs space-y-1 text-gray-600">
+                        ${meta.staff.map(s => `<div>${s}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLayout(stories) {
+            const bannerDiv = document.getElementById('banner-container');
+            const leadDiv = document.getElementById('lead-container');
+            const sidebarDiv = document.getElementById('sidebar-container');
+            const gridDiv = document.getElementById('grid-container');
+
+            stories.forEach((story, index) => {
+                if (story.type === 'special') {
+                    // Super Bowl Banner
+                    bannerDiv.innerHTML = `
+                        <div onclick="openStory(${index})" class="cursor-pointer bg-black text-white text-center py-3 mb-8 hover:bg-gray-900 transition-colors border-4 double border-asu-gold">
+                            <div class="flex items-center justify-center gap-4">
+                                <img src="${story.game_data.home_logo}" class="h-8">
+                                <span class="font-oswald tracking-widest text-xl uppercase">${story.headline} • ${story.game_data.status}</span>
+                                <img src="${story.game_data.away_logo}" class="h-8">
+                            </div>
+                        </div>`;
+                } else if (story.type === 'lead') {
+                    // Main Story
+                    leadDiv.innerHTML = `
+                        <div class="flex items-center gap-2 mb-2">
+                            <img src="${story.image_url}" class="h-6">
+                            <span class="text-xs font-bold uppercase text-asu-maroon">${story.sport}</span>
+                        </div>
+                        <h2 class="headline text-6xl mb-4">${story.headline}</h2>
+                        <span class="subheadline">${story.subhead}</span>
+                        <div class="story-text columns-1 md:columns-2 gap-8">
+                            <span class="dropcap">${story.body.charAt(0)}</span>${story.body.substring(1, 300)}...
+                        </div>
+                        <button class="btn-read" onclick="openStory(${index})">Full Recap & Box Score &rarr;</button>
+                    `;
+                } else if (story.type === 'sidebar') {
+                    // Right Sidebar Items
+                    const isLive = story.is_live;
+                    const liveBadge = isLive ? `<div class="text-red-600 font-bold text-xs uppercase mb-1 animate-pulse">● LIVE UPDATE</div>` : '';
+                    const borderClass = isLive ? "border-l-4 border-red-600 bg-gray-50 p-3" : "";
+                    
+                    sidebarDiv.innerHTML += `
+                        <div class="border-b border-gray-300 pb-4 ${borderClass}">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    ${liveBadge}
+                                    <h3 class="headline text-2xl">${story.headline}</h3>
+                                </div>
+                                <img src="${story.game_data.home_logo}" class="h-10">
+                            </div>
+                            <p class="text-sm mt-2 mb-2 text-gray-700">${story.subhead}</p>
+                            <button class="text-xs font-bold underline text-blue-900" onclick="openStory(${index})">Read More</button>
+                        </div>
+                    `;
+                } else {
+                    // Default to Grid
+                    gridDiv.innerHTML += `
+                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer" onclick="openStory(${index})">
+                            <div class="flex justify-between mb-4 items-center">
+                                <img src="${story.game_data.away_logo}" class="h-8">
+                                <span class="font-bold text-sm text-gray-500">VS</span>
+                                <img src="${story.game_data.home_logo}" class="h-8">
+                            </div>
+                            <h4 class="headline text-xl mb-2">${story.headline}</h4>
+                            <div class="flex justify-between text-sm font-bold mt-4 pt-2 border-t border-gray-200">
+                                <span>${story.game_data.away} ${story.game_data.away_score}</span>
+                                <span>${story.game_data.home} ${story.game_data.home_score}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function renderTicker(stories) {
+            const track = document.getElementById('ticker-feed');
+            const items = stories.map(s => {
+                const gd = s.game_data;
+                const liveDot = s.is_live ? '<span class="live-dot"></span>' : '';
+                return `
+                    <div class="ticker-item">
+                        ${liveDot} <span class="text-asu-gold mr-2 font-bold">${s.sport}:</span> 
+                        ${gd.away} ${gd.away_score} @ ${gd.home} ${gd.home_score} 
+                        <span class="ml-2 text-xs opacity-70">(${gd.status})</span>
+                    </div>
+                `;
+            }).join('');
+            // Double it for smooth scroll
+            track.innerHTML = items + items; 
+        }
+
+        function openStory(index) {
+            const s = allStories[index];
+            const modal = document.getElementById('storyModal');
+            const content = document.getElementById('modal-content-body');
+            
+            // Build Box Score HTML if available
+            let boxHtml = '';
+            if (s.box_score) {
+                const rows = s.box_score.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+                const heads = s.box_score.headers.map(h => `<th>${h}</th>`).join('');
+                boxHtml = `
+                    <div class="mt-8">
+                        <div class="font-oswald uppercase font-bold bg-black text-white px-2 py-1">${s.box_score.title}</div>
+                        <table class="box-score"><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6 border-b border-gray-300 pb-4">
+                    <img src="${s.game_data.home_logo}" class="h-16">
+                    <div>
+                        <div class="text-xs font-bold uppercase text-asu-maroon tracking-widest">${s.sport} • ${s.dateline || 'Tempe, AZ'}</div>
+                        <h1 class="headline text-4xl md:text-5xl">${s.headline}</h1>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2 story-text text-lg">
+                        ${s.body}
+                    </div>
+                    <div>
+                        <div class="bg-gray-100 p-4 border border-gray-300">
+                            <div class="text-center font-bold text-xl mb-4 border-b border-gray-400 pb-2">${s.game_data.status}</div>
+                            <div class="flex justify-between text-lg mb-2"><span>${s.game_data.away}</span> <strong>${s.game_data.away_score}</strong></div>
+                            <div class="flex justify-between text-lg"><span>${s.game_data.home}</span> <strong>${s.game_data.home_score}</strong></div>
+                        </div>
+                        ${boxHtml}
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('storyModal').style.display = 'none';
+        }
+
+        // Run
+        init();
+    </script>
 </body>
 </html>
