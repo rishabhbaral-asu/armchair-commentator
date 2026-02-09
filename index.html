@@ -7,7 +7,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -25,7 +24,6 @@
       padding-top: 48px;
     }
 
-    /* Masthead */
     .masthead h1 {
       font-family: 'Playfair Display', serif;
       font-weight: 900;
@@ -42,9 +40,9 @@
       margin: 20px auto;
       padding: 40px;
       box-shadow: 0 0 60px rgba(0,0,0,0.7);
+      min-height: 80vh;
     }
 
-    /* Headlines */
     .headline {
       font-family: 'Playfair Display', serif;
       font-weight: 900;
@@ -57,127 +55,106 @@
       text-align: justify;
     }
 
-    .columns {
-      column-count: 2;
-      column-gap: 28px;
-    }
+    .columns { column-count: 2; column-gap: 28px; }
 
-    /* Ticker */
     .ticker {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: black;
-      color: white;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      border-bottom: 3px solid var(--asu-gold);
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; width: 100%;
+      background: black; color: white; height: 48px;
+      display: flex; align-items: center; overflow: hidden;
+      border-bottom: 3px solid var(--asu-gold); z-index: 1000;
     }
 
     .ticker-track {
-      white-space: nowrap;
-      display: inline-block;
-      padding-left: 100%;
+      white-space: nowrap; display: inline-block; padding-left: 100%;
       animation: ticker 40s linear infinite;
-      font-family: 'Oswald', sans-serif;
-      text-transform: uppercase;
-      font-size: 0.9rem;
+      font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem;
     }
 
-    @keyframes ticker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
     .ticker span { margin-right: 40px; }
 
-    /* Scoreboard */
     .score-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px; margin-top: 20px;
     }
 
-    .score-card {
-      border: 1px solid #ccc;
-      padding: 14px;
-      background: white;
-    }
+    .score-card { border: 1px solid #ccc; padding: 14px; background: white; }
 
     .score-top {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
+      font-family: 'Oswald', sans-serif; font-size: 0.75rem; text-transform: uppercase;
+      display: flex; justify-content: space-between; margin-bottom: 6px;
     }
 
-    .score-row {
-      display: flex;
-      justify-content: space-between;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.05rem;
-    }
+    .score-row { display: flex; justify-content: space-between; font-family: 'Oswald', sans-serif; font-size: 1.05rem; }
 
-    .logo {
-      height: 22px;
-      margin-right: 6px;
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; }
+
+    .nav-buttons button {
+      background: var(--asu-maroon); color: white; border: none; padding: 10px 18px;
+      font-family: 'Oswald', sans-serif; cursor: pointer; border-radius: 8px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- LIVE TICKER -->
-  <div class="ticker">
-    <div id="tickerTrack" class="ticker-track"></div>
-  </div>
+  <div class="ticker"><div id="tickerTrack" class="ticker-track"></div></div>
 
   <div class="broadsheet">
 
-    <!-- Masthead -->
     <header class="masthead">
-      <h1>The Tempe Torch</h1>
-      <p class="text-center uppercase text-xs tracking-widest mt-2">
-        Auto‑Updating Sports Edition
-      </p>
+      <h1 onclick="showPage(0)">The Tempe Torch</h1>
+      <p class="text-center uppercase text-xs tracking-widest mt-2">Auto-Updating Sports Edition</p>
     </header>
 
-    <!-- Lead Story -->
-    <section class="mb-10">
+    <!-- PAGE 1: FRONT -->
+    <section id="page0">
       <h2 id="leadHeadline" class="headline text-5xl mb-3"></h2>
-      <p id="leadStory" class="story-text columns"></p>
-    </section>
+      <p id="previewStory" class="story-text columns"></p>
 
-    <!-- Scoreboard -->
-    <section>
-      <h3 class="headline text-3xl mb-4">Today’s Scores</h3>
+      <h3 class="headline text-3xl mt-10">Today’s Scores</h3>
       <div id="scoreGrid" class="score-grid"></div>
     </section>
+
+    <!-- PAGE 2: FULL STORY -->
+    <section id="page1" style="display:none">
+      <h2 class="headline text-5xl mb-6" id="detailHeadline"></h2>
+      <p id="detailedStory" class="story-text columns"></p>
+    </section>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Previous</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
 
   </div>
 
   <script>
+    let currentPage = 0;
+    const pages = ["page0", "page1"];
+
+    function showPage(i) {
+      pages.forEach((p, idx) => {
+        document.getElementById(p).style.display = idx === i ? "block" : "none";
+      });
+      currentPage = i;
+    }
+
+    function nextPage() { if (currentPage < pages.length - 1) showPage(currentPage + 1); }
+    function prevPage() { if (currentPage > 0) showPage(currentPage - 1); }
+
     async function loadData() {
-      const scoresRes = await fetch('data/daily_scores.json');
-      const scoresData = await scoresRes.json();
+      const scores = await fetch('data/daily_scores.json').then(r => r.json());
+      const stories = await fetch('data/daily_stories.json').then(r => r.json());
 
-      let storiesData = { lead_headline: 'Scores Around the Sports World', lead_story: 'Latest results updated automatically.' };
+      renderTicker(scores.games);
+      renderScores(scores.games);
 
-      try {
-        const storiesRes = await fetch('data/daily_stories.json');
-        storiesData = await storiesRes.json();
-      } catch {}
-
-      renderTicker(scoresData.games);
-      renderScores(scoresData.games);
-      renderLead(storiesData);
+      document.getElementById('leadHeadline').textContent = stories.lead_headline;
+      document.getElementById('detailHeadline').textContent = stories.lead_headline;
+      document.getElementById('previewStory').textContent = stories.preview_story;
+      document.getElementById('detailedStory').textContent = stories.detailed_story;
     }
 
     function renderTicker(games) {
@@ -194,29 +171,13 @@
       games.forEach(g => {
         const card = document.createElement('div');
         card.className = 'score-card';
-
         card.innerHTML = `
-          <div class="score-top">
-            <span>${g.sport}</span>
-            <span>${g.status}</span>
-          </div>
-          <div class="score-row">
-            <span>${g.away}</span>
-            <span>${g.away_score ?? ''}</span>
-          </div>
-          <div class="score-row">
-            <span>${g.home}</span>
-            <span>${g.home_score ?? ''}</span>
-          </div>
+          <div class="score-top"><span>${g.sport}</span><span>${g.status}</span></div>
+          <div class="score-row"><span>${g.away}</span><span>${g.away_score ?? ''}</span></div>
+          <div class="score-row"><span>${g.home}</span><span>${g.home_score ?? ''}</span></div>
         `;
-
         grid.appendChild(card);
       });
-    }
-
-    function renderLead(story) {
-      document.getElementById('leadHeadline').textContent = story.lead_headline;
-      document.getElementById('leadStory').textContent = story.lead_story;
     }
 
     loadData();
