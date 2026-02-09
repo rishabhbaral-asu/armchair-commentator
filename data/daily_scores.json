@@ -1,0 +1,29 @@
+{
+  "updated": "2026-02-09T06:40:31.059745",
+  "games": [
+    {
+      "sport": "NFL",
+      "home": "New England Patriots",
+      "away": "Seattle Seahawks",
+      "home_score": "13",
+      "away_score": "29",
+      "status": "Final"
+    },
+    {
+      "sport": "NCAA Basketball",
+      "home": "Ohio State Buckeyes",
+      "away": "Michigan Wolverines",
+      "home_score": "61",
+      "away_score": "82",
+      "status": "Final"
+    },
+    {
+      "sport": "NCAA Basketball",
+      "home": "West Virginia Mountaineers",
+      "away": "Texas Tech Red Raiders",
+      "home_score": "63",
+      "away_score": "70",
+      "status": "Final"
+    }
+  ]
+}
