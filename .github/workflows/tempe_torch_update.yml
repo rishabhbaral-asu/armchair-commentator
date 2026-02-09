@@ -2,7 +2,7 @@ name: Tempe Torch Daily Update
 
 on:
   schedule:
-    - cron: "0 13 * * *"   # runs every day at 13:00 UTC
+    - cron: "0 16 * * *"   # runs every day at 1600 UTC (0900 AZT)
   workflow_dispatch:
 
 jobs:
