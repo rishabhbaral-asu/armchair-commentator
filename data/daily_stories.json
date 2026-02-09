@@ -81,13 +81,13 @@
       }
     },
     {
-      "id": "live-49855",
+      "id": "live-97251",
       "type": "grid",
       "sport": "NCAA Football",
       "headline": "North Texas Mean Green vs Indiana Hoosiers",
       "subhead": "9/5 - TBD \u2022 NCAA Football",
       "dateline": "Indiana",
-      "body": "For Indiana Hoosiers, it was a night of missed opportunities. For North Texas Mean Green, it was a testament to execution. North Texas Mean Green defeated Indiana Hoosiers 0-0 at Indiana, capitalizing on a dominant second-half performance.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Indiana Hoosiers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, North Texas Mean Green responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the North Texas Mean Green head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, North Texas Mean Green found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Indiana Hoosiers defense that looked a step slow.\n\nWith this result, North Texas Mean Green adds a quality win to their resume as they look to build momentum for the remainder of the season. For Indiana Hoosiers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
+      "body": "The atmosphere at Indiana was electric as Indiana Hoosiers and North Texas Mean Green clashed in a pivotal NCAA Football showdown. When the dust settled, it was North Texas Mean Green who stood tall, securing a 0-0 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Indiana Hoosiers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, North Texas Mean Green responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the North Texas Mean Green head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, North Texas Mean Green found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Indiana Hoosiers defense that looked a step slow.\n\nWith this result, North Texas Mean Green adds a quality win to their resume as they look to build momentum for the remainder of the season. For Indiana Hoosiers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "NCAA Football",
         "league": "NCAA Football",
@@ -109,13 +109,13 @@
       "box_score": null
     },
     {
-      "id": "live-79737",
+      "id": "live-49648",
       "type": "grid",
       "sport": "NCAA Football",
       "headline": "Indiana State Sycamores vs Purdue Boilermakers",
       "subhead": "9/5 - TBD \u2022 NCAA Football",
       "dateline": "Purdue",
-      "body": "The atmosphere at Purdue was electric as Purdue Boilermakers and Indiana State Sycamores clashed in a pivotal NCAA Football showdown. When the dust settled, it was Indiana State Sycamores who stood tall, securing a 0-0 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Purdue Boilermakers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Indiana State Sycamores responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Indiana State Sycamores head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Indiana State Sycamores found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Purdue Boilermakers defense that looked a step slow.\n\nWith this result, Indiana State Sycamores adds a quality win to their resume as they look to build momentum for the remainder of the season. For Purdue Boilermakers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
+      "body": "For Purdue Boilermakers, it was a night of missed opportunities. For Indiana State Sycamores, it was a testament to execution. Indiana State Sycamores defeated Purdue Boilermakers 0-0 at Purdue, capitalizing on a dominant second-half performance.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Purdue Boilermakers appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Indiana State Sycamores responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Indiana State Sycamores head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Indiana State Sycamores found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Purdue Boilermakers defense that looked a step slow.\n\nWith this result, Indiana State Sycamores adds a quality win to their resume as they look to build momentum for the remainder of the season. For Purdue Boilermakers, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "NCAA Football",
         "league": "NCAA Football",
@@ -137,7 +137,7 @@
       "box_score": null
     },
     {
-      "id": "live-80342",
+      "id": "live-21936",
       "type": "grid",
       "sport": "NCAA Baseball",
       "headline": "Indiana Hoosiers vs North Carolina Tar Heels",
@@ -165,7 +165,7 @@
       "box_score": null
     },
     {
-      "id": "live-77392",
+      "id": "live-12259",
       "type": "grid",
       "sport": "NCAA Baseball",
       "headline": "Southern Indiana Screaming Eagles vs Cal State Bakersfield Roadrunners",
@@ -193,7 +193,7 @@
       "box_score": null
     },
     {
-      "id": "live-99087",
+      "id": "live-14429",
       "type": "grid",
       "sport": "NCAA Hockey",
       "headline": "Boston College Eagles vs Boston University Terriers",
@@ -221,7 +221,7 @@
       "box_score": null
     },
     {
-      "id": "live-53441",
+      "id": "live-17117",
       "type": "grid",
       "sport": "Premier League",
       "headline": "Leeds United vs Chelsea",
@@ -249,13 +249,13 @@
       "box_score": null
     },
     {
-      "id": "live-52550",
+      "id": "live-23299",
       "type": "grid",
       "sport": "Ligue 1",
       "headline": "Marseille vs Paris Saint-Germain",
       "subhead": "FT \u2022 Ligue 1",
       "dateline": "Paris Saint-Germain",
-      "body": "The atmosphere at Paris Saint-Germain was electric as Paris Saint-Germain and Marseille clashed in a pivotal Ligue 1 showdown. When the dust settled, it was Paris Saint-Germain who stood tall, securing a 5-0 victory that sends a clear message to the rest of the league.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Marseille appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Paris Saint-Germain responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Paris Saint-Germain head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Paris Saint-Germain found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Marseille defense that looked a step slow.\n\nWith this result, Paris Saint-Germain adds a quality win to their resume as they look to build momentum for the remainder of the season. For Marseille, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
+      "body": "For Marseille, it was a night of missed opportunities. For Paris Saint-Germain, it was a testament to execution. Paris Saint-Germain defeated Marseille 5-0 at Paris Saint-Germain, capitalizing on a dominant second-half performance.\n\nThis was a game defined by the margins. Neither side was able to build a lead larger than single digits for most of the contest. Marseille appeared to seize control late, utilizing a defensive stand to generate transition opportunities. However, Paris Saint-Germain responded with poise. A critical sequence in the closing minutes\u2014highlighted by a key defensive stop and a clutch score\u2014flipped the script.\n\n\"That was a character win,\" said the Paris Saint-Germain head coach. \"When things got tight, we didn't panic. We executed the sets we practiced all week.\"\n\nOffensively, Paris Saint-Germain found success by attacking the interior and generating trips to the line. Their efficiency in the red zone was the difference maker against a Marseille defense that looked a step slow.\n\nWith this result, Paris Saint-Germain adds a quality win to their resume as they look to build momentum for the remainder of the season. For Marseille, the loss sends them back to the drawing board, searching for answers to the consistency issues that have plagued them in close games.",
       "game_data": {
         "sport": "Ligue 1",
         "league": "Ligue 1",
@@ -277,7 +277,7 @@
       "box_score": null
     },
     {
-      "id": "live-54005",
+      "id": "live-48118",
       "type": "grid",
       "sport": "Liga F",
       "headline": "Espanyol vs Real Madrid",
@@ -305,7 +305,7 @@
       "box_score": null
     },
     {
-      "id": "live-32753",
+      "id": "live-59460",
       "type": "grid",
       "sport": "Liga F",
       "headline": "Barcelona vs Dux Logro\u00f1o",
@@ -333,7 +333,7 @@
       "box_score": null
     },
     {
-      "id": "live-89226",
+      "id": "live-23105",
       "type": "grid",
       "sport": "NWSL",
       "headline": "Portland Thorns FC vs Washington Spirit",
