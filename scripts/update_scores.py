@@ -1,10 +1,6 @@
 """
 Tempe Torch — Unified Live Score Fetcher
-
-This script pulls live scores across multiple sports and outputs a
-normalized JSON file used by the Tempe Torch newspaper frontend.
-
-Designed to run inside GitHub Actions daily.
+Pulls live scores, extracts logos/locations, and outputs raw data.
 """
 
 import json
@@ -12,7 +8,6 @@ import requests
 from datetime import datetime
 
 OUTPUT_PATH = "data/daily_scores.json"
-
 
 # --------------------------------------------------
 # Helpers
@@ -27,15 +22,12 @@ def fetch_json(url: str):
         print(f"Fetch failed: {url} -> {e}")
         return None
 
-
 # --------------------------------------------------
-# ESPN SCOREBOARD FETCHERS
+# GENERIC ESPN PARSER
 # --------------------------------------------------
 
-
-def parse_espn_scoreboard(data, sport_label):
+def parse_espn_scoreboard(data, sport_label, league_name=None):
     games = []
-
     if not data or "events" not in data:
         return games
 
@@ -43,111 +35,104 @@ def parse_espn_scoreboard(data, sport_label):
         try:
             comp = event["competitions"][0]
             teams = comp["competitors"]
+            
+            home_data = next(t for t in teams if t["homeAway"] == "home")
+            away_data = next(t for t in teams if t["homeAway"] == "away")
+            
+            # Extract status (e.g., "Final", "7:00 PM", "Live")
+            status_state = event["status"]["type"]["state"] # pre, in, post
+            status_detail = event["status"]["type"]["detail"]
+            
+            # Format time if game hasn't started
+            if status_state == "pre":
+                # API date is ISO string (e.g., 2023-10-25T23:00Z)
+                dt = datetime.strptime(event["date"], "%Y-%m-%dT%H:%M:%SZ")
+                # Simple formatted time (adjust logic for local timezone if needed)
+                status_detail = dt.strftime("%I:%M %p")
 
-            home = next(t for t in teams if t["homeAway"] == "home")
-            away = next(t for t in teams if t["homeAway"] == "away")
-
-            status = comp["status"]["type"]["description"]
-
-            games.append(
-                {
-                    "sport": sport_label,
-                    "home": home["team"]["displayName"],
-                    "away": away["team"]["displayName"],
-                    "home_score": home.get("score"),
-                    "away_score": away.get("score"),
-                    "status": status,
-                }
-            )
-        except Exception:
+            games.append({
+                "sport": sport_label,
+                "league": league_name or sport_label,
+                "date": event["date"],
+                "status": status_detail,
+                "is_live": status_state == "in",
+                
+                # HOME TEAM
+                "home": home_data["team"]["displayName"],
+                "home_abbr": home_data["team"].get("abbreviation", home_data["team"]["displayName"][:3].upper()),
+                "home_logo": home_data["team"].get("logo", ""),
+                "home_score": home_data.get("score", "0"),
+                "home_location": home_data["team"].get("location", ""), # Needed for State filtering
+                
+                # AWAY TEAM
+                "away": away_data["team"]["displayName"],
+                "away_abbr": away_data["team"].get("abbreviation", away_data["team"]["displayName"][:3].upper()),
+                "away_logo": away_data["team"].get("logo", ""),
+                "away_score": away_data.get("score", "0"),
+                "away_location": away_data["team"].get("location", ""), 
+            })
+        except Exception as e:
             continue
 
     return games
 
-
 # --------------------------------------------------
-# SPORT FETCH FUNCTIONS
-# --------------------------------------------------
-
-
-def fetch_nfl():
-    url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
-    data = fetch_json(url)
-    return parse_espn_scoreboard(data, "NFL")
-
-
-def fetch_ncaa_basketball():
-    url = "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
-    data = fetch_json(url)
-    return parse_espn_scoreboard(data, "NCAA Basketball")
-
-
-def fetch_ncaa_softball():
-    url = "https://site.api.espn.com/apis/site/v2/sports/softball/college-softball/scoreboard"
-    data = fetch_json(url)
-    return parse_espn_scoreboard(data, "College Softball")
-
-
-# --------------------------------------------------
-# Cricket (basic placeholder via ESPN Cricinfo JSON)
+# FETCHERS
 # --------------------------------------------------
 
+def fetch_sports_data():
+    all_games = []
+    
+    # Config: Map readable names to ESPN API endpoints
+    endpoints = [
+        ("NFL", "football/nfl"),
+        ("NBA", "basketball/nba"),
+        ("NHL", "hockey/nhl"),
+        ("NCAA Football", "football/college-football"),
+        ("NCAA Men's BB", "basketball/mens-college-basketball"),
+        ("NCAA Women's BB", "basketball/womens-college-basketball"),
+        ("NCAA Baseball", "baseball/college-baseball"),
+        ("NCAA Softball", "baseball/college-softball"),
+        ("NCAA Hockey", "hockey/mens-college-hockey"),
+        # Soccer Leagues
+        ("Premier League", "soccer/eng.1"),
+        ("Bundesliga", "soccer/ger.1"),
+        ("La Liga", "soccer/esp.1"),
+        ("Ligue 1", "soccer/fra.1"),
+        ("NWSL", "soccer/usa.nwsl"),
+        ("Liga F", "soccer/esp.w.1"),
+    ]
 
-def fetch_cricket():
-    url = "https://site.api.espncricinfo.com/apis/site/v2/sports/cricket/scoreboard"
-    data = fetch_json(url)
+    print("Fetching ESPN Sports...")
+    for label, slug in endpoints:
+        url = f"https://site.api.espn.com/apis/site/v2/sports/{slug}/scoreboard"
+        data = fetch_json(url)
+        all_games.extend(parse_espn_scoreboard(data, label))
 
-    games = []
+    # Cricket (Special Handling)
+    print("Fetching Cricket...")
+    cric_data = fetch_json("https://site.api.espn.com/apis/site/v2/sports/cricket/competitions/scoreboard")
+    # ESPN Cricket structure is similar enough to use the generic parser
+    all_games.extend(parse_espn_scoreboard(cric_data, "Cricket"))
 
-    if not data or "events" not in data:
-        return games
-
-    for event in data["events"]:
-        try:
-            comp = event["competitions"][0]
-            teams = comp["competitors"]
-
-            games.append(
-                {
-                    "sport": "Cricket",
-                    "home": teams[0]["team"]["displayName"],
-                    "away": teams[1]["team"]["displayName"],
-                    "home_score": teams[0].get("score"),
-                    "away_score": teams[1].get("score"),
-                    "status": comp["status"]["type"]["description"],
-                }
-            )
-        except Exception:
-            continue
-
-    return games
-
+    return all_games
 
 # --------------------------------------------------
 # MAIN
 # --------------------------------------------------
 
-
 def main():
-    print("Fetching live sports data...")
-
-    all_games = []
-
-    all_games.extend(fetch_nfl())
-    all_games.extend(fetch_ncaa_basketball())
-    all_games.extend(fetch_ncaa_softball())
-    all_games.extend(fetch_cricket())
-
+    games = fetch_sports_data()
+    
     output = {
         "updated": datetime.utcnow().isoformat(),
-        "games": all_games,
+        "games": games,
     }
 
     with open(OUTPUT_PATH, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"Saved {len(all_games)} games -> {OUTPUT_PATH}")
-
+    print(f"Saved {len(games)} raw games -> {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
