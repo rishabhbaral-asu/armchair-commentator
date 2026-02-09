@@ -1,13 +1,12 @@
 """
 Tempe Torch — Score Fetcher
 Fetches live scores, fetches REAL player stats, and filters by DATE (Today +/- 1 Day).
+NO EXTERNAL DEPENDENCIES.
 """
 
 import json
 import requests
-from datetime import datetime, timedelta
-from dateutil import parser # Use dateutil for robust parsing if available, else standard datetime
-import pytz
+from datetime import datetime, timezone
 
 OUTPUT_PATH = "data/daily_scores.json"
 
@@ -26,18 +25,20 @@ def fetch_json(url: str):
 
 def is_date_relevant(date_str):
     """Returns True if the game is within the target window (Yesterday/Today/Tomorrow)"""
+    if not date_str: return False
     try:
-        # ESPN dates are UTC ISO strings (e.g. 2024-10-12T14:00Z)
-        game_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
-        now = datetime.now(pytz.UTC)
+        # ESPN uses UTC ISO strings ending in 'Z' (e.g. 2024-10-12T14:00Z)
+        # We handle the 'Z' manually for compatibility
+        dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
         
         # Calculate difference
-        diff = game_date - now
+        diff = dt - now
         
-        # Keep if within -24 hours to +48 hours (covers "yesterday" through "tomorrow")
+        # Keep if within +/- 1.5 days (covers timezones adequately)
         return abs(diff.days) <= DATE_WINDOW_DAYS
-    except:
-        # If date parsing fails, usually safer to exclude, or include if you want to be permissive
+    except Exception as e:
+        # If parsing fails, exclude it to be safe
         return False
 
 def parse_espn_scoreboard(data, sport_label, league_name=None):
@@ -48,7 +49,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
     for event in data["events"]:
         try:
             # --- 1. STRICT DATE FILTER ---
-            if not is_date_relevant(event["date"]):
+            if not is_date_relevant(event.get("date")):
                 continue
 
             comp = event["competitions"][0]
