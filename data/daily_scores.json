@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-09T07:45:03.417877",
+  "updated": "2026-02-09T17:56:35.574751",
   "games": [
     {
       "sport": "NFL",
@@ -11,19 +11,27 @@
     },
     {
       "sport": "NCAA Basketball",
-      "home": "Ohio State Buckeyes",
-      "away": "Michigan Wolverines",
-      "home_score": "61",
-      "away_score": "82",
-      "status": "Final"
+      "home": "St. John's Red Storm",
+      "away": "Xavier Musketeers",
+      "home_score": "0",
+      "away_score": "0",
+      "status": "Scheduled"
     },
     {
       "sport": "NCAA Basketball",
-      "home": "West Virginia Mountaineers",
-      "away": "Texas Tech Red Raiders",
-      "home_score": "63",
-      "away_score": "70",
-      "status": "Final"
+      "home": "Louisville Cardinals",
+      "away": "NC State Wolfpack",
+      "home_score": "0",
+      "away_score": "0",
+      "status": "Scheduled"
+    },
+    {
+      "sport": "NCAA Basketball",
+      "home": "Kansas Jayhawks",
+      "away": "Arizona Wildcats",
+      "home_score": "0",
+      "away_score": "0",
+      "status": "Scheduled"
     }
   ]
 }
