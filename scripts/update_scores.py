@@ -1,13 +1,19 @@
 """
-Tempe Torch — Score Fetcher (With Player Stats)
-Fetches scores AND top performers to ensure roster accuracy.
+Tempe Torch — Score Fetcher
+Fetches live scores, fetches REAL player stats, and filters by DATE (Today +/- 1 Day).
 """
 
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil import parser # Use dateutil for robust parsing if available, else standard datetime
+import pytz
 
 OUTPUT_PATH = "data/daily_scores.json"
+
+# --- CONFIG: DATE WINDOW ---
+# Only show games from yesterday, today, and tomorrow.
+DATE_WINDOW_DAYS = 1 
 
 def fetch_json(url: str):
     try:
@@ -18,6 +24,22 @@ def fetch_json(url: str):
         print(f"Fetch failed: {url} -> {e}")
         return None
 
+def is_date_relevant(date_str):
+    """Returns True if the game is within the target window (Yesterday/Today/Tomorrow)"""
+    try:
+        # ESPN dates are UTC ISO strings (e.g. 2024-10-12T14:00Z)
+        game_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
+        now = datetime.now(pytz.UTC)
+        
+        # Calculate difference
+        diff = game_date - now
+        
+        # Keep if within -24 hours to +48 hours (covers "yesterday" through "tomorrow")
+        return abs(diff.days) <= DATE_WINDOW_DAYS
+    except:
+        # If date parsing fails, usually safer to exclude, or include if you want to be permissive
+        return False
+
 def parse_espn_scoreboard(data, sport_label, league_name=None):
     games = []
     if not data or "events" not in data:
@@ -25,28 +47,29 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
 
     for event in data["events"]:
         try:
+            # --- 1. STRICT DATE FILTER ---
+            if not is_date_relevant(event["date"]):
+                continue
+
             comp = event["competitions"][0]
             teams = comp["competitors"]
             
             home_data = next(t for t in teams if t["homeAway"] == "home")
             away_data = next(t for t in teams if t["homeAway"] == "away")
             
-            # --- NEW: Fetch Top Performers (Leaders) ---
-            # This ensures we mention REAL players who actually played today.
+            # Fetch Leaders (Real Stats)
             leaders = []
             if "leaders" in comp:
                 for leader_group in comp["leaders"]:
-                    # Usually contains 'leaders' list inside
                     if "leaders" in leader_group and len(leader_group["leaders"]) > 0:
-                        player = leader_group["leaders"][0] # Top player in this category
+                        player = leader_group["leaders"][0]
                         leaders.append({
                             "name": player["athlete"]["displayName"],
-                            "stat": player["displayValue"], # e.g., "28 Pts" or "300 Yds"
-                            "desc": leader_group["displayName"] # e.g., "Points" or "Passing"
+                            "stat": player["displayValue"], 
+                            "desc": leader_group["displayName"]
                         })
             
-            # Capture Game Note for "Championship" filtering
-            # We look for explicit "notes" field (e.g. "NBA Finals - Game 4")
+            # Game Note (Finals check)
             game_note = event.get("name", "")
             if comp.get("notes"):
                 game_note += " " + " ".join([n.get("headline", "") for n in comp["notes"]])
@@ -58,7 +81,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
                 "status": event["status"]["type"]["detail"],
                 "is_live": event["status"]["type"]["state"] == "in",
                 "game_note": game_note, 
-                "leaders": leaders, # <--- Added Real Player Data
+                "leaders": leaders,
                 
                 # HOME
                 "home": home_data["team"]["displayName"],
@@ -82,7 +105,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
 def fetch_sports_data():
     all_games = []
     
-    # 1. Fetching logic remains the same, but now populates 'leaders'
+    # Endpoints
     endpoints = [
         ("NFL", "football/nfl"),
         ("NBA", "basketball/nba"),
@@ -118,7 +141,7 @@ def main():
     output = { "updated": datetime.utcnow().isoformat(), "games": games }
     with open(OUTPUT_PATH, "w") as f:
         json.dump(output, f, indent=2)
-    print(f"Saved {len(games)} raw games with player stats -> {OUTPUT_PATH}")
+    print(f"Saved {len(games)} relevant games -> {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
