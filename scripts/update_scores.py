@@ -1,6 +1,6 @@
 """
-Tempe Torch — Unified Live Score Fetcher
-Fetches ALL sports data but captures extra metadata for filtering later.
+Tempe Torch — Score Fetcher (With Player Stats)
+Fetches scores AND top performers to ensure roster accuracy.
 """
 
 import json
@@ -31,18 +31,34 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
             home_data = next(t for t in teams if t["homeAway"] == "home")
             away_data = next(t for t in teams if t["homeAway"] == "away")
             
-            # Capture Game Note (e.g., "Final", "Super Bowl", "Championship")
+            # --- NEW: Fetch Top Performers (Leaders) ---
+            # This ensures we mention REAL players who actually played today.
+            leaders = []
+            if "leaders" in comp:
+                for leader_group in comp["leaders"]:
+                    # Usually contains 'leaders' list inside
+                    if "leaders" in leader_group and len(leader_group["leaders"]) > 0:
+                        player = leader_group["leaders"][0] # Top player in this category
+                        leaders.append({
+                            "name": player["athlete"]["displayName"],
+                            "stat": player["displayValue"], # e.g., "28 Pts" or "300 Yds"
+                            "desc": leader_group["displayName"] # e.g., "Points" or "Passing"
+                        })
+            
+            # Capture Game Note for "Championship" filtering
+            # We look for explicit "notes" field (e.g. "NBA Finals - Game 4")
             game_note = event.get("name", "")
             if comp.get("notes"):
-                game_note += " " + comp["notes"][0].get("headline", "")
-            
+                game_note += " " + " ".join([n.get("headline", "") for n in comp["notes"]])
+
             games.append({
                 "sport": sport_label,
-                "league": league_name or sport_label, # e.g., "NWSL"
+                "league": league_name or sport_label,
                 "date": event["date"],
                 "status": event["status"]["type"]["detail"],
                 "is_live": event["status"]["type"]["state"] == "in",
-                "game_note": game_note, # Crucial for the "Finals" exception
+                "game_note": game_note, 
+                "leaders": leaders, # <--- Added Real Player Data
                 
                 # HOME
                 "home": home_data["team"]["displayName"],
@@ -66,7 +82,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
 def fetch_sports_data():
     all_games = []
     
-    # 1. EXPANDED ENDPOINTS (Covering all requested leagues)
+    # 1. Fetching logic remains the same, but now populates 'leaders'
     endpoints = [
         ("NFL", "football/nfl"),
         ("NBA", "basketball/nba"),
@@ -77,13 +93,12 @@ def fetch_sports_data():
         ("NCAA Baseball", "baseball/college-baseball"),
         ("NCAA Softball", "baseball/college-softball"),
         ("NCAA Hockey", "hockey/mens-college-hockey"),
-        # Soccer Specifics
         ("Premier League", "soccer/eng.1"),
         ("Bundesliga", "soccer/ger.1"),
         ("La Liga", "soccer/esp.1"),
         ("Ligue 1", "soccer/fra.1"),
         ("Liga F", "soccer/esp.w.1"),
-        ("NWSL", "soccer/usa.nwsl"), # Explicitly fetching NWSL
+        ("NWSL", "soccer/usa.nwsl"),
     ]
 
     print("Fetching ESPN Sports...")
@@ -92,7 +107,6 @@ def fetch_sports_data():
         data = fetch_json(url)
         all_games.extend(parse_espn_scoreboard(data, label, label))
 
-    # Cricket (Special Handling)
     print("Fetching Cricket...")
     cric_data = fetch_json("https://site.api.espn.com/apis/site/v2/sports/cricket/competitions/scoreboard")
     all_games.extend(parse_espn_scoreboard(cric_data, "Cricket", "Cricket"))
@@ -104,7 +118,7 @@ def main():
     output = { "updated": datetime.utcnow().isoformat(), "games": games }
     with open(OUTPUT_PATH, "w") as f:
         json.dump(output, f, indent=2)
-    print(f"Saved {len(games)} raw games -> {OUTPUT_PATH}")
+    print(f"Saved {len(games)} raw games with player stats -> {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
