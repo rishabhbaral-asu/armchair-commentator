@@ -1,10 +1,3 @@
-"""
-Tempe Torch — Deep Data Fetcher
-Fetches schedule -> Then fetches FULL SUMMARY for each relevant game.
-Source of Truth: ESPN Game ID.
-INCLUDES CRASH PROTECTION for missing data fields.
-"""
-
 import json
 import requests
 from datetime import datetime, timezone
@@ -53,7 +46,7 @@ def is_relevant_pre_check(event):
 
 def get_deep_game_data(sport, league, game_id):
     """
-    The Money Function. Fetches the specific game summary page.
+    Fetches the specific game summary page.
     Includes SAFETY CHECKS for missing fields.
     """
     url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={game_id}"
@@ -71,6 +64,14 @@ def get_deep_game_data(sport, league, game_id):
     # 1. Location
     venue = game_info.get("venue", {}).get("fullName") or \
             game_info.get("venue", {}).get("address", {}).get("city", "Neutral Site")
+    
+    # Clean Venue City for Dateline
+    try:
+        city = game_info.get("venue", {}).get("address", {}).get("city", "")
+        state = game_info.get("venue", {}).get("address", {}).get("state", "")
+        dateline = f"{city.upper()}, {state}" if city and state else venue.upper()
+    except:
+        dateline = venue.upper()
 
     # 2. Competitors
     competitors_list = comp.get("competitors", [])
@@ -79,7 +80,6 @@ def get_deep_game_data(sport, league, game_id):
     
     # 3. Leaders (Top Performers)
     leaders = []
-    # Try header leaders first (most reliable for summary)
     if "leaders" in comp:
         for l in comp["leaders"]:
             if "leaders" in l and len(l["leaders"]) > 0:
@@ -91,7 +91,6 @@ def get_deep_game_data(sport, league, game_id):
                 })
     
     # 4. Headline (The Crash Fix)
-    # We safely check if 'notes' exists and is not empty
     headline = ""
     notes = comp.get("notes", [])
     if notes and len(notes) > 0:
@@ -104,6 +103,7 @@ def get_deep_game_data(sport, league, game_id):
         "date": comp.get("date"),
         "status": comp.get("status", {}).get("type", {}).get("detail", ""),
         "state": comp.get("status", {}).get("type", {}).get("state", ""), # pre, in, post
+        "dateline": dateline,
         "venue": venue,
         "home": home.get("team", {}).get("displayName", "Home Team"),
         "home_score": home.get("score", "0"),
@@ -118,7 +118,6 @@ def get_deep_game_data(sport, league, game_id):
 def fetch_sports_data():
     processed_games = []
     
-    # Map of (Sport, League)
     sources = [
         ("football", "nfl"), ("basketball", "nba"), ("hockey", "nhl"),
         ("football", "college-football"), ("basketball", "mens-college-basketball"),
