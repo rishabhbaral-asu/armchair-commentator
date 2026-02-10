@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-10T18:20:18.238726",
+  "updated": "2026-02-10T18:29:08.556069",
   "games": [
     {
       "game_id": "401810626",
@@ -8,16 +8,18 @@
       "date": "2026-02-11T00:30Z",
       "status": "Tue, February 10th at 7:30 PM EST",
       "state": "pre",
-      "dateline": "NEW YORK, NY",
       "venue": "Madison Square Garden",
+      "odds": "",
+      "headline": "",
       "home": "New York Knicks",
       "home_score": "0",
+      "home_record": "34-19",
       "home_logo": "https://a.espncdn.com/i/teamlogos/nba/500/ny.png",
       "away": "Indiana Pacers",
       "away_score": "0",
+      "away_record": "13-40",
       "away_logo": "https://a.espncdn.com/i/teamlogos/nba/500/ind.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401825507",
@@ -26,16 +28,18 @@
       "date": "2026-02-11T00:00Z",
       "status": "Tue, February 10th at 7:00 PM EST",
       "state": "pre",
-      "dateline": "LINCOLN, NE",
       "venue": "Pinnacle Bank Arena",
+      "odds": "",
+      "headline": "",
       "home": "Nebraska Cornhuskers",
       "home_score": "0",
+      "home_record": "21-2",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/158.png",
       "away": "Purdue Boilermakers",
       "away_score": "0",
+      "away_record": "19-4",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2509.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401820731",
@@ -44,16 +48,18 @@
       "date": "2026-02-11T00:00Z",
       "status": "Tue, February 10th at 7:00 PM EST",
       "state": "pre",
-      "dateline": "CORAL GABLES, FL",
       "venue": "Watsco Center",
+      "odds": "",
+      "headline": "",
       "home": "Miami Hurricanes",
       "home_score": "0",
+      "home_record": "18-5",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2390.png",
       "away": "North Carolina Tar Heels",
       "away_score": "0",
+      "away_record": "19-4",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/153.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401820734",
@@ -62,16 +68,18 @@
       "date": "2026-02-11T00:00Z",
       "status": "Tue, February 10th at 7:00 PM EST",
       "state": "pre",
-      "dateline": "TALLAHASSEE, FL",
       "venue": "Tucker Center",
+      "odds": "",
+      "headline": "",
       "home": "Florida State Seminoles",
       "home_score": "0",
+      "home_record": "11-12",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/52.png",
       "away": "Virginia Cavaliers",
       "away_score": "0",
+      "away_record": "20-3",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/258.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401808229",
@@ -80,16 +88,18 @@
       "date": "2026-02-11T00:00Z",
       "status": "Tue, February 10th at 7:00 PM EST",
       "state": "pre",
-      "dateline": "AUBURN, AL",
       "venue": "Neville Arena",
+      "odds": "",
+      "headline": "",
       "home": "Auburn Tigers",
       "home_score": "0",
+      "home_record": "14-9",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2.png",
       "away": "Vanderbilt Commodores",
       "away_score": "0",
+      "away_record": "19-4",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/238.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401827674",
@@ -98,16 +108,18 @@
       "date": "2026-02-11T00:00Z",
       "status": "Tue, February 10th at 7:00 PM EST",
       "state": "pre",
-      "dateline": "WACO, TX",
       "venue": "Foster Pavilion",
+      "odds": "",
+      "headline": "",
       "home": "Baylor Bears",
       "home_score": "0",
+      "home_record": "13-10",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/239.png",
       "away": "BYU Cougars",
       "away_score": "0",
+      "away_record": "17-6",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/252.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401825506",
@@ -116,16 +128,18 @@
       "date": "2026-02-11T01:00Z",
       "status": "Tue, February 10th at 8:00 PM EST",
       "state": "pre",
-      "dateline": "CHAMPAIGN, IL",
       "venue": "State Farm Center",
+      "odds": "",
+      "headline": "",
       "home": "Illinois Fighting Illini",
       "home_score": "0",
+      "home_record": "20-4",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/356.png",
       "away": "Wisconsin Badgers",
       "away_score": "0",
+      "away_record": "16-7",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/275.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401827676",
@@ -134,16 +148,18 @@
       "date": "2026-02-11T02:00Z",
       "status": "Tue, February 10th at 9:00 PM EST",
       "state": "pre",
-      "dateline": "SALT LAKE CITY, UT",
       "venue": "Jon M. Huntsman Center",
+      "odds": "",
+      "headline": "",
       "home": "Utah Utes",
       "home_score": "0",
+      "home_record": "9-14",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/254.png",
       "away": "Houston Cougars",
       "away_score": "0",
+      "away_record": "21-2",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/248.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401820736",
@@ -152,16 +168,18 @@
       "date": "2026-02-11T02:00Z",
       "status": "Tue, February 10th at 9:00 PM EST",
       "state": "pre",
-      "dateline": "PITTSBURGH, PA",
       "venue": "Petersen Events Center",
+      "odds": "",
+      "headline": "",
       "home": "Pittsburgh Panthers",
       "home_score": "0",
+      "home_record": "9-15",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/221.png",
       "away": "Duke Blue Devils",
       "away_score": "0",
+      "away_record": "21-2",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/150.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401808231",
@@ -170,16 +188,18 @@
       "date": "2026-02-11T02:00Z",
       "status": "Tue, February 10th at 9:00 PM EST",
       "state": "pre",
-      "dateline": "BATON ROUGE, LA",
       "venue": "Pete Maravich Assembly Center",
+      "odds": "",
+      "headline": "",
       "home": "LSU Tigers",
       "home_score": "0",
+      "home_record": "14-9",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/99.png",
       "away": "Arkansas Razorbacks",
       "away_score": "0",
+      "away_record": "17-6",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/8.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "401829244",
@@ -188,16 +208,18 @@
       "date": "2026-02-11T04:00Z",
       "status": "Tue, February 10th at 11:00 PM EST",
       "state": "pre",
-      "dateline": "SPOKANE, WA",
       "venue": "McCarthey Athletic Center",
+      "odds": "",
+      "headline": "",
       "home": "Gonzaga Bulldogs",
       "home_score": "0",
+      "home_record": "23-2",
       "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2250.png",
       "away": "Washington State Cougars",
       "away_score": "0",
+      "away_record": "11-15",
       "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/265.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "740848",
@@ -206,16 +228,18 @@
       "date": "2026-02-10T19:30Z",
       "status": "Tue, February 10th at 2:30 PM EST",
       "state": "pre",
-      "dateline": "STAMFORD BRIDGE",
       "venue": "Stamford Bridge",
+      "odds": "",
+      "headline": "",
       "home": "Chelsea",
       "home_score": "0",
+      "home_record": "12-7-6",
       "home_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/363.png",
       "away": "Leeds United",
       "away_score": "0",
+      "away_record": "7-8-10",
       "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     },
     {
       "game_id": "740854",
@@ -224,16 +248,18 @@
       "date": "2026-02-10T19:30Z",
       "status": "Tue, February 10th at 2:30 PM EST",
       "state": "pre",
-      "dateline": "TOTTENHAM HOTSPUR STADIUM",
       "venue": "Tottenham Hotspur Stadium",
+      "odds": "",
+      "headline": "",
       "home": "Tottenham Hotspur",
       "home_score": "0",
+      "home_record": "7-8-10",
       "home_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/367.png",
       "away": "Newcastle United",
       "away_score": "0",
+      "away_record": "9-6-10",
       "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/361.png",
-      "leaders": [],
-      "headline": ""
+      "leaders": []
     }
   ]
 }
