@@ -1,3 +1,8 @@
+"""
+Tempe Torch — Ultimate Data Fetcher
+Fetches Schedule -> Deep Summary -> Odds, Records, & Cricket Specifics.
+"""
+
 import json
 import requests
 from datetime import datetime, timezone
@@ -7,9 +12,9 @@ DATE_WINDOW_DAYS = 1
 
 # --- BOUNCER LOGIC ---
 TARGET_STATES = {"CA", "AZ", "IL", "GA", "MD", "DC", "VA", "TX"}
-TARGET_INTL = {"India", "USA", "United States", "USA Women", "India Women"}
+TARGET_INTL = {"India", "USA", "United States", "USA Women", "India Women", "Australia", "England"}
 TARGET_SOCCER_CLUBS = {"Fulham", "Leeds", "Leeds United", "Leverkusen", "Bayer Leverkusen", "Gladbach", "St. Pauli", "Barcelona", "Real Madrid", "PSG", "Paris Saint-Germain"}
-MAJOR_FINALS = ["Super Bowl", "NBA Finals", "World Series", "Stanley Cup Final", "Championship"]
+MAJOR_FINALS = ["Super Bowl", "NBA Finals", "World Series", "Stanley Cup Final", "Championship", "Final"]
 
 def fetch_json(url):
     try:
@@ -20,7 +25,6 @@ def fetch_json(url):
         return None
 
 def is_relevant_pre_check(event):
-    """Quick check to see if we should fetch the deep data for this game."""
     try:
         date_str = event.get("date", "")
         if date_str:
@@ -30,12 +34,9 @@ def is_relevant_pre_check(event):
 
         name = event.get("name", "")
         short_name = event.get("shortName", "")
-        league = event.get("competitions", [{}])[0].get("league", {}).get("slug", "")
-        
         search_text = (name + " " + short_name).lower()
         
         if any(k.lower() in search_text for k in MAJOR_FINALS): return True
-        if "nwsl" in league or "nwsl" in search_text: return True
         
         all_targets = TARGET_STATES.union(TARGET_INTL).union(TARGET_SOCCER_CLUBS)
         if any(t.lower() in search_text for t in all_targets): return True
@@ -45,40 +46,35 @@ def is_relevant_pre_check(event):
         return False
 
 def get_deep_game_data(sport, league, game_id):
-    """
-    Fetches the specific game summary page.
-    Includes SAFETY CHECKS for missing fields.
-    """
     url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={game_id}"
     data = fetch_json(url)
     if not data: return None
     
     header = data.get("header", {})
     game_info = data.get("gameInfo", {})
-    
-    # --- SAFETY CHECK: COMPETITIONS ---
-    competitions = header.get("competitions", [])
-    if not competitions: return None
-    comp = competitions[0]
+    comp = header.get("competitions", [{}])[0]
     
     # 1. Location
     venue = game_info.get("venue", {}).get("fullName") or \
             game_info.get("venue", {}).get("address", {}).get("city", "Neutral Site")
     
-    # Clean Venue City for Dateline
-    try:
-        city = game_info.get("venue", {}).get("address", {}).get("city", "")
-        state = game_info.get("venue", {}).get("address", {}).get("state", "")
-        dateline = f"{city.upper()}, {state}" if city and state else venue.upper()
-    except:
-        dateline = venue.upper()
-
-    # 2. Competitors
-    competitors_list = comp.get("competitors", [])
-    home = next((c for c in competitors_list if c["homeAway"] == "home"), {})
-    away = next((c for c in competitors_list if c["homeAway"] == "away"), {})
+    # 2. Competitors & Records
+    competitors = comp.get("competitors", [])
+    home = next((c for c in competitors if c["homeAway"] == "home"), {})
+    away = next((c for c in competitors if c["homeAway"] == "away"), {})
     
-    # 3. Leaders (Top Performers)
+    home_record = home.get("record", [{}])[0].get("summary", "")
+    away_record = away.get("record", [{}])[0].get("summary", "")
+
+    # 3. Betting Odds (The "Vegas" Angle)
+    odds_text = ""
+    if "pickcenter" in data:
+        for pick in data["pickcenter"]:
+            if "provider" in pick and pick["provider"]["name"] == "consensus":
+                odds_text = pick.get("details", "") # e.g. "SEA -3.0"
+                break
+    
+    # 4. Leaders / Top Performers
     leaders = []
     if "leaders" in comp:
         for l in comp["leaders"]:
@@ -90,11 +86,16 @@ def get_deep_game_data(sport, league, game_id):
                     "desc": l["displayName"]
                 })
     
-    # 4. Headline (The Crash Fix)
+    # 5. Headline
     headline = ""
     notes = comp.get("notes", [])
     if notes and len(notes) > 0:
         headline = notes[0].get("headline", "")
+
+    # CRICKET SPECIFIC SCORE HANDLING
+    # Cricket scores come as strings like "161/9 (20)"
+    home_score = home.get("score", "0")
+    away_score = away.get("score", "0")
 
     return {
         "game_id": game_id,
@@ -102,17 +103,22 @@ def get_deep_game_data(sport, league, game_id):
         "league": league,
         "date": comp.get("date"),
         "status": comp.get("status", {}).get("type", {}).get("detail", ""),
-        "state": comp.get("status", {}).get("type", {}).get("state", ""), # pre, in, post
-        "dateline": dateline,
+        "state": comp.get("status", {}).get("type", {}).get("state", ""),
         "venue": venue,
+        "odds": odds_text,
+        "headline": headline,
+        
         "home": home.get("team", {}).get("displayName", "Home Team"),
-        "home_score": home.get("score", "0"),
+        "home_score": home_score,
+        "home_record": home_record,
         "home_logo": home.get("team", {}).get("logos", [{}])[0].get("href", ""),
+        
         "away": away.get("team", {}).get("displayName", "Away Team"),
-        "away_score": away.get("score", "0"),
+        "away_score": away_score,
+        "away_record": away_record,
         "away_logo": away.get("team", {}).get("logos", [{}])[0].get("href", ""),
-        "leaders": leaders, 
-        "headline": headline
+        
+        "leaders": leaders
     }
 
 def fetch_sports_data():
@@ -122,7 +128,9 @@ def fetch_sports_data():
         ("football", "nfl"), ("basketball", "nba"), ("hockey", "nhl"),
         ("football", "college-football"), ("basketball", "mens-college-basketball"),
         ("baseball", "college-baseball"), ("soccer", "usa.nwsl"),
-        ("soccer", "eng.1"), ("soccer", "ger.1"), ("soccer", "esp.1")
+        ("soccer", "eng.1"), ("soccer", "ger.1"), ("soccer", "esp.1"),
+        # CRICKET IS HERE!
+        ("cricket", "competitions") 
     ]
 
     print("Scanning ESPN Schedule...")
