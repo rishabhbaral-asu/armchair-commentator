@@ -29,26 +29,40 @@ INSIDE_FLAP_DATA = {
 # --- VOCABULARY ENGINE ---
 VERBS_WIN_BIG = ["crushed", "dismantled", "routed", "steamrolled", "dominated"]
 VERBS_WIN_CLOSE = ["edged past", "outlasted", "survived", "squeaked by", "fended off"]
-VERBS_LOSE = ["stumbled", "fell to", "dropped a decision to", "came up short against"]
+
+# Sport-specific terminology for that authentic feel
+SPORT_CONTEXT = {
+    "basketball": {"start": "Tip-off", "venue_action": "take the floor at", "unit": "points"},
+    "football": {"start": "Kickoff", "venue_action": "clash at", "unit": "yards"},
+    "soccer": {"start": "Kickoff", "venue_action": "meet at", "unit": "goals"},
+    "baseball": {"start": "First pitch", "venue_action": "take the field at", "unit": "runs"},
+    "hockey": {"start": "Puck drop", "venue_action": "face off at", "unit": "goals"},
+    "cricket": {"start": "The match", "venue_action": "square off at", "unit": "runs"}
+}
+
+def get_sport_context(sport_name):
+    for key, context in SPORT_CONTEXT.items():
+        if key in sport_name.lower():
+            return context
+    return {"start": "Start time", "venue_action": "meet at", "unit": "points"}
 
 def generate_headline(game, margin, state):
+    # ESPN Style: Use the narrative hook if available
     if state == 'pre':
-        return f"{game['away']} Face {game['home']}"
+        if game.get('headline'): return game['headline']
+        return f"{game['away']} at {game['home']}"
     
     if state == 'in':
-        if abs(margin) > 10: return f"{game['home'] if margin > 0 else game['away']} Seize Control"
-        return "Battle in Progress"
+        if abs(margin) > 10: return f"{game['home'] if margin > 0 else game['away']} in Command"
+        return "Live: Tight Contest"
         
     # FINAL
     winner = game['home'] if margin > 0 else game['away']
     loser = game['away'] if margin > 0 else game['home']
     
-    if abs(margin) >= 15:
-        return f"{winner} Rout {loser}"
-    elif abs(margin) <= 3:
-        return f"{winner} Survive Thriller"
-    else:
-        return f"{winner} Top {loser}"
+    if abs(margin) >= 15: return f"{winner} Rout {loser}"
+    elif abs(margin) <= 3: return f"{winner} Edges {loser}"
+    else: return f"{winner} Defeat {loser}"
 
 def generate_dynamic_narrative(game):
     home = game.get('home')
@@ -59,7 +73,10 @@ def generate_dynamic_narrative(game):
     state = game.get('state', '')
     leaders = game.get('leaders', [])
     headline_note = game.get('headline', '')
+    sport = game.get('sport', '')
     
+    ctx = get_sport_context(sport)
+
     try:
         h_s = int(game.get('home_score', 0))
         a_s = int(game.get('away_score', 0))
@@ -67,38 +84,63 @@ def generate_dynamic_narrative(game):
     except:
         h_s, a_s, margin = 0, 0, 0
 
-    # A. PRE-GAME
+    # --- A. ESPN-STYLE PREVIEW ---
     if state == 'pre':
-        return (
-            f"{dateline} — The stage is set at {venue} as the {home} prepare to host the {away}. "
-            f"With both squads looking to establish momentum, analysts are circling this matchup as a key test. "
-            f"Kickoff is scheduled for {status}."
-        )
+        # 1. The Narrative Hook (The "Why We Watch" sentence)
+        if headline_note:
+            hook = f"{headline_note}. That is the storyline dominating the conversation as"
+        else:
+            hook = "Two squads looking to establish momentum will collide when"
 
-    # B. LIVE GAME
+        # 2. The Setup (Venue & Stakes)
+        lede = f"{dateline} — {hook} the {away} visit the {home}. The teams {ctx['venue_action']} {venue} with critical standings implications on the line."
+
+        # 3. The Player Spotlight (The "Key Matchup")
+        # ESPN previews always cite the star player's recent form.
+        player_spotlight = ""
+        if leaders:
+            l = leaders[0]
+            player_spotlight = (
+                f"\n\nAll eyes will be on {home} star {l['name']}, who enters the contest "
+                f"averaging {l['stat']} ({l['desc']}). The {away} defense will need to contain "
+                f"the playmaker if they hope to secure a road victory."
+            )
+        else:
+            player_spotlight = (
+                f"\n\nBoth coaching staffs have emphasized execution in practice this week. "
+                f"The matchup presents a clash of styles, with the {home} looking to push the tempo "
+                f"against a disciplined {away} unit."
+            )
+
+        # 4. The Closer (Time & Broadcast feel)
+        closer = f"\n\n{ctx['start']} is scheduled for {status}."
+
+        return f"{lede}{player_spotlight}{closer}"
+
+    # --- B. LIVE GAME (The Wire Update) ---
     if state == 'in':
         leader = home if margin > 0 else away
         trailer = away if margin > 0 else home
         
         if abs(margin) >= 15:
             return (
-                f"{dateline} — It has been one-way traffic at {venue}. The {leader} have opened up a commanding {h_s}-{a_s} lead over the {trailer}. "
-                f"Fans are witnessing a clinic as the offense operates with surgical precision. "
+                f"{dateline} — It has been all {leader} so far at {venue}. They have opened up a commanding {h_s}-{a_s} lead over the {trailer}. "
+                f"The offense has been clicking on all cylinders, while the defense has suffocated the {trailer} attack. "
                 f"Current status: {status}."
             )
         elif abs(margin) <= 5:
             return (
-                f"{dateline} — We have a thriller developing here. The {home} and {away} are trading blows in a tight contest, separated by just {abs(margin)} points. "
+                f"{dateline} — We have a thriller developing in {venue}. The {home} and {away} are trading scores in a tight contest, separated by just {abs(margin)} {ctx['unit']}. "
                 f"The score sits at {h_s}-{a_s} as they battle through the {status}. "
                 f"Every possession feels critical in what has become a defensive standoff."
             )
         else:
             return (
                 f"{dateline} — Action is underway at {venue}. The {leader} currently hold the advantage with a {h_s}-{a_s} lead. "
-                f"There is still plenty of time left in the {status} for a turnaround, but {leader} are controlling the tempo so far."
+                f"There is still plenty of time left in the {status} for a turnaround, but {leader} are controlling the flow of the game."
             )
 
-    # C. FINAL
+    # --- C. FINAL RECAP (The AP Style Report) ---
     if state == 'post':
         winner = home if h_s > a_s else away
         loser = away if winner == home else home
@@ -107,7 +149,7 @@ def generate_dynamic_narrative(game):
         stat_txt = "The team relied on a balanced attack to secure the victory."
         if leaders:
             l = leaders[0]
-            stat_txt = f"They were sparked by {l['name']}, who finished with {l['stat']} ({l['desc']})."
+            stat_txt = f"They were sparked by a standout performance from {l['name']}, who finished with {l['stat']} ({l['desc']})."
 
         narrative = (
             f"{dateline} — The {winner} {verb} the {loser} {h_s}-{a_s} on {datetime.now().strftime('%A')}. "
@@ -115,7 +157,7 @@ def generate_dynamic_narrative(game):
         )
         
         if headline_note:
-            narrative += f" {headline_note}"
+            narrative += f"\n\nThe win punctuates a week defined by the headline: {headline_note}."
             
         return narrative
 
