@@ -1,50 +1,87 @@
 {
   "meta": {
     "weather": {
-      "temp": "76\u00b0F",
-      "desc": "Perfect softball weather.",
-      "high": "78",
-      "low": "52"
+      "temp": "65\u00b0F",
+      "desc": "Morning clouds clearing to sun.",
+      "high": "72",
+      "low": "48"
     },
     "quote": {
-      "text": "The altitude is undefeated.",
-      "author": "Coach Hurley"
+      "text": "Tonight, the only ghost out there was the history we just buried.",
+      "author": "Sam Darnold"
     },
     "staff": [
       "Editor: R. Baral",
       "Photo: Getty Images"
     ],
-    "date": "Sunday, February 8, 2026"
+    "date": "Monday, February 9, 2026"
   },
   "stories": [
     {
-      "id": "sb-preview",
-      "type": "special",
-      "sport": "NFL",
-      "headline": "Super Bowl LX",
-      "subhead": "Kickoff at 4:30 PM.",
+      "id": "sb-recap",
+      "type": "lead",
+      "sport": "NFL \u2022 SUPER BOWL LX",
+      "headline": "DEFENSE REIGNS SUPREME",
+      "subhead": "Seahawks dismantle Patriots 29-13; Macdonald's scheme suffocates Maye.",
       "dateline": "SANTA CLARA, Calif.",
-      "body": "SANTA CLARA, Calif. \u2014 It is a battle of narratives as much as football. On one sideline stands Sam Darnold, the once-discarded prospect who found salvation in Seattle. Under Mike Macdonald's system, Darnold threw for 4,200 yards and 32 touchdowns this season, unlocking the terrifying potential of DK Metcalf and Jaxon Smith-Njigba.\n\nOpposite him is the future: Drake Maye. The Patriots' sophomore sensation has evoked memories of Brady, leading New England back to the promised land in just his second year. Maye's connection with his receiving corps has been lethal in the playoffs, dismantling the Chiefs and Ravens on the road.\n\nKickoff is set for 4:30 PM MST on NBC. The Seahawks are currently 2.5-point favorites.",
+      "body": "SANTA CLARA, Calif. \u2014 The dynasty talk was premature. The coronation was cancelled. In a defensive masterclass that suffocated the league's highest-flying offense, the Seattle Seahawks defeated the New England Patriots 29-13 to win Super Bowl LX, capturing the franchise's second Lombardi Trophy in a game that felt like a throwback to a different era of football.\n\nIt wasn't the shootout the pundits predicted. Instead, Mike Macdonald's defense turned Drake Maye's dream season into a recurring nightmare under the lights of Levi's Stadium. The Seahawks sacked the Patriots' sophomore quarterback seven times, holding New England to a season-low 240 total yards and forcing three critical turnovers that sucked the life out of the Patriots' sideline.\n\n\"We heard the noise,\" Macdonald said, clutching the trophy, his voice cracking with emotion. \"For two weeks, all we heard was 'Drake Maye this' and 'New England Offense that.' Nobody talked about our front seven. Nobody talked about our discipline. I think they're talking now.\"\n\nThe narrative entering the week focused on the Patriots' explosive youth, but it was Seattle's veteran castoffs who defined the evening. Sam Darnold, completing one of the most remarkable career renaissance arcs in NFL history, was surgical. He finished 22-of-28 for 215 yards and two touchdowns, avoiding the critical mistakes that once plagued his tenure in New York and Carolina.\n\nThe turning point came late in the second quarter. Trailing 9-6, the Patriots drove to the Seattle 5-yard line, poised to take the lead. On 3rd-and-goal, Maye dropped back and was immediately swallowed up by Leonard Williams for a 12-yard sack. New England was forced to settle for a field goal. Seattle responded with a methodical, soul-crushing 75-yard touchdown drive. Kenneth Walker III (112 yards, 1 TD) bludgeoned the Patriots' defensive front, ripping off runs of 12, 8, and 15 yards before punching it in. That swing\u2014from a potential Patriots lead to a Seahawks dominance\u2014broke New England's spirit.\n\nBy the fourth quarter, the Patriots looked exhausted. Their offensive line, which had been stellar all postseason, crumbled under the weight of Seattle's simulated pressures. As the clock hit zero, blue and green confetti rained down, signaling the dawn of a new era in the NFC West.",
       "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
       "game_data": {
         "home": "Seahawks",
-        "home_score": "VS",
+        "home_score": "29",
         "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
         "away": "Patriots",
-        "away_score": "VS",
+        "away_score": "13",
         "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png",
-        "status": "TODAY 4:30 PM"
+        "status": "FINAL"
+      },
+      "box_score": {
+        "title": "Super Bowl MVP",
+        "headers": [
+          "Player",
+          "Stat",
+          "Desc"
+        ],
+        "rows": [
+          [
+            "S. Darnold",
+            "22/28",
+            "2 TD"
+          ],
+          [
+            "K. Walker",
+            "112",
+            "Yards"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "preview-suns-lakers",
+      "type": "sidebar",
+      "sport": "NBA \u2022 PREVIEW",
+      "headline": "Clash of Styles",
+      "subhead": "Suns host Lakers in pivotal West matchup",
+      "dateline": "PHOENIX",
+      "body": "PHOENIX \u2014 Tonight at the Footprint Center (8:00 PM MST), two teams with diametrically opposing basketball philosophies collide. The Phoenix Suns (32-20) host the Los Angeles Lakers (30-22) in a matchup that pits mid-range precision against brute force in the paint.\n\nThe Suns enter the contest riding a wave of offensive efficiency. They have transformed into the league's premier jump-shooting team, leading the NBA in shooting percentage from 10-16 feet (48%). Devin Booker has been the catalyst, averaging 34.5 points per game in February while acting as the primary playmaker.\n\nConversely, the Lakers live in the restricted area. They average a league-high 58 points in the paint, utilizing the sheer size of Anthony Davis and the driving ability of LeBron James to collapse defenses.\n\nThe matchup to watch is undeniably Anthony Davis vs. Jusuf Nurkic. In their last meeting, Nurkic's physicality frustrated Davis, holding him to a 6-for-19 shooting night. However, Davis has been on a tear since the All-Star break. If Phoenix is forced to send double-teams at Davis, it leaves them vulnerable to Austin Reaves and D'Angelo Russell on the perimeter.\n\nInjury Report: Bradley Beal is a game-time decision with an ankle sprain. For the Lakers, Jarred Vanderbilt remains out.",
+      "game_data": {
+        "home": "Suns",
+        "home_score": "VS",
+        "home_logo": "https://a.espncdn.com/i/teamlogos/nba/500/phx.png",
+        "away": "Lakers",
+        "away_score": "VS",
+        "away_logo": "https://a.espncdn.com/i/teamlogos/nba/500/lal.png",
+        "status": "8:00 PM"
       }
     },
     {
       "id": "lead-bball-loss",
-      "type": "lead",
+      "type": "sidebar",
       "sport": "NCAA Men's BB",
-      "headline": "THIN AIR, THIN MARGINS",
-      "subhead": "Devils collapse late in Boulder.",
+      "headline": "Thin Air, Thin Margins",
+      "subhead": "Devils collapse late in Boulder",
       "dateline": "BOULDER, Colo.",
-      "body": "BOULDER, Colo. \u2014 The altitude in Boulder is undefeated, and for 36 minutes, the Arizona State Sun Devils (12-12, 3-8 Big 12) looked like they might be the exception. They held a three-point lead with four minutes remaining, silencing the CU Events Center. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against the Buffaloes.\n\nSenior point guard Moe Odum was electric, pouring in 23 points and dishing 5 assists. He repeatedly attacked Colorado's 7-foot interior, finding freshman center Massamba Diop (19 pts, 7 rebs) for easy dunks. But when the game tightened, Colorado's depth took over.",
-      "image_url": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
+      "body": "The altitude in Boulder is undefeated. For 36 minutes, Arizona State (12-12) looked like they might be the exception, holding a three-point lead. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against Colorado.\n\nSenior point guard Moe Odum was electric, pouring in 23 points. He repeatedly attacked Colorado's interior. But when the game tightened, Colorado's depth took over, closing on a 12-4 run.",
       "game_data": {
         "home": "Colorado",
         "home_score": "78",
@@ -52,37 +89,17 @@
         "away": "Arizona St",
         "away_score": "70",
         "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-        "status": "FINAL"
-      },
-      "box_score": {
-        "title": "Box Score",
-        "headers": [
-          "Player",
-          "PTS",
-          "AST"
-        ],
-        "rows": [
-          [
-            "M. Odum",
-            "23",
-            "5"
-          ],
-          [
-            "M. Diop",
-            "19",
-            "1"
-          ]
-        ]
+        "status": "FINAL (SUN)"
       }
     },
     {
       "id": "cricket-india",
-      "type": "sidebar",
+      "type": "grid",
       "sport": "T20 WC",
-      "headline": "SKY's The Limit",
-      "subhead": "India Avoids Disaster",
+      "headline": "SKY Saves India",
+      "subhead": "Captain's knock averts disaster",
       "dateline": "MUMBAI",
-      "body": "MUMBAI \u2014 The 2026 T20 World Cup nearly saw its biggest upset on day one. Captain Suryakumar Yadav exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse.",
+      "body": "MUMBAI \u2014 The 2026 T20 World Cup nearly saw its biggest upset on day one. Captain Suryakumar Yadav exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse against the USA.",
       "game_data": {
         "home": "India",
         "home_score": "161/9",
@@ -90,46 +107,66 @@
         "away": "USA",
         "away_score": "132/8",
         "away_logo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg",
-        "status": "FINAL"
-      },
-      "box_score": {
-        "title": "Match Summary",
-        "headers": [
-          "Batter",
-          "R",
-          "B"
-        ],
-        "rows": [
-          [
-            "S. Yadav",
-            "84",
-            "48"
-          ],
-          [
-            "M. Patel",
-            "45",
-            "38"
-          ]
-        ]
+        "status": "FINAL (SUN)"
       }
     },
     {
-      "id": "hockey-stcloud",
+      "id": "live-71188",
       "type": "grid",
       "sport": "NCAA Hockey",
-      "headline": "Berzins Robs Devils",
-      "subhead": "St. Cloud State wins 4-3",
-      "dateline": "TEMPE, Ariz.",
-      "body": "St. Cloud State goalie Patriks Berzins turned away 38 shots to preserve a 4-3 victory for the Huskies. ASU pulled within one in the final minute but could not find the equalizer.",
+      "headline": "Boston University Terriers vs Boston College Eagles",
+      "subhead": "3:08 - 2nd Period \u2022 NCAA Hockey",
+      "dateline": "Boston College",
+      "body": "In NCAA Hockey action at Boston College, Boston College Eagles edged past Boston University Terriers 3-1 in a thriller that came down to the final possessions.\n\nBoth sides traded momentum throughout the contest, with key defensive stops defining the rhythm. The result has significant implications for the standings as Boston College Eagles looks to build momentum.\n\nThe coaching staff credited the team's execution in critical moments for the result.",
       "game_data": {
-        "home": "St Cloud",
-        "home_score": "4",
-        "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png",
-        "away": "Arizona St",
-        "away_score": "3",
-        "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-        "status": "FINAL"
-      }
+        "sport": "NCAA Hockey",
+        "league": "NCAA Hockey",
+        "date": "2026-02-10T00:30Z",
+        "status": "3:08 - 2nd Period",
+        "is_live": true,
+        "game_note": "Boston University Terriers at Boston College Eagles Beanpot - Championship",
+        "leaders": [],
+        "home": "Boston College Eagles",
+        "home_abbr": "BC",
+        "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/103.png",
+        "home_score": "3",
+        "home_location": "Boston College",
+        "away": "Boston University Terriers",
+        "away_abbr": "BU",
+        "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/104.png",
+        "away_score": "1",
+        "away_location": "Boston University"
+      },
+      "box_score": null
+    },
+    {
+      "id": "live-27059",
+      "type": "grid",
+      "sport": "Premier League",
+      "headline": "Leeds United vs Chelsea",
+      "subhead": "Tue, February 10th at 2:30 PM EST \u2022 Premier League",
+      "dateline": "Chelsea",
+      "body": "In Premier League action at Chelsea, Leeds United edged past Chelsea 0-0 in a thriller that came down to the final possessions.\n\nBoth sides traded momentum throughout the contest, with key defensive stops defining the rhythm. The result has significant implications for the standings as Leeds United looks to build momentum.\n\nThe coaching staff credited the team's execution in critical moments for the result.",
+      "game_data": {
+        "sport": "Premier League",
+        "league": "Premier League",
+        "date": "2026-02-10T19:30Z",
+        "status": "Tue, February 10th at 2:30 PM EST",
+        "is_live": false,
+        "game_note": "Leeds United at Chelsea",
+        "leaders": [],
+        "home": "Chelsea",
+        "home_abbr": "CHE",
+        "home_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/363.png",
+        "home_score": "0",
+        "home_location": "Chelsea",
+        "away": "Leeds United",
+        "away_abbr": "LEE",
+        "away_logo": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png",
+        "away_score": "0",
+        "away_location": "Leeds United"
+      },
+      "box_score": null
     }
   ]
 }
