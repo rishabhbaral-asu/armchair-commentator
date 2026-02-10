@@ -7,65 +7,63 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,900;1,900&family=Oswald:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #fdfbf7; --paper-dark: #ebe7de; }
-        body { font-family: 'Libre Baskerville', serif; background: var(--asu-maroon); color: var(--ink); margin: 0; padding-top: 50px; }
+        :root { --asu-maroon: #8c1d40; --asu-gold: #ffc627; --ink: #1a1a1a; --paper: #f9f7f1; }
+        body { font-family: 'Libre Baskerville', serif; background: #e0e0e0; color: var(--ink); margin: 0; padding-top: 50px; }
         
-        .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: black; border-bottom: 3px solid var(--asu-gold); overflow: hidden; z-index: 1000; display: flex; align-items: center; }
+        .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: black; border-bottom: 4px solid var(--asu-gold); overflow: hidden; z-index: 1000; display: flex; align-items: center; }
         .ticker-content { display: flex; white-space: nowrap; animation: ticker 60s linear infinite; width: max-content; }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .ticker-item { display: inline-flex; align-items: center; padding: 0 30px; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; }
-        .ticker-item:hover { color: var(--asu-gold); }
+        .ticker-item { display: inline-flex; align-items: center; padding: 0 30px; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
         .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; display: inline-block; margin-right: 6px; animation: flash 1.5s infinite; }
 
-        .broadsheet { background: var(--paper); max-width: 1300px; margin: 30px auto; padding: 20px; box-shadow: 0 0 70px rgba(0,0,0,0.7); position: relative; }
-        @media (min-width: 768px) { .broadsheet { padding: 50px; } }
-
-        .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 14vw; md:font-size: 7rem; color: var(--asu-maroon); margin: 0; line-height: 0.8; text-align: center; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-        @media (min-width: 768px) { .masthead h1 { font-size: 7rem; } }
+        .broadsheet { background: var(--paper); max-width: 1200px; margin: 20px auto; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); min-height: 100vh; }
         
-        .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.95; color: var(--ink); letter-spacing: -1px; }
-        .subheadline { font-style: italic; font-size: 1.1rem; color: #444; display: block; margin: 10px 0; border-bottom: 1px solid #bbb; padding-bottom: 10px; }
-        .story-text { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 15px; white-space: pre-line; }
-        .dropcap { float: left; font-size: 4.5rem; line-height: 0.7; padding-top: 5px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); font-weight: 900; }
+        .masthead { text-align: center; border-bottom: 2px solid black; padding-bottom: 15px; margin-bottom: 30px; }
+        .masthead h1 { font-family: 'UnifrakturMaguntia', serif; font-size: 5rem; md:font-size: 7rem; color: var(--asu-maroon); margin: 0; line-height: 1; text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+        .meta-bar { display: flex; justify-content: space-between; border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 0; margin-top: 10px; font-family: 'Oswald', sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #555; }
         
-        .btn-read { display: inline-block; background: var(--ink); color: white; padding: 8px 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; transition: background 0.2s; margin-top: 10px; }
-        .btn-read:hover { background: var(--asu-maroon); }
+        .headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 0.95; color: var(--ink); }
+        .subhead { font-style: italic; font-size: 1.1rem; color: #444; margin: 10px 0; border-bottom: 1px solid #ccc; padding-bottom: 15px; }
+        .story-body { font-size: 1.05rem; line-height: 1.6; text-align: justify; }
+        .dropcap { float: left; font-size: 4rem; line-height: 0.7; padding-top: 5px; padding-right: 10px; font-family: 'Playfair Display', serif; color: var(--asu-maroon); }
         
-        .box-score { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; margin-top: 10px; background: white; border: 1px solid black; }
-        .box-score th { background: #eee; border-bottom: 2px solid black; text-align: left; padding: 4px; }
-        .box-score td { border-bottom: 1px solid #ddd; padding: 4px; }
+        .grid-story { border: 1px solid #ccc; padding: 15px; background: white; transition: transform 0.2s; cursor: pointer; }
+        .grid-story:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .box-score-table { width: 100%; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; border-collapse: collapse; margin-top: 15px; }
+        .box-score-table th { background: #eee; text-align: left; padding: 5px; border-bottom: 2px solid black; }
+        .box-score-table td { border-bottom: 1px solid #ddd; padding: 5px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--paper); padding: 40px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 10px solid var(--ink); position: relative; }
-        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--asu-maroon); font-weight: bold; }
-        .flap-header { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 2px solid black; margin-bottom: 8px; }
+        .modal-content { background: var(--paper); padding: 40px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid black; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--asu-maroon); }
     </style>
 </head>
 <body>
-    <div class="ticker-wrap">
-        <div class="ticker-content" id="ticker-feed"></div>
-    </div>
+    <div class="ticker-wrap"><div class="ticker-content" id="ticker-feed"></div></div>
 
     <div class="broadsheet">
-        <header class="masthead mb-8">
+        <header class="masthead">
             <h1>The Tempe Torch</h1>
-            <div class="flex justify-between items-center border-t border-b border-black py-2 mt-2 px-4 font-sans text-xs font-bold uppercase tracking-widest text-gray-600" id="meta-bar">
-                <span>Tempe, Arizona</span>
+            <div class="meta-bar">
+                <span>Vol. CXLII, No. 42</span>
                 <span id="meta-date">Loading...</span>
                 <span>$1.50</span>
             </div>
         </header>
 
-        <div id="banner-container"></div>
+        <div class="grid lg:grid-cols-12 gap-10">
+            <div class="hidden lg:block lg:col-span-2 border-r border-gray-300 pr-6" id="inside-flap"></div>
 
-        <div class="grid lg:grid-cols-12 gap-8">
-            <div class="hidden lg:block lg:col-span-2 border-r-2 border-double border-gray-400 pr-6" id="inside-flap"></div>
             <div class="lg:col-span-7 border-r border-gray-300 pr-6" id="lead-container"></div>
-            <div class="lg:col-span-3 flex flex-col gap-6" id="sidebar-container"></div>
+
+            <div class="lg:col-span-3 flex flex-col gap-6" id="sidebar-container">
+                <div class="border-b-4 border-black mb-2"><span class="bg-black text-white px-2 py-1 font-oswald text-sm uppercase">Latest Wire</span></div>
+            </div>
         </div>
 
-        <div class="mt-12 pt-8 border-t-4 double border-black">
-            <h3 class="font-oswald text-2xl uppercase mb-6 text-center bg-gray-100 py-2">Scoreboard & Analysis</h3>
+        <div class="mt-12 pt-6 border-t-4 double border-black">
+            <h3 class="font-oswald text-2xl uppercase mb-6 text-center tracking-widest">Scoreboard & Global Reports</h3>
             <div class="grid md:grid-cols-3 gap-6" id="grid-container"></div>
         </div>
     </div>
@@ -90,69 +88,64 @@
                 renderLayout(allStories);
             } catch (e) {
                 console.error("Data load failed", e);
-                document.getElementById('lead-container').innerHTML = `<p class="text-red-700 font-bold">System Error: Run generate_stories.py</p>`;
             }
         }
 
         function renderMeta(meta) {
             document.getElementById('meta-date').textContent = meta.date;
-            const flap = document.getElementById('inside-flap');
-            flap.innerHTML = `
-                <div class="mb-8">
-                    <div class="flap-header">Weather</div>
-                    <div class="flex items-center mb-2">
-                        <span class="text-4xl mr-3">☀</span>
-                        <div><div class="text-2xl font-bold font-oswald">${meta.weather.temp}</div><div class="text-xs uppercase tracking-wide">Tempe</div></div>
-                    </div>
-                    <p class="text-xs text-gray-600">${meta.weather.desc}</p>
+            document.getElementById('inside-flap').innerHTML = `
+                <div class="mb-6">
+                    <div class="font-bold border-b border-black mb-2 font-oswald uppercase text-xs">Weather</div>
+                    <div class="text-3xl font-bold">${meta.weather.temp}</div>
+                    <div class="text-xs text-gray-600">${meta.weather.desc}</div>
                 </div>
-                <div class="mb-8"><div class="flap-header">Quote</div><blockquote class="text-xs italic text-gray-700 my-2">"${meta.quote.text}"</blockquote><cite class="text-xs font-bold not-italic">— ${meta.quote.author}</cite></div>
-                <div class="mb-8"><div class="flap-header">Staff</div><div class="text-xs space-y-1 text-gray-600">${meta.staff.map(s => `<div>${s}</div>`).join('')}</div></div>
+                <div class="mb-6">
+                    <div class="font-bold border-b border-black mb-2 font-oswald uppercase text-xs">Quote of the Day</div>
+                    <blockquote class="text-sm italic font-serif">"${meta.quote.text}"</blockquote>
+                </div>
+                <div>
+                     <div class="font-bold border-b border-black mb-2 font-oswald uppercase text-xs">Staff</div>
+                     <div class="text-xs text-gray-500">${meta.staff.join('<br>')}</div>
+                </div>
             `;
         }
 
         function renderLayout(stories) {
-            const bannerDiv = document.getElementById('banner-container');
             const leadDiv = document.getElementById('lead-container');
             const sidebarDiv = document.getElementById('sidebar-container');
             const gridDiv = document.getElementById('grid-container');
-            bannerDiv.innerHTML = leadDiv.innerHTML = sidebarDiv.innerHTML = gridDiv.innerHTML = '';
 
             stories.forEach((story, index) => {
-                if (story.type === 'special') {
-                    bannerDiv.innerHTML = `
-                        <div onclick="openStory(${index})" class="cursor-pointer bg-black text-white text-center py-3 mb-8 hover:bg-gray-900 transition-colors border-4 double border-asu-gold">
-                            <div class="flex items-center justify-center gap-4">
-                                <img src="${story.game_data.home_logo}" class="h-8">
-                                <span class="font-oswald tracking-widest text-xl uppercase">${story.headline} • ${story.game_data.status}</span>
-                                <img src="${story.game_data.away_logo}" class="h-8">
-                            </div>
-                        </div>`;
-                } else if (story.type === 'lead') {
+                if (story.type === 'lead') {
                     leadDiv.innerHTML = `
-                        <div class="flex items-center gap-2 mb-2"><img src="${story.image_url}" class="h-6"><span class="text-xs font-bold uppercase text-asu-maroon">${story.sport}</span></div>
-                        <h2 class="headline text-6xl mb-4 leading-tight">${story.headline}</h2>
-                        <span class="subheadline text-xl text-gray-600 mb-6 block border-b border-gray-300 pb-4">${story.subhead}</span>
-                        <div class="story-text columns-1 md:columns-2 gap-8 text-lg"><span class="dropcap text-asu-maroon">${story.body.charAt(0)}</span>${story.body.substring(1, 450)}...</div>
-                        <button class="btn-read mt-4" onclick="openStory(${index})">Read Full Analysis &rarr;</button>
+                        <div class="flex items-center gap-2 mb-2"><span class="text-xs font-bold uppercase text-asu-maroon tracking-widest">${story.sport}</span></div>
+                        <h2 class="headline text-5xl mb-3 leading-none cursor-pointer hover:text-gray-700" onclick="openStory(${index})">${story.headline}</h2>
+                        <span class="subhead block">${story.subhead}</span>
+                        <div class="story-body mt-4"><span class="dropcap">${story.body.charAt(0)}</span>${story.body.substring(1, 400)}...</div>
+                        <button class="text-sm font-bold uppercase mt-4 underline text-asu-maroon" onclick="openStory(${index})">Continue Reading</button>
                     `;
-                } else if (story.type === 'sidebar') {
-                    const isPreview = story.headline.includes("Preview") || story.sport.includes("PREVIEW");
-                    const badge = isPreview ? `<div class="bg-blue-800 text-white px-2 py-1 text-xs font-bold uppercase mb-2 inline-block">Game Preview</div>` : `<div class="text-xs font-bold uppercase text-gray-500 mb-1 tracking-widest">Analysis</div>`;
+                } else if (story.type === 'sidebar' || index < 3 && story.type !== 'lead') {
+                    // Fill sidebar with first few non-lead stories if no sidebar explicit type
                     sidebarDiv.innerHTML += `
-                        <div class="border-b border-gray-300 pb-4">
-                            <div class="flex justify-between items-start"><div>${badge}<h3 class="headline text-2xl mb-1 hover:text-asu-maroon cursor-pointer" onclick="openStory(${index})">${story.headline}</h3></div><img src="${story.game_data.home_logo}" class="h-10"></div>
-                            <p class="text-sm mt-1 mb-2 text-gray-700 leading-snug">${story.subhead}</p>
-                            <button class="text-xs font-bold underline text-blue-900" onclick="openStory(${index})">Read More</button>
+                        <div class="pb-4 border-b border-gray-200">
+                            <h4 class="headline text-xl mb-1 cursor-pointer hover:text-asu-maroon" onclick="openStory(${index})">${story.headline}</h4>
+                            <p class="text-xs text-gray-500 uppercase font-oswald mb-2">${story.dateline} • ${story.game_data.status}</p>
+                            <p class="text-sm leading-snug text-gray-800">${story.body.substring(0, 80)}...</p>
                         </div>`;
                 } else {
                     gridDiv.innerHTML += `
-                        <div class="border border-gray-400 p-4 hover:shadow-lg transition-shadow cursor-pointer bg-white" onclick="openStory(${index})">
-                            <div class="flex justify-between mb-3 items-center border-b border-gray-100 pb-2"><span class="text-xs font-bold uppercase text-gray-500">${story.sport}</span><span class="text-xs font-bold text-asu-maroon">${story.game_data.status}</span></div>
-                            <div class="flex justify-between mb-4 items-center"><img src="${story.game_data.away_logo}" class="h-8" onerror="this.src='https://via.placeholder.com/30'"><span class="font-bold text-sm text-gray-400">@</span><img src="${story.game_data.home_logo}" class="h-8" onerror="this.src='https://via.placeholder.com/30'"></div>
-                            <h4 class="headline text-lg mb-2 leading-tight">${story.headline}</h4>
-                            <div class="text-xs text-gray-500 font-sans uppercase tracking-wider mb-2">📍 ${story.dateline}</div>
-                            <div class="flex justify-between text-sm font-bold mt-2 text-gray-800 pt-2 border-t border-gray-100"><span>${story.game_data.away} ${story.game_data.away_score}</span><span>${story.game_data.home} ${story.game_data.home_score}</span></div>
+                        <div class="grid-story" onclick="openStory(${index})">
+                             <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-1">
+                                <span class="text-xs font-bold text-gray-400 uppercase">${story.sport}</span>
+                                <span class="text-xs font-bold text-asu-maroon">${story.game_data.status}</span>
+                             </div>
+                             <h3 class="headline text-lg mb-2 leading-tight">${story.headline}</h3>
+                             <div class="text-xs font-oswald text-gray-500 uppercase mb-3">${story.dateline}</div>
+                             <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2"><img src="${story.game_data.away_logo}" class="h-6"> <span class="font-bold text-sm">${story.game_data.away_score}</span></div>
+                                <span class="text-xs text-gray-400">@</span>
+                                <div class="flex items-center gap-2"><img src="${story.game_data.home_logo}" class="h-6"> <span class="font-bold text-sm">${story.game_data.home_score}</span></div>
+                             </div>
                         </div>`;
                 }
             });
@@ -162,8 +155,8 @@
             const track = document.getElementById('ticker-feed');
             const items = stories.map(s => {
                 const gd = s.game_data;
-                const liveDot = s.is_live ? '<span class="live-dot"></span>' : '';
-                return `<div class="ticker-item">${liveDot} <span class="text-asu-gold mr-2 font-bold">${s.sport}:</span> ${gd.away} ${gd.away_score} @ ${gd.home} ${gd.home_score} <span class="ml-2 text-xs opacity-70">(${gd.status})</span></div>`;
+                const liveDot = s.game_data.state === 'in' ? '<span class="live-dot"></span>' : '';
+                return `<div class="ticker-item cursor-pointer" onclick="openStory(${allStories.indexOf(s)})">${liveDot} <span class="text-asu-gold mr-2 font-bold">${s.sport}:</span> ${gd.away} ${gd.away_score} - ${gd.home} ${gd.home_score} <span class="ml-2 opacity-70">(${gd.status})</span></div>`;
             }).join('');
             track.innerHTML = items + items; 
         }
@@ -172,25 +165,33 @@
             const s = allStories[index];
             const modal = document.getElementById('storyModal');
             const content = document.getElementById('modal-content-body');
+            
             let boxHtml = '';
-            if (s.box_score) {
-                const rows = s.box_score.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
-                const heads = s.box_score.headers.map(h => `<th>${h}</th>`).join('');
-                boxHtml = `<div class="mt-8"><div class="font-oswald uppercase font-bold bg-black text-white px-2 py-1">${s.box_score.title}</div><table class="box-score"><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table></div>`;
+            if (s.leaders && s.leaders.length > 0) {
+                const rows = s.leaders.map(l => `<tr><td>${l.name}</td><td>${l.stat}</td><td>${l.desc}</td></tr>`).join('');
+                boxHtml = `<div class="mt-8 border-t border-black pt-4"><h4 class="font-oswald uppercase text-sm font-bold mb-2">Game Leaders</h4><table class="box-score-table"><thead><tr><th>Player</th><th>Stat</th><th>Context</th></tr></thead><tbody>${rows}</tbody></table></div>`;
             }
+
             content.innerHTML = `
-                <div class="flex items-center gap-4 mb-6 border-b border-gray-300 pb-4">
-                    <img src="${s.game_data.home_logo}" class="h-16" onerror="this.src='https://via.placeholder.com/50'">
-                    <div><div class="text-xs font-bold uppercase text-asu-maroon tracking-widest">${s.sport} • ${s.dateline || s.game_data.home_location}</div><h1 class="headline text-4xl md:text-5xl">${s.headline}</h1></div>
+                <div class="text-center mb-6">
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">${s.sport} • ${s.dateline}</span>
+                    <h1 class="headline text-4xl md:text-5xl mt-2 mb-4">${s.headline}</h1>
+                    <div class="flex justify-center items-center gap-8 font-oswald text-xl border-y border-black py-4">
+                        <div class="text-center"><img src="${s.game_data.away_logo}" class="h-12 mx-auto block mb-2">${s.game_data.away}<br><span class="text-3xl font-bold">${s.game_data.away_score}</span></div>
+                        <div class="text-2xl text-gray-400">VS</div>
+                        <div class="text-center"><img src="${s.game_data.home_logo}" class="h-12 mx-auto block mb-2">${s.game_data.home}<br><span class="text-3xl font-bold">${s.game_data.home_score}</span></div>
+                    </div>
                 </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="md:col-span-2 story-text text-lg">${s.body}</div>
-                    <div><div class="bg-gray-100 p-4 border border-gray-300"><div class="text-center font-bold text-xl mb-4 border-b border-gray-400 pb-2">${s.game_data.status}</div><div class="flex justify-between text-lg mb-2"><span>${s.game_data.away}</span> <strong>${s.game_data.away_score}</strong></div><div class="flex justify-between text-lg"><span>${s.game_data.home}</span> <strong>${s.game_data.home_score}</strong></div></div>${boxHtml}</div>
-                </div>`;
+                <div class="story-body px-2 md:px-10">
+                    <p class="mb-4"><span class="font-bold uppercase text-xs text-gray-500">${s.dateline} —</span> ${s.body}</p>
+                </div>
+                ${boxHtml}
+            `;
             modal.style.display = 'flex';
         }
 
         function closeModal() { document.getElementById('storyModal').style.display = 'none'; }
+        
         init();
     </script>
 </body>
