@@ -6,9 +6,9 @@ from pathlib import Path
 SCORES_PATH = Path("data/daily_scores.json")
 STORIES_PATH = Path("data/daily_stories.json")
 
-# --- 1. PINNED STORIES (Rewritten in the "New Style") ---
+# --- 1. PINNED STORIES ---
+# (These are hardcoded examples of the "Gold Standard" writing style)
 
-# Super Bowl Recap - The "Gold Standard" Example
 SB_BODY = """SANTA CLARA, Calif. — Seattle Seahawks (14-6) vs. New England Patriots (13-7)
 Levi's Stadium; Sunday
 
@@ -26,7 +26,6 @@ TOP PERFORMERS: Kenneth Walker III (SEA) pounded the rock for 112 yards and a to
 
 INJURIES: Cole Strange (NE) left in the 2nd Quarter (knee)."""
 
-# Cricket Recap - The "Global Wire" Example
 CRICKET_BODY = """MUMBAI — India (1-0) vs. United States (0-1)
 Wankhede Stadium; Sunday
 
@@ -69,7 +68,7 @@ INSIDE_FLAP_DATA = {
     "date": datetime.now().strftime("%A, %B %d, %Y")
 }
 
-# --- 2. THE WRITER ENGINE (Context + Personality) ---
+# --- 2. WRITER ENGINE ---
 
 def analyze_matchup(game):
     h_rec = game.get('home_record', '')
@@ -86,14 +85,18 @@ def analyze_matchup(game):
         return f"Two squads looking to establish momentum collide as the {game['away']} ({a_rec}) visit the {game['home']} ({h_rec})."
 
 def generate_live_story(game):
-    # Data extraction
-    home = game['home']
-    away = game['away']
+    # Data extraction with safe fallbacks
+    home = game.get('home', 'Home Team')
+    away = game.get('away', 'Away Team')
     h_rec = game.get('home_record', '')
     a_rec = game.get('away_record', '')
+    
+    # SAFE LOCATION HANDLING
     venue = game.get('venue', 'Neutral Site')
-    location = game.get('location', venue)
-    status = game.get('status', '')
+    # Try 'location' first, fallback to 'venue', fallback to generic
+    location = game.get('location', venue) 
+    
+    status = game.get('status', 'Scheduled')
     odds = game.get('odds', '')
     headline = game.get('headline', '')
     
@@ -102,31 +105,38 @@ def generate_live_story(game):
     
     # 2. BOTTOM LINE (The Hook)
     bottom_line = ""
-    if game['state'] == 'pre':
+    state = game.get('state', 'pre')
+    
+    if state == 'pre':
         if odds:
             bottom_line = f"BOTTOM LINE: The {home} look to cover the {odds} spread in a pivotal matchup."
         elif headline:
             bottom_line = f"BOTTOM LINE: {headline}"
         else:
             bottom_line = f"BOTTOM LINE: The {home} host the {away} looking to improve their standing."
-    elif game['state'] == 'in':
+    elif state == 'in':
          bottom_line = f"BOTTOM LINE: Live action from {location} as {home} and {away} trade blows."
     else:
-        h_s = int(game.get('home_score', 0))
-        a_s = int(game.get('away_score', 0))
-        winner = home if h_s > a_s else away
-        bottom_line = f"BOTTOM LINE: The {winner} make a statement with a {h_s}-{a_s} victory."
+        # Final Score Logic
+        try:
+            h_s = int(game.get('home_score', 0))
+            a_s = int(game.get('away_score', 0))
+            winner = home if h_s > a_s else away
+            bottom_line = f"BOTTOM LINE: The {winner} make a statement with a {h_s}-{a_s} victory."
+        except:
+             bottom_line = f"BOTTOM LINE: {home} vs {away} - Final."
 
     # 3. NARRATIVE BODY (Humanized)
     context = analyze_matchup(game)
+    sport = game.get('sport', '').upper()
     
     body_text = ""
-    if "CRICKET" in game['sport']:
+    if "CRICKET" in sport:
         body_text = (
             f"{context} Conditions at {venue} are expected to play a major role. "
             f"The {home} will look to capitalize on their familiarity with the surface, while {away} hope to silence the home crowd early."
         )
-    elif "BASKETBALL" in game['sport']:
+    elif "BASKETBALL" in sport:
         body_text = (
             f"{context} The {home} have relied on a high-octane offense this season, but they face a stern test against the disciplined defense of the {away}. "
             f"Execution in the half-court will likely determine the winner of this contest."
@@ -143,26 +153,31 @@ def generate_live_story(game):
     if leaders:
         p_list = []
         for l in leaders:
-            # "J. Smith (SEA) is averaging 25.0 PPG."
-            p_list.append(f"{l['name']} ({l['team']}) is pacing the squad with {l['stat']} ({l['desc']}).")
+            # "J. Smith (SEA) is pacing the squad with 25.0 PPG."
+            p_list.append(f"{l['name']} ({l.get('team','NA')}) is pacing the squad with {l['stat']} ({l['desc']}).")
         performers += " ".join(p_list)
     else:
         performers += "Stats will be updated as action unfolds."
 
-    # 5. INJURIES (The Footer)
+    # 5. INJURIES
     injuries = "INJURIES: Updates to be provided."
 
     return f"{header}\n\n{bottom_line}\n\n{body_text}\n\n{performers}\n\n{injuries}"
 
-
 def generate_grid_item(game):
+    # Safe fallback for missing IDs
+    g_id = game.get('game_id', random.randint(1000, 9999))
+    
+    # Safe fallback for location/dateline
+    dateline = game.get('location', game.get('venue', 'Neutral Site'))
+
     return {
-        "id": f"game-{game.get('game_id')}",
+        "id": f"game-{g_id}",
         "type": "grid",
-        "sport": game['sport'],
-        "headline": f"{game['away']} vs {game['home']}",
-        "subhead": game['status'],
-        "dateline": game['location'],
+        "sport": game.get('sport', 'Unknown'),
+        "headline": f"{game.get('away', 'Away')} vs {game.get('home', 'Home')}",
+        "subhead": game.get('status', ''),
+        "dateline": dateline,
         "body": generate_live_story(game),
         "game_data": game,
         "box_score": None
@@ -175,7 +190,7 @@ def main():
             raw_data = json.load(f)
             for g in raw_data.get("games", []):
                 # Dedupe
-                if g['home'] != "Seahawks": 
+                if g.get('home') != "Seahawks": 
                     live_stories.append(generate_grid_item(g))
 
     final_stories = PINNED_STORIES + live_stories
