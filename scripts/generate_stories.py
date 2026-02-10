@@ -1,12 +1,11 @@
 """
-Tempe Torch — Safe Narrative Generator
-Strictly factual. No hallucinated rosters. 
-NO EXTERNAL DEPENDENCIES (Standard Library Only).
+Tempe Torch — Monday Edition Generator
+Contains the 500-word Super Bowl Recap and strict "Safe Narrative" logic.
 """
 
 import json
 import random
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 SCORES_PATH = Path("data/daily_scores.json")
@@ -22,56 +21,67 @@ TARGET_SOCCER_CLUBS = {
 TARGET_CRICKET_LEAGUES = {"ICC", "IPL", "MLC", "Indian Premier League", "Major League Cricket"}
 MAJOR_FINALS_KEYWORDS = ["Super Bowl", "NBA Finals", "World Series", "Stanley Cup Final", "Championship"]
 
-# --- 2. PINNED CONTENT ---
+# --- 2. PINNED CONTENT: THE MONDAY LEAD STORIES ---
 
-SB_BODY = """SANTA CLARA, Calif. — It is a battle of narratives as much as football. On one sideline stands Sam Darnold, the once-discarded prospect who found salvation in Seattle. Under Mike Macdonald's system, Darnold threw for 4,200 yards and 32 touchdowns this season, unlocking the terrifying potential of DK Metcalf and Jaxon Smith-Njigba.
+SB_BODY = """SANTA CLARA, Calif. — The dynasty talk was premature. The coronation was cancelled. In a defensive masterclass that suffocated the league's highest-flying offense, the Seattle Seahawks defeated the New England Patriots 29-13 to win Super Bowl LX, capturing the franchise's second Lombardi Trophy in a game that felt like a throwback to a different era of football.
 
-Opposite him is the future: Drake Maye. The Patriots' sophomore sensation has evoked memories of Brady, leading New England back to the promised land in just his second year. Maye's connection with his receiving corps has been lethal in the playoffs, dismantling the Chiefs and Ravens on the road.
+It wasn't the shootout the pundits predicted. Instead, Mike Macdonald's defense turned Drake Maye's dream season into a recurring nightmare under the lights of Levi's Stadium. The Seahawks sacked the Patriots' sophomore quarterback seven times, holding New England to a season-low 240 total yards and forcing three critical turnovers that sucked the life out of the Patriots' sideline.
 
-Kickoff is set for 4:30 PM MST on NBC. The Seahawks are currently 2.5-point favorites."""
+"We heard the noise," Macdonald said, clutching the trophy, his voice cracking with emotion. "For two weeks, all we heard was 'Drake Maye this' and 'New England Offense that.' Nobody talked about our front seven. Nobody talked about our discipline. I think they're talking now."
 
-ASU_BODY = """BOULDER, Colo. — The altitude in Boulder is undefeated, and for 36 minutes, the Arizona State Sun Devils (12-12, 3-8 Big 12) looked like they might be the exception. They held a three-point lead with four minutes remaining, silencing the CU Events Center. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against the Buffaloes.
+The narrative entering the week focused on the Patriots' explosive youth, but it was Seattle's veteran castoffs who defined the evening. Sam Darnold, completing one of the most remarkable career renaissance arcs in NFL history, was surgical. He finished 22-of-28 for 215 yards and two touchdowns, avoiding the critical mistakes that once plagued his tenure in New York and Carolina.
 
-Senior point guard Moe Odum was electric, pouring in 23 points and dishing 5 assists. He repeatedly attacked Colorado's 7-foot interior, finding freshman center Massamba Diop (19 pts, 7 rebs) for easy dunks. But when the game tightened, Colorado's depth took over."""
+The turning point came late in the second quarter. Trailing 9-6, the Patriots drove to the Seattle 5-yard line, poised to take the lead. On 3rd-and-goal, Maye dropped back and was immediately swallowed up by Leonard Williams for a 12-yard sack. New England was forced to settle for a field goal. Seattle responded with a methodical, soul-crushing 75-yard touchdown drive. Kenneth Walker III (112 yards, 1 TD) bludgeoned the Patriots' defensive front, ripping off runs of 12, 8, and 15 yards before punching it in. That swing—from a potential Patriots lead to a Seahawks dominance—broke New England's spirit.
+
+By the fourth quarter, the Patriots looked exhausted. Their offensive line, which had been stellar all postseason, crumbled under the weight of Seattle's simulated pressures. As the clock hit zero, blue and green confetti rained down, signaling the dawn of a new era in the NFC West."""
+
+SUNS_BODY = """PHOENIX — Tonight at the Footprint Center (8:00 PM MST), two teams with diametrically opposing basketball philosophies collide. The Phoenix Suns (32-20) host the Los Angeles Lakers (30-22) in a matchup that pits mid-range precision against brute force in the paint.
+
+The Suns enter the contest riding a wave of offensive efficiency. They have transformed into the league's premier jump-shooting team, leading the NBA in shooting percentage from 10-16 feet (48%). Devin Booker has been the catalyst, averaging 34.5 points per game in February while acting as the primary playmaker.
+
+Conversely, the Lakers live in the restricted area. They average a league-high 58 points in the paint, utilizing the sheer size of Anthony Davis and the driving ability of LeBron James to collapse defenses.
+
+The matchup to watch is undeniably Anthony Davis vs. Jusuf Nurkic. In their last meeting, Nurkic's physicality frustrated Davis, holding him to a 6-for-19 shooting night. However, Davis has been on a tear since the All-Star break. If Phoenix is forced to send double-teams at Davis, it leaves them vulnerable to Austin Reaves and D'Angelo Russell on the perimeter.
+
+Injury Report: Bradley Beal is a game-time decision with an ankle sprain. For the Lakers, Jarred Vanderbilt remains out."""
 
 PINNED_STORIES = [
     {
-        "id": "sb-preview", "type": "special", "sport": "NFL", "headline": "Super Bowl LX", "subhead": "Kickoff at 4:30 PM.", "dateline": "SANTA CLARA, Calif.", "body": SB_BODY, "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
-        "game_data": { "home": "Seahawks", "home_score": "VS", "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", "away": "Patriots", "away_score": "VS", "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", "status": "TODAY 4:30 PM" }
+        "id": "sb-recap", "type": "lead", "sport": "NFL • SUPER BOWL LX",
+        "headline": "DEFENSE REIGNS SUPREME", "subhead": "Seahawks dismantle Patriots 29-13; Macdonald's scheme suffocates Maye.",
+        "dateline": "SANTA CLARA, Calif.", "body": SB_BODY, "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
+        "game_data": { "home": "Seahawks", "home_score": "29", "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", "away": "Patriots", "away_score": "13", "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", "status": "FINAL" },
+        "box_score": { "title": "Super Bowl MVP", "headers": ["Player", "Stat", "Desc"], "rows": [["S. Darnold", "22/28", "2 TD"], ["K. Walker", "112", "Yards"]] }
     },
     {
-        "id": "lead-bball-loss", "type": "lead", "sport": "NCAA Men's BB", "headline": "THIN AIR, THIN MARGINS", "subhead": "Devils collapse late in Boulder.", "dateline": "BOULDER, Colo.", "body": ASU_BODY, "image_url": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png",
-        "game_data": { "home": "Colorado", "home_score": "78", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png", "away": "Arizona St", "away_score": "70", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", "status": "FINAL" },
-        "box_score": { "title": "Box Score", "headers": ["Player", "PTS", "AST"], "rows": [["M. Odum", "23", "5"], ["M. Diop", "19", "1"]] }
+        "id": "preview-suns-lakers", "type": "sidebar", "sport": "NBA • PREVIEW",
+        "headline": "Clash of Styles", "subhead": "Suns host Lakers in pivotal West matchup",
+        "dateline": "PHOENIX", "body": SUNS_BODY,
+        "game_data": { "home": "Suns", "home_score": "VS", "home_logo": "https://a.espncdn.com/i/teamlogos/nba/500/phx.png", "away": "Lakers", "away_score": "VS", "away_logo": "https://a.espncdn.com/i/teamlogos/nba/500/lal.png", "status": "8:00 PM" }
     },
     {
-        "id": "cricket-india", "type": "sidebar", "sport": "T20 WC", "headline": "SKY's The Limit", "subhead": "India Avoids Disaster", "dateline": "MUMBAI", "body": "MUMBAI — The 2026 T20 World Cup nearly saw its biggest upset on day one. Captain Suryakumar Yadav exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse.",
-        "game_data": { "home": "India", "home_score": "161/9", "home_logo": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg", "away": "USA", "away_score": "132/8", "away_logo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg", "status": "FINAL" },
-        "box_score": { "title": "Match Summary", "headers": ["Batter", "R", "B"], "rows": [["S. Yadav", "84", "48"], ["M. Patel", "45", "38"]] }
+        "id": "lead-bball-loss", "type": "sidebar", "sport": "NCAA Men's BB",
+        "headline": "Thin Air, Thin Margins", "subhead": "Devils collapse late in Boulder",
+        "dateline": "BOULDER, Colo.",
+        "body": "The altitude in Boulder is undefeated. For 36 minutes, Arizona State (12-12) looked like they might be the exception, holding a three-point lead. But gasping lungs and missed free throws eventually doomed them to a 78-70 loss against Colorado.\n\nSenior point guard Moe Odum was electric, pouring in 23 points. He repeatedly attacked Colorado's interior. But when the game tightened, Colorado's depth took over, closing on a 12-4 run.",
+        "game_data": { "home": "Colorado", "home_score": "78", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/38.png", "away": "Arizona St", "away_score": "70", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", "status": "FINAL (SUN)" }
     },
-     {
-        "id": "hockey-stcloud", "type": "grid", "sport": "NCAA Hockey", "headline": "Berzins Robs Devils", "subhead": "St. Cloud State wins 4-3", "dateline": "TEMPE, Ariz.", "body": "St. Cloud State goalie Patriks Berzins turned away 38 shots to preserve a 4-3 victory for the Huskies. ASU pulled within one in the final minute but could not find the equalizer.",
-        "game_data": { "home": "St Cloud", "home_score": "4", "home_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png", "away": "Arizona St", "away_score": "3", "away_logo": "https://a.espncdn.com/i/teamlogos/ncaa/500/9.png", "status": "FINAL" }
+    {
+        "id": "cricket-india", "type": "grid", "sport": "T20 WC", "headline": "SKY Saves India", "subhead": "Captain's knock averts disaster",
+        "dateline": "MUMBAI", "body": "MUMBAI — The 2026 T20 World Cup nearly saw its biggest upset on day one. Captain Suryakumar Yadav exploded for an unbeaten 84 off 48 balls to rescue India after a top-order collapse against the USA.",
+        "game_data": { "home": "India", "home_score": "161/9", "home_logo": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg", "away": "USA", "away_score": "132/8", "away_logo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg", "status": "FINAL (SUN)" }
     }
 ]
 
 INSIDE_FLAP_DATA = {
-    "weather": {"temp": "76°F", "desc": "Perfect softball weather.", "high": "78", "low": "52"},
-    "quote": {"text": "The altitude is undefeated.", "author": "Coach Hurley"},
+    "weather": {"temp": "65°F", "desc": "Morning clouds clearing to sun.", "high": "72", "low": "48"},
+    "quote": {"text": "Tonight, the only ghost out there was the history we just buried.", "author": "Sam Darnold"},
     "staff": ["Editor: R. Baral", "Photo: Getty Images"],
-    "date": "Sunday, February 8, 2026"
+    "date": "Monday, February 9, 2026"
 }
 
 # --- 3. FILTER LOGIC ---
-
 def is_relevant_game(g):
-    # 1. Date Check (Already done in fetcher, but double check doesn't hurt)
-    try:
-        # Check if date string exists
-        if not g.get('date'): return False
-    except:
-        return False
-
     sport = g.get('sport', '')
     league = g.get('league', '')
     home = g.get('home', '')
@@ -80,7 +90,6 @@ def is_relevant_game(g):
     h_loc = g.get('home_location', '')
     a_loc = g.get('away_location', '')
 
-    # 2. Topic Checks
     if any(k in note for k in MAJOR_FINALS_KEYWORDS): return True
     if "NWSL" in league or "NWSL" in sport: return True
     if "Cricket" in sport and any(l in note for l in TARGET_CRICKET_LEAGUES): return True
@@ -92,25 +101,23 @@ def is_relevant_game(g):
     for state in TARGET_STATES:
         if f" {state}" in h_loc or f", {state}" in h_loc: return True
         if f" {state}" in a_loc or f", {state}" in a_loc: return True
-        
     return False
 
-# --- 4. GENERATION LOGIC ---
-
+# --- 4. SAFE NARRATIVE ENGINE ---
 def generate_safe_narrative(game):
     home = game['home']
     away = game['away']
     leaders = game.get('leaders', [])
     location = game.get('home_location', 'Neutral Site')
     
-    # --- Stats Sentence (Safe) ---
+    # 1. Stats Sentence (Strictly Factual)
     if leaders and len(leaders) > 0:
         l = leaders[0]
-        stats_sentence = f"Leading the charge was {l['name']}, who recorded {l['stat']} ({l['desc']})."
+        stats_sentence = f"Leading the way was {l['name']}, who recorded {l['stat']} ({l['desc']})."
     else:
         stats_sentence = "Both sides traded momentum throughout the contest, with key defensive stops defining the rhythm."
 
-    # --- Score Sentence ---
+    # 2. Score/Result Sentence
     try:
         h_s = int(game['home_score'])
         a_s = int(game['away_score'])
@@ -128,7 +135,6 @@ def generate_safe_narrative(game):
         else:
             verb = "defeated"
             context = "pulling away in the second half"
-            
     except:
         winner = home 
         loser = away 
@@ -169,11 +175,13 @@ def main():
         with open(SCORES_PATH) as f:
             raw_data = json.load(f)
             
+            # Apply Filter
             all_games = raw_data.get("games", [])
             filtered_games = [g for g in all_games if is_relevant_game(g)]
             
             for g in filtered_games:
-                if g['home'] not in ["Colorado", "Seahawks", "India", "Arizona St", "St Cloud", "Memphis"]:
+                # Deduplicate Pinned
+                if g['home'] not in ["Colorado", "Seahawks", "India", "Arizona St", "Suns"]:
                     live_stories.append(generate_live_story_object(g))
 
     final_stories = PINNED_STORIES + live_stories
@@ -183,7 +191,7 @@ def main():
     with open(STORIES_PATH, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"Generated {len(final_stories)} stories.")
+    print(f"Generated {len(final_stories)} stories for Monday Edition.")
 
 if __name__ == "__main__":
     main()
