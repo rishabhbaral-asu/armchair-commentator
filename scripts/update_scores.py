@@ -1,7 +1,7 @@
 """
 Tempe Torch — Score Fetcher
-Fetches live scores, fetches REAL player stats, and filters by DATE (Today +/- 1 Day).
-NO EXTERNAL DEPENDENCIES.
+Fetches live scores & REAL player stats.
+Strictly Standard Library (No external dependencies).
 """
 
 import json
@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 OUTPUT_PATH = "data/daily_scores.json"
 
 # --- CONFIG: DATE WINDOW ---
-# Only show games from yesterday, today, and tomorrow.
+# 1 means: Yesterday, Today, Tomorrow
 DATE_WINDOW_DAYS = 1 
 
 def fetch_json(url: str):
@@ -24,21 +24,20 @@ def fetch_json(url: str):
         return None
 
 def is_date_relevant(date_str):
-    """Returns True if the game is within the target window (Yesterday/Today/Tomorrow)"""
+    """Returns True if game is within target window."""
     if not date_str: return False
     try:
-        # ESPN uses UTC ISO strings ending in 'Z' (e.g. 2024-10-12T14:00Z)
-        # We handle the 'Z' manually for compatibility
-        dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        # Parse ESPN's ISO format (e.g. 2024-10-12T14:00Z)
+        # We manually handle the 'Z' to avoid needing dateutil
+        if date_str.endswith('Z'):
+            date_str = date_str[:-1]
+        
+        dt = datetime.fromisoformat(date_str).replace(tzinfo=timezone.utc)
         now = datetime.now(timezone.utc)
         
-        # Calculate difference
         diff = dt - now
-        
-        # Keep if within +/- 1.5 days (covers timezones adequately)
         return abs(diff.days) <= DATE_WINDOW_DAYS
-    except Exception as e:
-        # If parsing fails, exclude it to be safe
+    except:
         return False
 
 def parse_espn_scoreboard(data, sport_label, league_name=None):
@@ -48,7 +47,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
 
     for event in data["events"]:
         try:
-            # --- 1. STRICT DATE FILTER ---
+            # 1. Date Filter
             if not is_date_relevant(event.get("date")):
                 continue
 
@@ -58,7 +57,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
             home_data = next(t for t in teams if t["homeAway"] == "home")
             away_data = next(t for t in teams if t["homeAway"] == "away")
             
-            # Fetch Leaders (Real Stats)
+            # 2. Fetch Leaders (Real Stats)
             leaders = []
             if "leaders" in comp:
                 for leader_group in comp["leaders"]:
@@ -70,7 +69,7 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
                             "desc": leader_group["displayName"]
                         })
             
-            # Game Note (Finals check)
+            # 3. Game Note (Finals check)
             game_note = event.get("name", "")
             if comp.get("notes"):
                 game_note += " " + " ".join([n.get("headline", "") for n in comp["notes"]])
@@ -84,14 +83,12 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
                 "game_note": game_note, 
                 "leaders": leaders,
                 
-                # HOME
                 "home": home_data["team"]["displayName"],
                 "home_abbr": home_data["team"].get("abbreviation", home_data["team"]["displayName"][:3].upper()),
                 "home_logo": home_data["team"].get("logo", ""),
                 "home_score": home_data.get("score", "0"),
                 "home_location": home_data["team"].get("location", ""), 
                 
-                # AWAY
                 "away": away_data["team"]["displayName"],
                 "away_abbr": away_data["team"].get("abbreviation", away_data["team"]["displayName"][:3].upper()),
                 "away_logo": away_data["team"].get("logo", ""),
@@ -106,7 +103,6 @@ def parse_espn_scoreboard(data, sport_label, league_name=None):
 def fetch_sports_data():
     all_games = []
     
-    # Endpoints
     endpoints = [
         ("NFL", "football/nfl"),
         ("NBA", "basketball/nba"),
