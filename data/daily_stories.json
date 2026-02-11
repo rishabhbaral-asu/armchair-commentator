@@ -13,7 +13,7 @@
       "Tempe Torch Wire"
     ],
     "date": "Wednesday, February 11, 2026",
-    "last_updated": "04:26 AM"
+    "last_updated": "05:52 AM"
   },
   "stories": [
     {
@@ -157,24 +157,24 @@
       "type": "grid",
       "sport": "BASKETBALL \u2022 NBA",
       "headline": "San Antonio Spurs vs Los Angeles Lakers",
-      "subhead": "5:49 - 2nd Quarter",
+      "subhead": "Final",
       "dateline": "Los Angeles, CA",
-      "body": "LOS ANGELES, CA \u2014 San Antonio Spurs vs. Los Angeles Lakers\ncrypto.com Arena; 5:49 - 2nd Quarter\n\nBOTTOM LINE: Live action from crypto.com Arena as Los Angeles Lakers and San Antonio Spurs trade blows.\n\nThe Los Angeles Lakers look to defend their turf against the visiting San Antonio Spurs.\n\nTOP PERFORMERS: Stats to follow.",
+      "body": "LOS ANGELES, CA \u2014 San Antonio Spurs vs. Los Angeles Lakers\ncrypto.com Arena; Final\n\nBOTTOM LINE: The San Antonio Spurs make a statement with a 108-136 victory.\n\nThe Los Angeles Lakers look to defend their turf against the visiting San Antonio Spurs.\n\nTOP PERFORMERS: Stats to follow.",
       "game_data": {
         "game_id": "401810629",
         "sport": "BASKETBALL \u2022 NBA",
         "date": "2026-02-11T03:30Z",
-        "status": "5:49 - 2nd Quarter",
-        "state": "in",
+        "status": "Final",
+        "state": "post",
         "venue": "crypto.com Arena",
         "location": "Los Angeles, CA",
         "home": "Los Angeles Lakers",
-        "home_score": "40",
-        "home_rec": "32-20",
+        "home_score": "108",
+        "home_rec": "32-21",
         "home_rank": 99,
         "away": "San Antonio Spurs",
-        "away_score": "68",
-        "away_rec": "36-16",
+        "away_score": "136",
+        "away_rec": "37-16",
         "away_rank": 99,
         "odds": "SA -13.5",
         "leaders": []
