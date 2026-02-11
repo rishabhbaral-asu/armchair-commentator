@@ -11,9 +11,8 @@ Automated Pipeline:
 import json
 import time
 import os
-import random
 import requests
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 # --- CONFIGURATION ---
@@ -64,7 +63,6 @@ def fetch_json(url):
 def step_1_scrape():
     print("  [1/3] Scraping ESPN...")
     raw = []
-    # Added Cricket specifically
     sources = [
         ("football", "nfl"), ("basketball", "nba"), ("football", "college-football"), 
         ("basketball", "mens-college-basketball"), ("cricket", "competitions")
@@ -88,7 +86,7 @@ def step_2_filter(events):
         comp = e.get("competitions", [{}])[0]
         venue = comp.get("venue", {})
         
-        # Venue Resolution (The Fix)
+        # Venue Resolution
         city = venue.get("address", {}).get("city", "")
         state = venue.get("address", {}).get("state", "")
         if not city and venue.get("fullName") in VENUE_MAP:
@@ -124,6 +122,15 @@ def parse_game_data(data, sport, league, city, state):
     home = next((c for c in competitors if c["homeAway"] == "home"), {})
     away = next((c for c in competitors if c["homeAway"] == "away"), {})
     
+    # --- SAFETY HELPERS ---
+    def get_record(team_obj):
+        """Safely extracts record or returns 0-0"""
+        recs = team_obj.get("record", [])
+        if recs and len(recs) > 0:
+            return recs[0].get("summary", "0-0")
+        return "0-0"
+    
+    # Leaders
     leaders = []
     if "leaders" in comp:
         for l in comp["leaders"]:
@@ -136,24 +143,26 @@ def parse_game_data(data, sport, league, city, state):
         "sport": f"{sport.upper()} • {league.upper()}",
         "date": comp.get("date"),
         "status": comp.get("status", {}).get("type", {}).get("detail", ""),
-        "state": comp.get("status", {}).get("type", {}).get("state", ""), # pre/in/post
+        "state": comp.get("status", {}).get("type", {}).get("state", ""),
         "venue": data.get("gameInfo", {}).get("venue", {}).get("fullName", "Stadium"),
         "location": f"{city}, {state}" if city else "Neutral Site",
+        
         "home": home.get("team", {}).get("displayName", "Home"),
         "home_score": home.get("score", "0"),
-        "home_rec": home.get("record", [{}])[0].get("summary", ""),
+        "home_rec": get_record(home),  # <--- FIXED
         "home_rank": home.get("curatedRank", {}).get("current", 99),
+        
         "away": away.get("team", {}).get("displayName", "Away"),
         "away_score": away.get("score", "0"),
-        "away_rec": away.get("record", [{}])[0].get("summary", ""),
+        "away_rec": get_record(away),  # <--- FIXED
         "away_rank": away.get("curatedRank", {}).get("current", 99),
+        
         "odds": data.get("pickcenter", [{}])[0].get("details", "") if data.get("pickcenter") else "",
         "leaders": leaders
     }
 
 # --- PART 2: THE WRITER ---
 
-# PINNED CONTENT (The Gold Standard Examples)
 PINNED_STORIES = [
     {
         "id": "sb-recap", "type": "lead", "sport": "NFL • SUPER BOWL LX",
@@ -164,27 +173,16 @@ PINNED_STORIES = [
         "image_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
         "game_data": { "home": "Seahawks", "home_score": "29", "home_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", "away": "Patriots", "away_score": "13", "away_logo": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", "status": "FINAL" },
         "box_score": None
-    },
-    {
-        "id": "cricket-ind-usa", "type": "sidebar", "sport": "CRICKET • T20 WC",
-        "headline": "India def. USA (7 wkts)",
-        "subhead": "Yadav (84*) rescues hosts after early collapse",
-        "dateline": "MUMBAI", 
-        "body": "The cricketing world nearly witnessed the upset of the century. Chasing a modest target of 133, the powerhouse Indian lineup crumbled to 34/4 inside the powerplay, silenced by a spirited American bowling attack.\n\nEnter Suryakumar Yadav. The captain played a knock for the ages, abandoning his usual flamboyant style for a gritty, unbeaten 84 off 48 balls. He anchored partnerships with the lower order, slowly shifting the momentum back to the hosts before exploding in the final overs to secure victory by 7 wickets.\n\nTOP PERFORMERS: Suryakumar Yadav (IND) 84* (48). Arshdeep Singh (IND) 4/18.",
-        "game_data": { "home": "India", "home_score": "161/3", "home_logo": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg", "away": "USA", "away_score": "132/8", "away_logo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg", "status": "FINAL" },
-        "box_score": None
     }
 ]
 
 def generate_narrative(g):
-    # 1. Context (Clash of Titans / David vs Goliath)
     context = ""
     if g['home_rank'] != 99 and g['away_rank'] != 99:
         context = f"A heavyweight clash features No. {g['away_rank']} {g['away']} visiting No. {g['home_rank']} {g['home']}."
     else:
         context = f"The {g['home']} look to defend their turf against the visiting {g['away']}."
 
-    # 2. Bottom Line (The Hook)
     bottom_line = ""
     if g['state'] == 'pre':
         bottom_line = f"BOTTOM LINE: The {g['home']} ({g['home_rec']}) host the {g['away']} ({g['away_rec']}) in a pivotal matchup."
@@ -199,7 +197,6 @@ def generate_narrative(g):
         except:
              bottom_line = f"BOTTOM LINE: {g['home']} vs {g['away']} - Final."
 
-    # 3. Performers
     stats = " ".join(g['leaders'][:2]) if g['leaders'] else "Stats to follow."
     
     return f"{g['location'].upper()} — {g['away']} vs. {g['home']}\n{g['venue']}; {g['status']}\n\n{bottom_line}\n\n{context}\n\nTOP PERFORMERS: {stats}"
@@ -210,7 +207,6 @@ def step_3_publish(games):
     
     for g in games:
         if g['home'] == "Seahawks": continue 
-        if g['home'] == "India" and g['away'] == "USA": continue
         
         story = {
             "id": f"game-{g['game_id']}",
@@ -225,7 +221,6 @@ def step_3_publish(games):
         }
         stories.append(story)
 
-    # Merge
     final_output = {
         "meta": {
             "weather": {"temp": "72°F", "desc": "Sunny"},
@@ -249,7 +244,6 @@ def step_3_publish(games):
 def main():
     print(f"TEMPE TORCH NEWSROOM IS LIVE")
     
-    # Check Environment
     is_github_action = os.environ.get('CI') == 'true'
 
     if is_github_action:
