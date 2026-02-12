@@ -1,1386 +1,265 @@
 
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>The Tempe Torch</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="refresh" content="300">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap');
-            
             :root {
-                --primary: #1a1a1a;
-                --accent: #b71c1c;
-                --bg: #f4f1ea;
-                --card-bg: #ffffff;
-                --text: #2c2c2c;
+                --bg: #eef2f5; --card: #ffffff; --text: #111; 
+                --gray: #666; --border: #e0e0e0;
+                --az-red: #B1063A; --accent: #2c3e50;
             }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+            
+            h1 { text-align: center; font-family: 'Georgia', serif; color: var(--accent); margin-bottom: 5px; }
+            .header-info { text-align: center; color: var(--gray); font-size: 0.9rem; margin-bottom: 30px; font-style: italic; }
 
-            body { background: var(--bg); color: var(--text); font-family: 'Lora', serif; margin: 0; padding: 20px; line-height: 1.6; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
             
-            header { text-align: center; border-bottom: 4px double var(--primary); margin-bottom: 40px; padding-bottom: 20px; }
-            h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0; color: var(--primary); letter-spacing: -1px; }
-            .subhead { font-style: italic; color: #555; font-size: 1.1rem; margin-top: 5px; }
+            .game-card { background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }
             
-            .section-title { 
-                font-family: 'Roboto Condensed', sans-serif; 
-                font-size: 1.5rem; 
-                text-transform: uppercase; 
-                border-bottom: 2px solid var(--accent); 
-                color: var(--accent);
-                margin: 40px 0 20px 0; 
+            /* Status Colors */
+            .game-card.in { border-left: 5px solid #d32f2f; } /* Live */
+            .game-card.post { border-left: 5px solid #333; } /* Final */
+            .game-card.pre { border-left: 5px solid #1976d2; } /* Future */
+
+            .card-top { background: #f8f9fa; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+            .league-tag { font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; color: var(--gray); text-transform: uppercase; }
+            .game-time { font-weight: 600; font-size: 0.85rem; color: var(--accent); }
+
+            .matchup { padding: 20px; display: flex; align-items: center; justify-content: space-between; }
+            
+            .team { display: flex; align-items: center; gap: 15px; flex: 1; }
+            .team.away { justify-content: flex-start; }
+            .team.home { justify-content: flex-end; text-align: right; }
+            .team img { height: 40px; width: 40px; object-fit: contain; }
+            
+            .tm-info { display: flex; flex-direction: column; }
+            .tm-name { font-weight: 700; font-size: 1.1rem; line-height: 1.1; }
+            .tm-record { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
+            .tm-score { font-size: 2rem; font-weight: 800; color: #000; font-variant-numeric: tabular-nums; }
+
+            .team.away .tm-score { margin-left: auto; padding-right: 15px; }
+            .team.home .tm-score { margin-right: auto; padding-left: 15px; }
+
+            .game-meta { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+            .status { font-size: 0.8rem; font-weight: bold; color: var(--az-red); margin-bottom: 5px; text-transform: uppercase; }
+            
+            /* Box Score Mini Table */
+            .linescore { border-collapse: collapse; font-size: 0.7rem; color: var(--gray); }
+            .linescore td, .linescore th { padding: 2px 5px; text-align: center; border: 1px solid #eee; }
+            .tm-code { font-weight: bold; color: #000; }
+
+            .card-footer { padding: 10px 20px; background: #fff; border-top: 1px solid #f0f0f0; }
+            .game-note { font-size: 0.85rem; color: #555; margin-bottom: 10px; font-style: italic; min-height: 1.2em; }
+            
+            details summary { list-style: none; outline: none; }
+            details summary::-webkit-details-marker { display: none; }
+            
+            .story-btn { 
+                display: block; width: 100%; text-align: center; 
+                background: #f1f3f4; padding: 8px 0; border-radius: 6px; 
+                font-weight: 600; font-size: 0.9rem; color: #333; cursor: pointer; transition: 0.2s; 
             }
-            
-            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-            
-            .story-card { 
-                background: var(--card-bg); 
-                padding: 25px; 
-                border: 1px solid #ddd; 
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-                transition: transform 0.2s;
-            }
-            .story-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-            
-            .story-card h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 10px 0 15px 0; line-height: 1.2; }
-            .meta { font-family: 'Roboto Condensed', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: #888; letter-spacing: 1px; }
-            
-            .lede-text { font-size: 1.05rem; color: #333; }
-            .dateline { font-weight: bold; font-family: sans-serif; font-size: 0.8rem; color: #666; text-transform: uppercase; }
-            
-            /* READ MORE TOGGLE */
-            details { margin-top: 15px; border-top: 1px solid #eee; }
-            summary { 
-                cursor: pointer; 
-                font-family: 'Roboto Condensed', sans-serif; 
-                font-weight: bold; 
-                color: var(--accent); 
-                padding: 15px 0; 
-                list-style: none; 
-                outline: none;
-            }
-            summary::-webkit-details-marker { display: none; }
-            summary::after { content: " +"; }
-            details[open] summary::after { content: " -"; }
-            
-            .full-story { animation: fadein 0.3s; font-size: 0.95rem; }
-            
-            /* BOX SCORE & STATS */
-            .box-score { width: 100%; border-collapse: collapse; margin: 15px 0; font-family: sans-serif; font-size: 0.85rem; }
-            .box-score th { border-bottom: 2px solid #333; padding: 5px; background: #f9f9f9; }
-            .box-score td { border-bottom: 1px solid #eee; padding: 5px; text-align: center; }
-            .box-score td:first-child { text-align: left; font-weight: bold; }
-            
-            .stat-box { background: #f9f9f9; padding: 15px; border-left: 3px solid #ccc; margin: 15px 0; }
-            .stat-box h4, .notebook h4 { margin: 0 0 10px 0; font-family: 'Roboto Condensed'; text-transform: uppercase; font-size: 0.9rem; }
-            .leader-list { padding-left: 20px; margin: 0; }
-            
-            @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+            .story-btn:hover { background: #e0e0e0; }
+            .story-btn.live-pulse { background: #ffebee; color: #c62828; animation: pulse 2s infinite; }
+
+            .full-story { padding: 15px; background: #fafafa; margin-top: 10px; border-radius: 8px; font-size: 0.9rem; color: #444; }
+
+            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
             
             @media (max-width: 600px) {
-                h1 { font-size: 2.5rem; }
-                body { padding: 15px; }
+                .matchup { flex-direction: column; gap: 15px; }
+                .team { width: 100%; justify-content: space-between !important; }
+                .team.home { flex-direction: row-reverse; }
+                .team.away .tm-score { margin: 0; }
+                .team.home .tm-score { margin: 0; }
             }
         </style>
     </head>
     <body>
-        <header>
-            <h1>The Tempe Torch</h1>
-            <div class="subhead">Geofenced Sports Wire • February 12, 2026</div>
-        </header>
-        <h2 class='section-title'>ENG.2</h2><div class='grid'>
-            <article class="story-card">
-                <div class="meta">ENG.2 • Sat, Feb 14</div>
-                <h3>Sheffield United vs. Portsmouth</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">PORTSMOUTH —</span> 
-        The <strong>Portsmouth</strong> (7-9-11) prepare to defend their home turf against the 
-        incoming <strong>Sheffield United</strong> (11-2-15). Tip-off/Kickoff is set for 03:00 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Fratton Park</li>
-                <li><strong>Odds:</strong> SHU +130</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
+        <h1>The Tempe Torch</h1>
+        <div class="header-info">
+            Strict Geofence Active • All Times Arizona (MST) • Updated 08:44 PM
         </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Portsmouth looking to establish dominance at Fratton Park, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
+        <div class="grid">
             
-            <article class="story-card">
-                <div class="meta">ENG.2 • Sat, Feb 14</div>
-                <h3>Blackburn Rovers vs. Queens Park Rangers</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">LONDON —</span> 
-        The <strong>Queens Park Rangers</strong> (11-7-11) prepare to defend their home turf against the 
-        incoming <strong>Blackburn Rovers</strong> (7-8-13). Tip-off/Kickoff is set for 03:00 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> MATRADE Loftus Road</li>
-                <li><strong>Odds:</strong> QPR +115</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Queens Park Rangers looking to establish dominance at MATRADE Loftus Road, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            </div><h2 class='section-title'>NBA</h2><div class='grid'>
-            <article class="story-card">
-                <div class="meta">NBA • Fri, Feb 13</div>
-                <h3>Dallas Mavericks vs. Los Angeles Lakers</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">LOS ANGELES —</span> 
-        The <strong>Los Angeles Lakers</strong> (32-21) prepare to defend their home turf against the 
-        incoming <strong>Dallas Mavericks</strong> (19-34). Tip-off/Kickoff is set for 03:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> crypto.com Arena</li>
-                <li><strong>Odds:</strong> LAL -6.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Los Angeles Lakers looking to establish dominance at crypto.com Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            </div><h2 class='section-title'>NCAA</h2><div class='grid'>
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Valparaiso Beacons vs. Illinois State Redbirds</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">NORMAL —</span> 
-        The <strong>Illinois State Redbirds</strong> (16-9) prepare to defend their home turf against the 
-        incoming <strong>Valparaiso Beacons</strong> (13-12). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> CEFCU Arena</li>
-                <li><strong>Odds:</strong> ILST -8.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Illinois State Redbirds looking to establish dominance at CEFCU Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Murray State Racers vs. Indiana State Sycamores</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">TERRE HAUTE —</span> 
-        The <strong>Indiana State Sycamores</strong> (10-15) prepare to defend their home turf against the 
-        incoming <strong>Murray State Racers</strong> (18-8). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Hulman Center</li>
-                <li><strong>Odds:</strong> MUR -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Indiana State Sycamores looking to establish dominance at Hulman Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Marist Red Foxes vs. Merrimack Warriors</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">NORTH ANDOVER —</span> 
-        The <strong>Merrimack Warriors</strong> (16-9) prepare to defend their home turf against the 
-        incoming <strong>Marist Red Foxes</strong> (16-8). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Lawler Arena</li>
-                <li><strong>Odds:</strong> MRMK -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Merrimack Warriors looking to establish dominance at Lawler Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Winthrop Eagles vs. Gardner-Webb Runnin' Bulldogs</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">BOILING SPRINGS —</span> 
-        The <strong>Gardner-Webb Runnin' Bulldogs</strong> (3-22) prepare to defend their home turf against the 
-        incoming <strong>Winthrop Eagles</strong> (18-8). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Paul Porter Arena</li>
-                <li><strong>Odds:</strong> WIN -20.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Gardner-Webb Runnin' Bulldogs looking to establish dominance at Paul Porter Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UNC Asheville Bulldogs vs. Longwood Lancers</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">FARMVILLE —</span> 
-        The <strong>Longwood Lancers</strong> (13-13) prepare to defend their home turf against the 
-        incoming <strong>UNC Asheville Bulldogs</strong> (11-13). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Joan Perry Brock Center</li>
-                <li><strong>Odds:</strong> LONG -2.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Longwood Lancers looking to establish dominance at Joan Perry Brock Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Robert Morris Colonials vs. Cleveland State Vikings</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">CLEVELAND —</span> 
-        The <strong>Cleveland State Vikings</strong> (10-15) prepare to defend their home turf against the 
-        incoming <strong>Robert Morris Colonials</strong> (16-10). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Wolstein Center</li>
-                <li><strong>Odds:</strong> RMU -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Cleveland State Vikings looking to establish dominance at Wolstein Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Central Connecticut Blue Devils vs. New Haven Chargers</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">WEST HAVEN —</span> 
-        The <strong>New Haven Chargers</strong> (10-14) prepare to defend their home turf against the 
-        incoming <strong>Central Connecticut Blue Devils</strong> (13-10). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Jeffery P. Hazell Athletics Center</li>
-                <li><strong>Odds:</strong> CCSU -2.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the New Haven Chargers looking to establish dominance at Jeffery P. Hazell Athletics Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Stonehill Skyhawks vs. Chicago State Cougars</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">CHICAGO —</span> 
-        The <strong>Chicago State Cougars</strong> (5-20) prepare to defend their home turf against the 
-        incoming <strong>Stonehill Skyhawks</strong> (9-16). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Jones Convocation Center</li>
-                <li><strong>Odds:</strong> STO -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Chicago State Cougars looking to establish dominance at Jones Convocation Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Long Island University Sharks vs. Wagner Seahawks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">STATEN ISLAND —</span> 
-        The <strong>Wagner Seahawks</strong> (8-14) prepare to defend their home turf against the 
-        incoming <strong>Long Island University Sharks</strong> (16-8). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Spiro Sports Center</li>
-                <li><strong>Odds:</strong> LIU -6.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Wagner Seahawks looking to establish dominance at Spiro Sports Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Mercyhurst Lakers vs. Le Moyne Dolphins</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SYRACUSE —</span> 
-        The <strong>Le Moyne Dolphins</strong> (12-13) prepare to defend their home turf against the 
-        incoming <strong>Mercyhurst Lakers</strong> (12-13). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Ted Grant Court</li>
-                <li><strong>Odds:</strong> LEM -2.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Le Moyne Dolphins looking to establish dominance at Ted Grant Court, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Monmouth Hawks vs. Drexel Dragons</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">PHILADELPHIA —</span> 
-        The <strong>Drexel Dragons</strong> (13-12) prepare to defend their home turf against the 
-        incoming <strong>Monmouth Hawks</strong> (12-12). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Daskalakis Athletic Center</li>
-                <li><strong>Odds:</strong> DREX -2.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Drexel Dragons looking to establish dominance at Daskalakis Athletic Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Elon Phoenix vs. UNC Wilmington Seahawks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">WILMINGTON —</span> 
-        The <strong>UNC Wilmington Seahawks</strong> (20-4) prepare to defend their home turf against the 
-        incoming <strong>Elon Phoenix</strong> (13-12). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Trask Coliseum</li>
-                <li><strong>Odds:</strong> UNCW -8.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the UNC Wilmington Seahawks looking to establish dominance at Trask Coliseum, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Georgia State Panthers vs. James Madison Dukes</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">HARRISONBURG —</span> 
-        The <strong>James Madison Dukes</strong> (12-13) prepare to defend their home turf against the 
-        incoming <strong>Georgia State Panthers</strong> (9-16). Tip-off/Kickoff is set for 12:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Atlantic Union Bank Center</li>
-                <li><strong>Odds:</strong> JMU -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the James Madison Dukes looking to establish dominance at Atlantic Union Bank Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UIC Flames vs. Drake Bulldogs</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">DES MOINES —</span> 
-        The <strong>Drake Bulldogs</strong> (12-14) prepare to defend their home turf against the 
-        incoming <strong>UIC Flames</strong> (13-12). Tip-off/Kickoff is set for 12:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Knapp Center</li>
-                <li><strong>Odds:</strong> DRKE -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Drake Bulldogs looking to establish dominance at Knapp Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Tennessee Tech Golden Eagles vs. Morehead State Eagles</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">MOREHEAD —</span> 
-        The <strong>Morehead State Eagles</strong> (13-12) prepare to defend their home turf against the 
-        incoming <strong>Tennessee Tech Golden Eagles</strong> (10-15). Tip-off/Kickoff is set for 12:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Ellis T. Johnson Arena</li>
-                <li><strong>Odds:</strong> MORE -4.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Morehead State Eagles looking to establish dominance at Ellis T. Johnson Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Evansville Purple Aces vs. Southern Illinois Salukis</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">CARBONDALE —</span> 
-        The <strong>Southern Illinois Salukis</strong> (11-14) prepare to defend their home turf against the 
-        incoming <strong>Evansville Purple Aces</strong> (6-19). Tip-off/Kickoff is set for 01:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Banterra Center</li>
-                <li><strong>Odds:</strong> SIU -11.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Southern Illinois Salukis looking to establish dominance at Banterra Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>St. Thomas-Minnesota Tommies vs. Omaha Mavericks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">OMAHA —</span> 
-        The <strong>Omaha Mavericks</strong> (12-14) prepare to defend their home turf against the 
-        incoming <strong>St. Thomas-Minnesota Tommies</strong> (20-6). Tip-off/Kickoff is set for 01:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Baxter Arena</li>
-                <li><strong>Odds:</strong> STMN -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Omaha Mavericks looking to establish dominance at Baxter Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Sacramento State Hornets vs. Northern Colorado Bears</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">GREELEY —</span> 
-        The <strong>Northern Colorado Bears</strong> (15-10) prepare to defend their home turf against the 
-        incoming <strong>Sacramento State Hornets</strong> (9-14). Tip-off/Kickoff is set for 01:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Bank of Colorado Arena</li>
-                <li><strong>Odds:</strong> UNCO -9.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Northern Colorado Bears looking to establish dominance at Bank of Colorado Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Portland State Vikings vs. Northern Arizona Lumberjacks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">FLAGSTAFF —</span> 
-        The <strong>Northern Arizona Lumberjacks</strong> (9-16) prepare to defend their home turf against the 
-        incoming <strong>Portland State Vikings</strong> (16-6). Tip-off/Kickoff is set for 01:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> J. Lawrence Walkup Skydome</li>
-                <li><strong>Odds:</strong> PRST -6.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Northern Arizona Lumberjacks looking to establish dominance at J. Lawrence Walkup Skydome, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Tennessee State Tigers vs. Southern Indiana Screaming Eagles</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">EVANSVILLE —</span> 
-        The <strong>Southern Indiana Screaming Eagles</strong> (5-19) prepare to defend their home turf against the 
-        incoming <strong>Tennessee State Tigers</strong> (16-8). Tip-off/Kickoff is set for 01:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Liberty Arena (IN)</li>
-                <li><strong>Odds:</strong> TNST -6.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Southern Indiana Screaming Eagles looking to establish dominance at Liberty Arena (IN), the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Southeast Missouri State Redhawks vs. SIU Edwardsville Cougars</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">EDWARDSVILLE —</span> 
-        The <strong>SIU Edwardsville Cougars</strong> (16-9) prepare to defend their home turf against the 
-        incoming <strong>Southeast Missouri State Redhawks</strong> (15-10). Tip-off/Kickoff is set for 01:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> First Community Arena</li>
-                <li><strong>Odds:</strong> SEMO -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the SIU Edwardsville Cougars looking to establish dominance at First Community Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Little Rock Trojans vs. Western Illinois Leathernecks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">MACOMB —</span> 
-        The <strong>Western Illinois Leathernecks</strong> (5-21) prepare to defend their home turf against the 
-        incoming <strong>Little Rock Trojans</strong> (9-16). Tip-off/Kickoff is set for 01:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Western Hall</li>
-                <li><strong>Odds:</strong> LR -6.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Western Illinois Leathernecks looking to establish dominance at Western Hall, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UT Martin Skyhawks vs. Lindenwood Lions</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SAINT CHARLES —</span> 
-        The <strong>Lindenwood Lions</strong> (15-10) prepare to defend their home turf against the 
-        incoming <strong>UT Martin Skyhawks</strong> (19-6). Tip-off/Kickoff is set for 01:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Hyland Arena</li>
-                <li><strong>Odds:</strong> UTM -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Lindenwood Lions looking to establish dominance at Hyland Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>California Baptist Lancers vs. Southern Utah Thunderbirds</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">CEDAR CITY —</span> 
-        The <strong>Southern Utah Thunderbirds</strong> (8-16) prepare to defend their home turf against the 
-        incoming <strong>California Baptist Lancers</strong> (18-6). Tip-off/Kickoff is set for 01:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> America First Events Center</li>
-                <li><strong>Odds:</strong> CBU -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Southern Utah Thunderbirds looking to establish dominance at America First Events Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Louisiana Tech Bulldogs vs. Missouri State Bears</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SPRINGFIELD —</span> 
-        The <strong>Missouri State Bears</strong> (13-10) prepare to defend their home turf against the 
-        incoming <strong>Louisiana Tech Bulldogs</strong> (13-10). Tip-off/Kickoff is set for 01:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Great Southern Bank Arena</li>
-                <li><strong>Odds:</strong> MOST -4.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Missouri State Bears looking to establish dominance at Great Southern Bank Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Oregon State Beavers vs. San Francisco Dons</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SAN FRANCISCO —</span> 
-        The <strong>San Francisco Dons</strong> (14-12) prepare to defend their home turf against the 
-        incoming <strong>Oregon State Beavers</strong> (13-13). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> The Sobrato Center</li>
-                <li><strong>Odds:</strong> SF -9.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the San Francisco Dons looking to establish dominance at The Sobrato Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Memphis Tigers vs. North Texas Mean Green</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">DENTON —</span> 
-        The <strong>North Texas Mean Green</strong> (13-11) prepare to defend their home turf against the 
-        incoming <strong>Memphis Tigers</strong> (12-11). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> The Super Pit</li>
-                <li><strong>Odds:</strong> MEM -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the North Texas Mean Green looking to establish dominance at The Super Pit, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Weber State Wildcats vs. Idaho Vandals</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">MOSCOW —</span> 
-        The <strong>Idaho Vandals</strong> (13-11) prepare to defend their home turf against the 
-        incoming <strong>Weber State Wildcats</strong> (12-13). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> ICCU Arena</li>
-                <li><strong>Odds:</strong> IDHO -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Idaho Vandals looking to establish dominance at ICCU Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Idaho State Bengals vs. Eastern Washington Eagles</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">CHENEY —</span> 
-        The <strong>Eastern Washington Eagles</strong> (7-17) prepare to defend their home turf against the 
-        incoming <strong>Idaho State Bengals</strong> (10-15). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Reese Court</li>
-                <li><strong>Odds:</strong> EWU -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Eastern Washington Eagles looking to establish dominance at Reese Court, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Utah Valley Wolverines vs. Utah Tech Trailblazers</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">ST. GEORGE —</span> 
-        The <strong>Utah Tech Trailblazers</strong> (14-11) prepare to defend their home turf against the 
-        incoming <strong>Utah Valley Wolverines</strong> (18-6). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Burns Arena</li>
-                <li><strong>Odds:</strong> UVU -8.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Utah Tech Trailblazers looking to establish dominance at Burns Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UT Arlington Mavericks vs. Abilene Christian Wildcats</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">ABILENE —</span> 
-        The <strong>Abilene Christian Wildcats</strong> (10-13) prepare to defend their home turf against the 
-        incoming <strong>UT Arlington Mavericks</strong> (14-9). Tip-off/Kickoff is set for 02:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Moody Coliseum (Abilene)</li>
-                <li><strong>Odds:</strong> UTA -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Abilene Christian Wildcats looking to establish dominance at Moody Coliseum (Abilene), the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Hawai'i Rainbow Warriors vs. Cal State Bakersfield Roadrunners</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">BAKERSFIELD —</span> 
-        The <strong>Cal State Bakersfield Roadrunners</strong> (8-17) prepare to defend their home turf against the 
-        incoming <strong>Hawai'i Rainbow Warriors</strong> (17-5). Tip-off/Kickoff is set for 02:30 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Icardo Center</li>
-                <li><strong>Odds:</strong> HAW -12.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Cal State Bakersfield Roadrunners looking to establish dominance at Icardo Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>Cal State Fullerton Titans vs. Long Beach State Beach</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">LONG BEACH —</span> 
-        The <strong>Long Beach State Beach</strong> (8-16) prepare to defend their home turf against the 
-        incoming <strong>Cal State Fullerton Titans</strong> (12-13). Tip-off/Kickoff is set for 03:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Walter Pyramid</li>
-                <li><strong>Odds:</strong> LBSU -1.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Long Beach State Beach looking to establish dominance at Walter Pyramid, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UC Irvine Anteaters vs. Cal Poly Mustangs</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SAN LUIS OBISPO —</span> 
-        The <strong>Cal Poly Mustangs</strong> (9-16) prepare to defend their home turf against the 
-        incoming <strong>UC Irvine Anteaters</strong> (16-8). Tip-off/Kickoff is set for 03:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Mott Athletics Center</li>
-                <li><strong>Odds:</strong> UCI -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Cal Poly Mustangs looking to establish dominance at Mott Athletics Center, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Fri, Feb 13</div>
-                <h3>UC Davis Aggies vs. UC San Diego Tritons</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SAN DIEGO —</span> 
-        The <strong>UC San Diego Tritons</strong> (16-9) prepare to defend their home turf against the 
-        incoming <strong>UC Davis Aggies</strong> (15-9). Tip-off/Kickoff is set for 03:00 AM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> LionTree Arena</li>
-                <li><strong>Odds:</strong> UCSD -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the UC San Diego Tritons looking to establish dominance at LionTree Arena, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Thu, Feb 12</div>
-                <h3>NJIT Highlanders vs. New Hampshire Wildcats</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">DURHAM —</span> 
-        The <strong>New Hampshire Wildcats</strong> (8-14) prepare to defend their home turf against the 
-        incoming <strong>NJIT Highlanders</strong> (13-12). Tip-off/Kickoff is set for 11:00 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Lundholm Gymnasium</li>
-                <li><strong>Odds:</strong> UNH -2.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the New Hampshire Wildcats looking to establish dominance at Lundholm Gymnasium, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Thu, Feb 12</div>
-                <h3>UMBC Retrievers vs. Maine Black Bears</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">ORONO —</span> 
-        The <strong>Maine Black Bears</strong> (6-19) prepare to defend their home turf against the 
-        incoming <strong>UMBC Retrievers</strong> (14-8). Tip-off/Kickoff is set for 11:00 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Skip Chappelle Court in Memorial Gymnasium</li>
-                <li><strong>Odds:</strong> UMBC -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the Maine Black Bears looking to establish dominance at Skip Chappelle Court in Memorial Gymnasium, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Thu, Feb 12</div>
-                <h3>Bryant Bulldogs vs. UMass Lowell River Hawks</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">LOWELL —</span> 
-        The <strong>UMass Lowell River Hawks</strong> (10-15) prepare to defend their home turf against the 
-        incoming <strong>Bryant Bulldogs</strong> (8-16). Tip-off/Kickoff is set for 11:00 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> Kennedy Family Athletic Complex</li>
-                <li><strong>Odds:</strong> UML -3.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the UMass Lowell River Hawks looking to establish dominance at Kennedy Family Athletic Complex, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            
-            <article class="story-card">
-                <div class="meta">NCAA • Thu, Feb 12</div>
-                <h3>Northern Kentucky Norse vs. IU Indianapolis Jaguars</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">INDIANAPOLIS —</span> 
-        The <strong>IU Indianapolis Jaguars</strong> (7-19) prepare to defend their home turf against the 
-        incoming <strong>Northern Kentucky Norse</strong> (15-11). Tip-off/Kickoff is set for 11:30 PM.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        <div class="stat-box">
-            <h4>Tale of the Tape</h4>
-            <ul>
-                <li><strong>Venue:</strong> The Jungle</li>
-                <li><strong>Odds:</strong> NKU -5.5</li>
-                <li><strong>Broadcast:</strong> Check local listings</li>
-            </ul>
-        </div>
-        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
-        With the IU Indianapolis Jaguars looking to establish dominance at The Jungle, the pressure is on the visitors 
-        to disrupt the rhythm early.</p>
-        
-                    </div>
-                </details>
-            </article>
-            </div><h2 class='section-title'>NFL</h2><div class='grid'>
-            <article class="story-card">
-                <div class="meta">NFL • Sun, Feb 08</div>
-                <h3>Seattle Seahawks vs. New England Patriots</h3>
-                <div class="summary">
-                    
-        <p class="lede-text"><span class="dateline">SANTA CLARA —</span> 
-        The <strong>Seattle Seahawks</strong> dominated the <strong>New England Patriots</strong> with a final score of 
-        <strong>29-13</strong>, moving to 14-3 on the season.</p>
-        
-                </div>
-                <details>
-                    <summary>Read Full Dispatch</summary>
-                    <div class="full-story">
-                        
-        
-            <table class="box-score">
-                <thead><tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>4</th><th>T</th></tr></thead>
-                <tbody>
-                    <tr><td>SEA</td><td>3.0</td><td>6.0</td><td>3.0</td><td>17.0</td><td><strong>29</strong></td></tr>
-                    <tr><td>NE</td><td>0.0</td><td>0.0</td><td>0.0</td><td>13.0</td><td><strong>13</strong></td></tr>
-                </tbody>
-            </table>
-            
-        <h4>Key Performers</h4><ul class='leader-list'><li>Drake Maye: 27/43, 295 YDS, 2 TD, 2 INT</li><li>Kenneth Walker III: 27 CAR, 135 YDS</li><li>Mack Hollins: 4 REC, 78 YDS, 1 TD</li></ul>
-        <div class="notebook">
-            <h4>Reporter's Notebook</h4>
-            <p>Both teams battled hard, but execution in the final minutes proved to be the difference maker.</p>
-        </div>
-        
-                    </div>
-                </details>
-            </article>
+        <article class="game-card pre">
+            <div class="card-top">
+                <span class="league-tag">NCAA BASKETBALL</span>
+                <span class="game-time">Thu, Feb 12 @ 04:30 PM AZT</span>
             </div>
+            
+            <div class="matchup">
+                <div class="team away">
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/94.png" onerror="this.style.display='none'">
+                    <div class="tm-info">
+                        <div class="tm-name">Northern Kentucky Norse</div>
+                        <div class="tm-record">15-11</div>
+                    </div>
+                    <div class="tm-score">0</div>
+                </div>
+                
+                <div class="game-meta">
+                    <div class="status">Thu, February 12th at 6:30 PM EST</div>
+                    
+                </div>
+
+                <div class="team home">
+                    <div class="tm-score">0</div>
+                    <div class="tm-info">
+                        <div class="tm-name">IU Indianapolis Jaguars</div>
+                        <div class="tm-record">7-19</div>
+                    </div>
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/85.png" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="game-note">Regional Coverage</div>
+                <details>
+                    <summary><div class='story-btn'>Preview</div></summary>
+                    <div class="full-story">
+                        <p><strong>Northern Kentucky Norse vs IU Indianapolis Jaguars</strong></p>
+                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
+                    </div>
+                </details>
+            </div>
+        </article>
+        
+        <article class="game-card pre">
+            <div class="card-top">
+                <span class="league-tag">NCAA BASKETBALL</span>
+                <span class="game-time">Thu, Feb 12 @ 05:00 PM AZT</span>
+            </div>
+            
+            <div class="matchup">
+                <div class="team away">
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/93.png" onerror="this.style.display='none'">
+                    <div class="tm-info">
+                        <div class="tm-name">Murray State Racers</div>
+                        <div class="tm-record">18-8</div>
+                    </div>
+                    <div class="tm-score">0</div>
+                </div>
+                
+                <div class="game-meta">
+                    <div class="status">Thu, February 12th at 7:00 PM EST</div>
+                    
+                </div>
+
+                <div class="team home">
+                    <div class="tm-score">0</div>
+                    <div class="tm-info">
+                        <div class="tm-name">Indiana State Sycamores</div>
+                        <div class="tm-record">10-15</div>
+                    </div>
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/282.png" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="game-note">Regional Coverage</div>
+                <details>
+                    <summary><div class='story-btn'>Preview</div></summary>
+                    <div class="full-story">
+                        <p><strong>Murray State Racers vs Indiana State Sycamores</strong></p>
+                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
+                    </div>
+                </details>
+            </div>
+        </article>
+        
+        <article class="game-card pre">
+            <div class="card-top">
+                <span class="league-tag">NCAA BASKETBALL</span>
+                <span class="game-time">Thu, Feb 12 @ 06:00 PM AZT</span>
+            </div>
+            
+            <div class="matchup">
+                <div class="team away">
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2634.png" onerror="this.style.display='none'">
+                    <div class="tm-info">
+                        <div class="tm-name">Tennessee State Tigers</div>
+                        <div class="tm-record">16-8</div>
+                    </div>
+                    <div class="tm-score">0</div>
+                </div>
+                
+                <div class="game-meta">
+                    <div class="status">Thu, February 12th at 8:00 PM EST</div>
+                    
+                </div>
+
+                <div class="team home">
+                    <div class="tm-score">0</div>
+                    <div class="tm-info">
+                        <div class="tm-name">Southern Indiana Screaming Eagles</div>
+                        <div class="tm-record">5-19</div>
+                    </div>
+                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/88.png" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="game-note">Regional Coverage</div>
+                <details>
+                    <summary><div class='story-btn'>Preview</div></summary>
+                    <div class="full-story">
+                        <p><strong>Tennessee State Tigers vs Southern Indiana Screaming Eagles</strong></p>
+                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
+                    </div>
+                </details>
+            </div>
+        </article>
+        
+        <article class="game-card pre">
+            <div class="card-top">
+                <span class="league-tag">NBA</span>
+                <span class="game-time">Thu, Feb 12 @ 08:00 PM AZT</span>
+            </div>
+            
+            <div class="matchup">
+                <div class="team away">
+                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" onerror="this.style.display='none'">
+                    <div class="tm-info">
+                        <div class="tm-name">Dallas Mavericks</div>
+                        <div class="tm-record">19-34</div>
+                    </div>
+                    <div class="tm-score">0</div>
+                </div>
+                
+                <div class="game-meta">
+                    <div class="status">Thu, February 12th at 10:00 PM EST</div>
+                    
+                </div>
+
+                <div class="team home">
+                    <div class="tm-score">0</div>
+                    <div class="tm-info">
+                        <div class="tm-name">Los Angeles Lakers</div>
+                        <div class="tm-record">32-21</div>
+                    </div>
+                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="game-note">Regional Coverage</div>
+                <details>
+                    <summary><div class='story-btn'>Preview</div></summary>
+                    <div class="full-story">
+                        <p><strong>Dallas Mavericks vs Los Angeles Lakers</strong></p>
+                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
+                    </div>
+                </details>
+            </div>
+        </article>
+        
+        </div>
     </body>
     </html>
     
