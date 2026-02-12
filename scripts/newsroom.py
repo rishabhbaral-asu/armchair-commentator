@@ -1,9 +1,9 @@
 """
-THE TEMPE TORCH — GLOBAL DESK EDITION
--------------------------------------
-1. SCOPE: Games +/- 7 Days.
-2. LOGIC: Home/Away/Venue checks for AZ, CA, TX, IL, GA, MD, VA, DC teams.
-3. PLUS: International coverage for Prem, La Liga, and World Cricket.
+THE TEMPE TORCH — PROFESSIONAL EDITION
+--------------------------------------
+1. STRICT FILTERING: Only shows games involving teams from the target list (Home or Away).
+2. LAYOUT: "Lede" paragraph + Clickable "Read Full Dispatch" for deep dives.
+3. CONTENT: Expanded storytelling with stats, quarters, and analysis.
 """
 
 import json
@@ -18,44 +18,45 @@ OUTPUT_HTML_PATH = Path("index.html")
 REFRESH_RATE_MINUTES = 30
 WINDOW_DAYS = 7 
 
-# --- THE WATCH LIST ---
-# If a team name contains ANY of these strings, we track them.
+# --- THE STUBBORN EDITOR (Strict Watch List) ---
+# We map keywords to their "Home Desk" to ensure we only grab relevant teams.
 
-WATCH_LIST_KEYWORDS = {
-    # --- USA: SOUTHWEST & WEST ---
-    "Arizona", "Sun Devils", "Wildcats", "Cardinals", "Suns", "Diamondbacks", "D-backs", "Coyotes", "Mercury",
-    "California", "Cal", "Stanford", "UCLA", "USC", "Los Angeles", "Lakers", "Clippers", "Dodgers", "Angels", 
-    "Rams", "Chargers", "Kings", "Ducks", "San Francisco", "49ers", "Giants", "Warriors", "San Diego", "Padres", 
-    "Sacramento", "Sharks", "Earthquakes", "Galaxy", "LAFC",
+WATCH_LIST = {
+    # ARIZONA
+    "Arizona": "AZ", "Sun Devils": "AZ", "Wildcats": "AZ", "Cardinals": "AZ", 
+    "Suns": "AZ", "Diamondbacks": "AZ", "D-backs": "AZ", "Coyotes": "AZ", "Mercury": "AZ",
+    
+    # CALIFORNIA
+    "California": "CA", "Cal": "CA", "Stanford": "CA", "UCLA": "CA", "USC": "CA", 
+    "Los Angeles": "CA", "Lakers": "CA", "Clippers": "CA", "Dodgers": "CA", "Angels": "CA", 
+    "Rams": "CA", "Chargers": "CA", "Kings": "CA", "Ducks": "CA", "San Francisco": "CA", 
+    "49ers": "CA", "Giants": "CA", "Warriors": "CA", "San Diego": "CA", "Padres": "CA", 
+    "Sacramento": "CA", "Sharks": "CA", "Earthquakes": "CA", "Galaxy": "CA", "LAFC": "CA",
+    
+    # TEXAS
+    "Texas": "TX", "Longhorns": "TX", "Aggies": "TX", "Texas A&M": "TX", "Houston": "TX", 
+    "Rockets": "TX", "Texans": "TX", "Astros": "TX", "Dallas": "TX", "Cowboys": "TX", 
+    "Mavericks": "TX", "Stars": "TX", "San Antonio": "TX", "Spurs": "TX", "Rangers": "TX", 
+    "TCU": "TX", "Baylor": "TX", "Tech": "TX", "SMU": "TX",
+    
+    # ILLINOIS
+    "Illinois": "IL", "Chicago": "IL", "Bears": "IL", "Bulls": "IL", "Blackhawks": "IL", 
+    "Cubs": "IL", "White Sox": "IL", "Northwestern": "IL", "Fighting Illini": "IL",
+    
+    # GEORGIA
+    "Georgia": "GA", "Bulldogs": "GA", "Falcons": "GA", "Hawks": "GA", "Braves": "GA", 
+    "United": "GA", "Yellow Jackets": "GA",
+    
+    # DMV (DC/MD/VA)
+    "Maryland": "MD", "Terrapins": "MD", "Baltimore": "MD", "Ravens": "MD", "Orioles": "MD", 
+    "Washington": "DC", "Commanders": "DC", "Wizards": "DC", "Capitals": "DC", "Nationals": "DC", 
+    "Virginia": "VA", "Cavaliers": "VA", "Hokies": "VA", "Georgetown": "DC", "Hoyas": "DC",
 
-    # --- USA: TEXAS ---
-    "Texas", "Longhorns", "Aggies", "Texas A&M", "Houston", "Rockets", "Texans", "Astros", "Dallas", "Cowboys", 
-    "Mavericks", "Stars", "San Antonio", "Spurs", "Rangers", "TCU", "Baylor", "Tech", "SMU",
-
-    # --- USA: MIDWEST & EAST ---
-    "Illinois", "Chicago", "Bears", "Bulls", "Blackhawks", "Cubs", "White Sox", "Northwestern", "Fighting Illini",
-    "Georgia", "Bulldogs", "Falcons", "Hawks", "Braves", "United", "Tech", "Yellow Jackets",
-    "Maryland", "Terrapins", "Baltimore", "Ravens", "Orioles", "Washington", "Commanders", "Wizards", "Capitals", 
-    "Nationals", "Virginia", "Cavaliers", "Hokies", "Virginia Tech", "Georgetown", "Hoyas",
-
-    # --- EUROPEAN FOOTBALL ---
-    "Fulham", "Cottagers",       # Premier League
-    "Leeds", "Leeds United",     # Prem/Championship
-    "Barcelona", "Barca", "Blaugrana", # La Liga
-
-    # --- CRICKET: INDIA (National + IPL Affiliates) ---
-    "India", "Men in Blue", 
-    "Mumbai Indians", "Chennai Super Kings", "Royal Challengers", "Kolkata Knight Riders", 
-    "Delhi Capitals", "Punjab Kings", "Rajasthan Royals", "Sunrisers", "Lucknow Super Giants", "Gujarat Titans",
-
-    # --- CRICKET: USA (National + MLC Affiliates) ---
-    "United States", "USA Cricket", "Monank Patel",
-    "Texas Super Kings", "Los Angeles Knight Riders", "MI New York", 
-    "San Francisco Unicorns", "Seattle Orcas", "Washington Freedom"
+    # INTERNATIONAL / SPECIFIC CLUBS
+    "Fulham": "UK", "Leeds": "UK", "Barcelona": "ESP",
+    "India": "IND", "Mumbai Indians": "IND", "Chennai": "IND", "Royal Challengers": "IND",
+    "United States": "USA", "USA Cricket": "USA", "Super Kings": "USA", "MI New York": "USA"
 }
-
-# Strict Venue Safety Net (US Only)
-TARGET_STATES = {"AZ", "CA", "TX", "IL", "GA", "MD", "VA", "DC"}
 
 # --- FETCHING ---
 
@@ -68,90 +69,145 @@ def fetch_json(url):
 def is_in_window(date_str):
     if not date_str: return False
     try:
-        # Handle variations in ESPN date formats (sometimes ends in Z, sometimes not)
         clean_date = date_str.replace("Z", "+00:00")
         dt = datetime.fromisoformat(clean_date)
         if dt.tzinfo is None: dt = dt.replace(tzinfo=timezone.utc)
-        
         now = datetime.now(timezone.utc)
         return abs((dt - now).days) <= WINDOW_DAYS
     except: return False
 
+def get_team_identity(team_name):
+    """Returns the region code if the team is in our watchlist, else None."""
+    for key, region in WATCH_LIST.items():
+        if key.lower() in team_name.lower():
+            return region
+    return None
+
 def is_relevant_game(event):
     """
-    Decides if a game matters based on:
-    1. Venue (US States)
-    2. Identity (Watch List)
+    STRICT FILTER: Game is relevant ONLY if Home or Away team is in the watchlist.
+    Venue location is ignored to prevent random neutral site games.
     """
     c = event['competitions'][0]
-    
-    # 1. VENUE CHECK (US Only)
-    venue = c.get('venue', {}).get('address', {})
-    if venue.get('state') in TARGET_STATES:
-        return True
-        
-    # 2. TEAM IDENTITY CHECK (Global)
     h_name = c['competitors'][0]['team']['displayName']
     a_name = c['competitors'][1]['team']['displayName']
     
-    # Check strict keyword match
-    for key in WATCH_LIST_KEYWORDS:
-        if key.lower() in h_name.lower(): return True
-        if key.lower() in a_name.lower(): return True
-        
+    if get_team_identity(h_name) or get_team_identity(a_name):
+        return True
     return False
 
-# --- STORY ENGINE ---
+# --- PRO STORY ENGINE ---
 
 class StoryEngine:
     def __init__(self, game_data):
         self.g = game_data
         self.h = game_data['home']
         self.a = game_data['away']
+        self.region = get_team_identity(self.h['name']) or get_team_identity(self.a['name']) or "Global"
         
-    def generate(self):
-        if self.g['status_state'] == 'in': return self.write_live_blog()
-        elif self.g['status_state'] == 'post': return self.write_recap()
-        else: return self.write_preview()
+    def generate_html(self):
+        """Returns a tuple: (Lede HTML, Full Body HTML)"""
+        status = self.g['status_state']
+        
+        if status == 'in': 
+            lede = self.live_lede()
+            body = self.live_details()
+        elif status == 'post': 
+            lede = self.recap_lede()
+            body = self.recap_details()
+        else: 
+            lede = self.preview_lede()
+            body = self.preview_details()
+            
+        return lede, body
 
-    def write_preview(self):
+    # --- PREVIEWS ---
+    def preview_lede(self):
         return f"""
-        <p class="dateline">{self.g['city'].upper()} (Preview) —</p>
-        <p>The {self.h['name']} prepare to host the {self.a['name']} at {self.g['venue']}.</p>
-        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
-        Vegas has set the line at {self.g['odds']}, suggesting a tight battle.</p>
+        <p class="lede-text"><span class="dateline">{self.g['city'].upper()} —</span> 
+        The <strong>{self.h['name']}</strong> ({self.h['record']}) prepare to defend their home turf against the 
+        incoming <strong>{self.a['name']}</strong> ({self.a['record']}). Tip-off/Kickoff is set for {self.g['time_display']}.</p>
         """
 
-    def write_recap(self):
-        if self.g.get('headline_description'):
-            return f"""
-            <p class="dateline">{self.g['city'].upper()} (AP) —</p>
-            <p>{self.g['headline_description']}</p>
-            <hr>
-            <p style="font-size:0.9em"><em>{self.get_stat_block()}</em></p>
+    def preview_details(self):
+        return f"""
+        <div class="stat-box">
+            <h4>Tale of the Tape</h4>
+            <ul>
+                <li><strong>Venue:</strong> {self.g['venue']}</li>
+                <li><strong>Odds:</strong> {self.g['odds']}</li>
+                <li><strong>Broadcast:</strong> Check local listings</li>
+            </ul>
+        </div>
+        <p>Analysts are circling this matchup as a potential pivoting point for both squads. 
+        With the {self.h['name']} looking to establish dominance at {self.g['venue']}, the pressure is on the visitors 
+        to disrupt the rhythm early.</p>
+        """
+
+    # --- RECAPS ---
+    def recap_lede(self):
+        winner = self.h if float(self.h['score'] or 0) > float(self.a['score'] or 0) else self.a
+        loser = self.a if winner == self.h else self.h
+        margin = float(winner['score']) - float(loser['score'])
+        
+        verb = "edged out" if margin < 7 else "dominated"
+        if margin > 20: verb = "crushed"
+        
+        return f"""
+        <p class="lede-text"><span class="dateline">{self.g['city'].upper()} —</span> 
+        The <strong>{winner['name']}</strong> {verb} the <strong>{loser['name']}</strong> with a final score of 
+        <strong>{winner['score']}-{loser['score']}</strong>, moving to {winner['record']} on the season.</p>
+        """
+
+    def recap_details(self):
+        # Construct a box score table if linescores exist
+        box_html = ""
+        if self.g['h_linescores'] and self.g['a_linescores']:
+            headers = "".join([f"<th>{i+1}</th>" for i in range(len(self.g['h_linescores']))])
+            h_row = "".join([f"<td>{s}</td>" for s in self.g['h_linescores']])
+            a_row = "".join([f"<td>{s}</td>" for s in self.g['a_linescores']])
+            box_html = f"""
+            <table class="box-score">
+                <thead><tr><th>Team</th>{headers}<th>T</th></tr></thead>
+                <tbody>
+                    <tr><td>{self.a['abbrev']}</td>{a_row}<td><strong>{self.a['score']}</strong></td></tr>
+                    <tr><td>{self.h['abbrev']}</td>{h_row}<td><strong>{self.h['score']}</strong></td></tr>
+                </tbody>
+            </table>
             """
-        
-        # Generic Fallback
-        winner = self.h if int(self.h['score'] or 0) > int(self.a['score'] or 0) else self.a
+
+        leaders_html = ""
+        if self.g['leaders']:
+            leaders_html = "<h4>Key Performers</h4><ul class='leader-list'>" + \
+                           "".join([f"<li>{l}</li>" for l in self.g['leaders']]) + "</ul>"
+
         return f"""
-        <p class="dateline">{self.g['city'].upper()} —</p>
-        <p>The {winner['name']} secured a victory over the {self.a['name'] if winner==self.h else self.h['name']} 
-        with a final score of {self.h['score']}-{self.a['score']}.</p>
-        <p>{self.get_stat_block()}</p>
+        {box_html}
+        {leaders_html}
+        <div class="notebook">
+            <h4>Reporter's Notebook</h4>
+            <p>{self.g['headline_description'] or "Both teams battled hard, but execution in the final minutes proved to be the difference maker."}</p>
+        </div>
         """
 
-    def write_live_blog(self):
+    # --- LIVE ---
+    def live_lede(self):
         return f"""
-        <p class="dateline" style="color:#d32f2f">LIVE • {self.g['time_display']} —</p>
-        <p><strong>{self.a['name']} {self.a['score']}</strong> @ <strong>{self.h['name']} {self.h['score']}</strong></p>
-        <p>{self.g['status_detail']}</p>
+        <p class="lede-text" style="border-left: 4px solid #d32f2f; padding-left: 10px;">
+        <strong style="color:#d32f2f">LIVE ACTION:</strong> The {self.h['name']} are currently battling the {self.a['name']}.
+        <br><strong>Current Score:</strong> {self.a['name']} {self.a['score']} - {self.h['name']} {self.h['score']}</p>
         """
 
-    def get_stat_block(self):
-        if not self.g['leaders']: return "Check box score for details."
-        return "Key Performers: " + ", ".join(self.g['leaders'])
+    def live_details(self):
+        return f"""
+        <div class="stat-box">
+            <p><strong>Status:</strong> {self.g['status_detail']}</p>
+            <p><strong>Venue:</strong> {self.g['venue']}</p>
+        </div>
+        <p>Updates are flowing in from {self.g['city']}. Check back for the final recap.</p>
+        """
 
-# --- MAIN LOOP ---
+# --- MAIN LOGIC ---
 
 def process_game(e, sport, league):
     c = e['competitions'][0]
@@ -163,18 +219,24 @@ def process_game(e, sport, league):
     if 'headlines' in e and len(e['headlines']) > 0:
         headline_desc = e['headlines'][0].get('description') or e['headlines'][0].get('shortLinkText')
 
-    # Leaders (Generic parser for different sports structures)
+    # Leaders
     leaders = []
     if 'leaders' in c:
         for l in c['leaders']:
             if l.get('leaders'):
                 ath = l['leaders'][0]['athlete']['displayName']
                 val = l['leaders'][0]['displayValue']
-                leaders.append(f"{ath} ({val})")
-
-    # Score cleaning (Cricket scores can be complex strings like "145/2")
-    # For sorting, we just take the raw string.
+                leaders.append(f"{ath}: {val}")
     
+    # Line Scores (Quarter/Inning scores)
+    h_lines = [x.get('value') for x in h.get('linescores', [])]
+    a_lines = [x.get('value') for x in a.get('linescores', [])]
+
+    # Odds
+    odds_txt = "N/A"
+    if c.get('odds'):
+        odds_txt = c['odds'][0].get('details', 'N/A')
+
     return {
         "id": e['id'],
         "date": datetime.strptime(e['date'].replace("Z", ""), "%Y-%m-%dT%H:%M").replace(tzinfo=timezone.utc),
@@ -183,50 +245,43 @@ def process_game(e, sport, league):
         "status_detail": c['status']['type']['detail'],
         "venue": c.get('venue', {}).get('fullName', 'Stadium'),
         "city": c.get('venue', {}).get('address', {}).get('city', 'Unknown'),
-        "odds": c.get('odds', [{}])[0].get('details', 'N/A'),
+        "odds": odds_txt,
         "headline_description": headline_desc,
         "leaders": leaders,
+        "h_linescores": h_lines,
+        "a_linescores": a_lines,
         "home": {
             "name": h['team']['displayName'],
+            "abbrev": h['team'].get('abbreviation', h['team']['displayName'][:3].upper()),
             "score": h.get('score', '0'),
-            "record": h.get('records', [{}])[0].get('summary', '')
+            "record": h.get('records', [{}])[0].get('summary', '0-0')
         },
         "away": {
             "name": a['team']['displayName'],
+            "abbrev": a['team'].get('abbreviation', a['team']['displayName'][:3].upper()),
             "score": a.get('score', '0'),
-            "record": a.get('records', [{}])[0].get('summary', '')
+            "record": a.get('records', [{}])[0].get('summary', '0-0')
         }
     }
 
 def run_newsroom():
-    print(f"  -> Scraping Global Sports ({WINDOW_DAYS} day window)...")
+    print(f"  -> Scraping Global Wires ({WINDOW_DAYS} day window)...")
     
-    # Source List: (Sport, League_Slug)
-    # Note: 'None' for league means we use the global scoreboard for that sport (useful for Cricket)
     sources = [
-        # US Sports
         ("basketball", "nba"), 
         ("football", "nfl"), 
         ("football", "college-football"), 
         ("basketball", "mens-college-basketball"),
-        
-        # International Football
-        ("soccer", "eng.1"),   # Premier League
-        ("soccer", "eng.2"),   # Championship (Leeds/Fulham safety net)
-        ("soccer", "esp.1"),   # La Liga
-        
-        # Global Cricket (All Leagues/Intl)
-        ("cricket", None)      # None = global scoreboard
+        ("soccer", "eng.1"),
+        ("soccer", "eng.2"),
+        ("soccer", "esp.1"),
+        ("cricket", None)
     ]
     
     sections = {}
     
     for sport, league in sources:
-        # Dynamic URL construction
-        if league:
-            url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-        else:
-            url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/scoreboard"
+        url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard" if league else f"https://site.api.espn.com/apis/site/v2/sports/{sport}/scoreboard"
             
         data = fetch_json(url)
         if not data: continue
@@ -234,23 +289,23 @@ def run_newsroom():
         for e in data.get('events', []):
             if not is_in_window(e['date']): continue
             
+            # STRICT IDENTITY CHECK ONLY
             if is_relevant_game(e):
                 g = process_game(e, sport, league or "global")
-                writer = StoryEngine(g)
+                engine = StoryEngine(g)
+                lede, body = engine.generate_html()
                 
                 story = {
-                    "headline": f"{g['away']['name']} vs {g['home']['name']}",
-                    "body": writer.generate(),
-                    "date_display": g['date'].strftime("%a %b %d"),
+                    "headline": f"{g['away']['name']} vs. {g['home']['name']}",
+                    "lede": lede,
+                    "body": body,
+                    "date_display": g['date'].strftime("%a, %b %d"),
                     "status": g['status_detail']
                 }
                 
-                # Naming Logic
-                if league: 
-                    cat = league.replace("mens-", "").replace("college-", "NCAA ").replace("eng.1", "Premier League").replace("eng.2", "Championship").replace("esp.1", "La Liga").upper()
-                else:
-                    cat = sport.upper() # "CRICKET"
-                    
+                cat = (league or sport).replace("eng.1", "Premier League").replace("esp.1", "La Liga").upper()
+                if "COLLEGE" in cat: cat = "NCAA"
+                
                 if cat not in sections: sections[cat] = []
                 sections[cat].append(story)
                 
@@ -260,49 +315,118 @@ def publish_html(sections):
     print("  -> Generating HTML...")
     content = ""
     
-    # Sort keys to put Cricket/Soccer at the top or bottom as you prefer. 
-    # Currently alphabetical.
     for cat, stories in sorted(sections.items()):
         stories.sort(key=lambda x: x['date_display'])
         grid_html = ""
         for s in stories:
             grid_html += f"""
             <article class="story-card">
-                <div class="meta">{cat} • {s['date_display']} • {s['status']}</div>
+                <div class="meta">{cat} • {s['date_display']}</div>
                 <h3>{s['headline']}</h3>
-                <div class="body">{s['body']}</div>
+                <div class="summary">
+                    {s['lede']}
+                </div>
+                <details>
+                    <summary>Read Full Dispatch</summary>
+                    <div class="full-story">
+                        {s['body']}
+                    </div>
+                </details>
             </article>
             """
         content += f"<h2 class='section-title'>{cat}</h2><div class='grid'>{grid_html}</div>"
         
-    if not content: content = "<div style='text-align:center'>No games found. The team buses are empty.</div>"
+    if not content: content = "<div class='empty-state'>No games involving your teams were found in this window.</div>"
 
     html = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <title>The Tempe Torch</title>
-        <meta http-equiv="refresh" content="1800">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&display=swap');
-            body {{ background: #fdfbf7; color: #111; font-family: 'Merriweather', serif; padding: 40px; }}
-            h1 {{ font-family: 'Playfair Display'; font-size: 4rem; text-align: center; margin-bottom: 10px; }}
-            .subhead {{ text-align: center; font-style: italic; color: #555; margin-bottom: 50px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }}
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap');
             
-            .section-title {{ border-bottom: 2px solid #800000; color: #800000; font-family: 'Playfair Display'; margin-top: 40px; }}
-            .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 40px; }}
+            :root {{
+                --primary: #1a1a1a;
+                --accent: #b71c1c;
+                --bg: #f4f1ea;
+                --card-bg: #ffffff;
+                --text: #2c2c2c;
+            }}
+
+            body {{ background: var(--bg); color: var(--text); font-family: 'Lora', serif; margin: 0; padding: 20px; line-height: 1.6; }}
             
-            .story-card {{ background: #fff; padding: 30px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }}
-            .story-card h3 {{ font-family: 'Playfair Display'; font-size: 1.8rem; margin: 10px 0; }}
-            .meta {{ font-size: 0.8rem; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 1px; }}
-            .body {{ font-size: 1rem; line-height: 1.7; color: #333; }}
-            .body p {{ margin-bottom: 15px; }}
-            .dateline {{ font-weight: bold; font-family: sans-serif; font-size: 0.85rem; color: #444; text-transform: uppercase; }}
+            header {{ text-align: center; border-bottom: 4px double var(--primary); margin-bottom: 40px; padding-bottom: 20px; }}
+            h1 {{ font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0; color: var(--primary); letter-spacing: -1px; }}
+            .subhead {{ font-style: italic; color: #555; font-size: 1.1rem; margin-top: 5px; }}
+            
+            .section-title {{ 
+                font-family: 'Roboto Condensed', sans-serif; 
+                font-size: 1.5rem; 
+                text-transform: uppercase; 
+                border-bottom: 2px solid var(--accent); 
+                color: var(--accent);
+                margin: 40px 0 20px 0; 
+            }}
+            
+            .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }}
+            
+            .story-card {{ 
+                background: var(--card-bg); 
+                padding: 25px; 
+                border: 1px solid #ddd; 
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+                transition: transform 0.2s;
+            }}
+            .story-card:hover {{ transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
+            
+            .story-card h3 {{ font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 10px 0 15px 0; line-height: 1.2; }}
+            .meta {{ font-family: 'Roboto Condensed', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: #888; letter-spacing: 1px; }}
+            
+            .lede-text {{ font-size: 1.05rem; color: #333; }}
+            .dateline {{ font-weight: bold; font-family: sans-serif; font-size: 0.8rem; color: #666; text-transform: uppercase; }}
+            
+            /* READ MORE TOGGLE */
+            details {{ margin-top: 15px; border-top: 1px solid #eee; }}
+            summary {{ 
+                cursor: pointer; 
+                font-family: 'Roboto Condensed', sans-serif; 
+                font-weight: bold; 
+                color: var(--accent); 
+                padding: 15px 0; 
+                list-style: none; 
+                outline: none;
+            }}
+            summary::-webkit-details-marker {{ display: none; }}
+            summary::after {{ content: " +"; }}
+            details[open] summary::after {{ content: " -"; }}
+            
+            .full-story {{ animation: fadein 0.3s; font-size: 0.95rem; }}
+            
+            /* BOX SCORE & STATS */
+            .box-score {{ width: 100%; border-collapse: collapse; margin: 15px 0; font-family: sans-serif; font-size: 0.85rem; }}
+            .box-score th {{ border-bottom: 2px solid #333; padding: 5px; background: #f9f9f9; }}
+            .box-score td {{ border-bottom: 1px solid #eee; padding: 5px; text-align: center; }}
+            .box-score td:first-child {{ text-align: left; font-weight: bold; }}
+            
+            .stat-box {{ background: #f9f9f9; padding: 15px; border-left: 3px solid #ccc; margin: 15px 0; }}
+            .stat-box h4, .notebook h4 {{ margin: 0 0 10px 0; font-family: 'Roboto Condensed'; text-transform: uppercase; font-size: 0.9rem; }}
+            .leader-list {{ padding-left: 20px; margin: 0; }}
+            
+            @keyframes fadein {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
+            
+            @media (max-width: 600px) {{
+                h1 {{ font-size: 2.5rem; }}
+                body {{ padding: 15px; }}
+            }}
         </style>
     </head>
     <body>
-        <h1>The Tempe Torch</h1>
-        <div class="subhead">Global Edition (Tempe • London • Barcelona • Mumbai) • {datetime.now().strftime('%B %d, %Y')}</div>
+        <header>
+            <h1>The Tempe Torch</h1>
+            <div class="subhead">Geofenced Sports Wire • {datetime.now().strftime('%B %d, %Y')}</div>
+        </header>
         {content}
     </body>
     </html>
