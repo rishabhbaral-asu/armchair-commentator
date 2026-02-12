@@ -2,386 +2,349 @@ import json
 import time
 import os
 import requests
-import calendar
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 # --- CONFIGURATION ---
 OUTPUT_HTML_PATH = Path("index.html")
-REFRESH_RATE_MINUTES = 15
-WINDOW_DAYS = 3  # Look 3 days back/forward
+REFRESH_RATE_MINUTES = 10
+WINDOW_DAYS = 3  # Past 3 days, Next 3 days
 
-# --- STRICT ALLOWLIST (The "Bouncer") ---
-# We match strictly on distinct team names/mascots to avoid "North Texas" or "California Baptist" junk.
-# Format: "Keyword": "Region Label"
+# --- THE CLUBHOUSE (STRICT ADMITTANCE) ---
+# Only teams in this set get displayed.
+# We use partial matches that are unique enough to avoid false positives.
 
-STRICT_TEAMS = {
-    # ARIZONA (Complete)
-    "Arizona Cardinals": "AZ", "Phoenix Suns": "AZ", "Arizona Diamondbacks": "AZ", 
-    "Arizona Coyotes": "AZ", "Phoenix Mercury": "AZ", "Arizona State": "AZ", 
-    "Sun Devils": "AZ", "Arizona Wildcats": "AZ", "Tucson": "AZ",
+CLUBHOUSE = {
+    # --- ARIZONA ---
+    "Arizona Cardinals", "Phoenix Suns", "Arizona Diamondbacks", "Arizona State", 
+    "Arizona Wildcats", "Phoenix Mercury", "Tucson", "Sun Devils",
+    
+    # --- CALIFORNIA ---
+    "Los Angeles Lakers", "LA Lakers", "Los Angeles Clippers", "LA Clippers",
+    "Golden State Warriors", "Sacramento Kings", 
+    "Los Angeles Dodgers", "San Francisco Giants", "San Diego Padres", "Los Angeles Angels",
+    "Los Angeles Rams", "Los Angeles Chargers", "San Francisco 49ers",
+    "USC Trojans", "UCLA Bruins", "California Golden Bears", "Stanford Cardinal",
+    "San Jose Sharks", "Anaheim Ducks", "LA Galaxy", "Los Angeles FC",
 
-    # CALIFORNIA (Major Only)
-    "Los Angeles Lakers": "CA", "LA Lakers": "CA", "L.A. Lakers": "CA",
-    "Los Angeles Clippers": "CA", "LA Clippers": "CA", "L.A. Clippers": "CA",
-    "Golden State Warriors": "CA", "Sacramento Kings": "CA",
-    "Los Angeles Dodgers": "CA", "San Francisco Giants": "CA", "San Diego Padres": "CA", 
-    "Los Angeles Angels": "CA", "Oakland Athletics": "CA",
-    "Los Angeles Rams": "CA", "Los Angeles Chargers": "CA", "San Francisco 49ers": "CA",
-    "USC Trojans": "CA", "UCLA Bruins": "CA", "California Golden Bears": "CA", "Cal Bears": "CA", 
-    "Stanford Cardinal": "CA", "San Jose Sharks": "CA", "Anaheim Ducks": "CA",
-    "LA Galaxy": "CA", "Los Angeles FC": "CA", "San Jose Earthquakes": "CA",
+    # --- TEXAS ---
+    "Dallas Cowboys", "Houston Texans", "Dallas Mavericks", "Houston Rockets", "San Antonio Spurs",
+    "Texas Rangers", "Houston Astros", "Dallas Stars",
+    "Texas Longhorns", "Texas A&M Aggies", "Texas Tech Red Raiders", "Baylor Bears", 
+    "TCU Horned Frogs", "SMU Mustangs", "Houston Cougars",
 
-    # TEXAS (The "Big" Teams Only)
-    "Dallas Cowboys": "TX", "Houston Texans": "TX",
-    "Dallas Mavericks": "TX", "Houston Rockets": "TX", "San Antonio Spurs": "TX",
-    "Texas Rangers": "TX", "Houston Astros": "TX",
-    "Dallas Stars": "TX",
-    "Texas Longhorns": "TX", "Texas A&M Aggies": "TX", "Texas Tech Red Raiders": "TX", 
-    "Baylor Bears": "TX", "TCU Horned Frogs": "TX", "SMU Mustangs": "TX", "Houston Cougars": "TX",
+    # --- ILLINOIS ---
+    "Chicago Bears", "Chicago Bulls", "Chicago Blackhawks", "Chicago Cubs", "Chicago White Sox",
+    "Illinois Fighting Illini", "Northwestern Wildcats",
 
-    # ILLINOIS
-    "Chicago Bears": "IL", "Chicago Bulls": "IL", "Chicago Blackhawks": "IL", 
-    "Chicago Cubs": "IL", "Chicago White Sox": "IL", "Illinois Fighting Illini": "IL", 
-    "Northwestern Wildcats": "IL",
+    # --- GEORGIA ---
+    "Atlanta Falcons", "Atlanta Hawks", "Atlanta Braves", "Atlanta United",
+    "Georgia Bulldogs", "Georgia Tech Yellow Jackets",
 
-    # GEORGIA
-    "Atlanta Falcons": "GA", "Atlanta Hawks": "GA", "Atlanta Braves": "GA", 
-    "Atlanta United": "GA", "Georgia Bulldogs": "GA", "Georgia Tech Yellow Jackets": "GA",
+    # --- DMV ---
+    "Washington Commanders", "Washington Wizards", "Washington Capitals", "Washington Nationals",
+    "Baltimore Ravens", "Baltimore Orioles", "Maryland Terrapins", 
+    "Virginia Cavaliers", "Virginia Tech Hokies", "Georgetown Hoyas",
 
-    # DMV (DC/MD/VA)
-    "Washington Commanders": "DC", "Washington Wizards": "DC", "Washington Capitals": "DC", 
-    "Washington Nationals": "DC", "Baltimore Ravens": "MD", "Baltimore Orioles": "MD",
-    "Maryland Terrapins": "MD", "Virginia Cavaliers": "VA", "Virginia Tech Hokies": "VA", 
-    "Georgetown Hoyas": "DC",
+    # --- INTERNATIONAL SOCCER ---
+    "Fulham", "Leeds United", "Barcelona", "FC Barcelona",
 
-    # INTERNATIONAL / SPECIFIC
-    "Fulham": "EPL", "Leeds United": "EFL", "FC Barcelona": "LIGA",
-    "India": "INTL", "Mumbai Indians": "IPL", "Chennai Super Kings": "IPL",
-    "USA Cricket": "USA", "United States": "USA"
+    # --- INDIAN PREMIER LEAGUE (IPL) ---
+    "Chennai Super Kings", "Delhi Capitals", "Gujarat Titans", "Kolkata Knight Riders",
+    "Lucknow Super Giants", "Mumbai Indians", "Punjab Kings", "Rajasthan Royals",
+    "Royal Challengers", "Sunrisers Hyderabad",
+
+    # --- MAJOR LEAGUE CRICKET (MLC) ---
+    "Los Angeles Knight Riders", "MI New York", "San Francisco Unicorns",
+    "Seattle Orcas", "Texas Super Kings", "Washington Freedom",
+
+    # --- NATIONAL CRICKET TEAMS ---
+    "India Men", "India Women", "United States", "USA Cricket"
 }
 
-def get_team_region(name):
-    """Checks if the team name (or part of it) is in our strict list."""
-    # Check exact full matches or strict substring matches from our keys
-    for key, region in STRICT_TEAMS.items():
-        if key.lower() in name.lower():
-            return region
-    return None
-
-# --- TIMEZONE ENGINE (Fixed) ---
-
-def parse_game_time(date_str):
+def is_clubhouse_team(name):
     """
-    Parses ESPN's ISO-8601 UTC string and converts specifically to Arizona Time (MST).
-    Arizona is UTC-7. 
+    Returns True if the team is in our Clubhouse.
+    Checks if any defined clubhouse string is IN the API name.
     """
+    # Special safety check: Ensure "Indiana" (Pacers/Hoosiers) doesn't trigger "India" matches
+    if "India" in name and "Indiana" in name:
+        return False 
+        
+    for member in CLUBHOUSE:
+        # We check if the unique member string is inside the API name
+        if member.lower() in name.lower():
+            return True
+    return False
+
+# --- ENGINE ROOM ---
+
+def get_az_time(utc_str):
+    """Converts ESPN UTC string to Arizona Time (MST, UTC-7)."""
     try:
-        # 1. Parse strictly as UTC
-        # ESPN format example: "2023-11-20T01:00Z"
-        if date_str.endswith("Z"):
-            date_str = date_str.replace("Z", "+00:00")
-        
-        dt_utc = datetime.fromisoformat(date_str)
-        
-        # 2. Convert to AZT (UTC-7) manually to avoid system locale issues
-        # We subtract 7 hours from the UTC timestamp
+        # ESPN Time: 2023-11-20T20:00Z
+        clean = utc_str.replace("Z", "")
+        dt_utc = datetime.fromisoformat(clean)
         dt_az = dt_utc - timedelta(hours=7)
-        
-        # 3. Format
-        time_display = dt_az.strftime("%I:%M %p") # e.g. 06:30 PM
-        date_display = dt_az.strftime("%a, %b %d") # e.g. Mon, Nov 20
-        
-        return dt_az, date_display, time_display
-    except Exception as e:
-        print(f"Time parse error for {date_str}: {e}")
-        return datetime.now(), "Date TBD", "TBD"
+        return dt_az
+    except:
+        return datetime.now()
 
-# --- FETCH & PROCESS ---
-
-def fetch_games():
-    print("  -> Scraping the wires...")
+def fetch_wire():
+    print("  -> Pinging the satellites...")
     
-    endpoints = [
+    # The endpoints we care about
+    sources = [
         ("basketball", "nba"),
         ("football", "nfl"),
         ("football", "college-football"),
         ("basketball", "mens-college-basketball"),
         ("baseball", "mlb"),
-        ("soccer", "eng.1"), 
-        ("soccer", "esp.1"),
-        ("cricket", None)
+        ("soccer", "eng.1"), # Prem
+        ("soccer", "esp.1"), # La Liga
+        ("soccer", "eng.2"), # Championship (Leeds)
+        ("cricket", "ipl"),  # Specific IPL endpoint
+        ("cricket", None)    # Global Cricket (Catches MLC & Internationals)
     ]
     
-    valid_games = []
-    
-    for sport, league in endpoints:
-        url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard" if league else f"https://site.api.espn.com/apis/site/v2/sports/{sport}/scoreboard"
+    dashboard = []
+    processed_ids = set() # To prevent duplicates if we hit same game in multiple endpoints
+
+    for sport, league in sources:
+        base = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard" if league else f"https://site.api.espn.com/apis/site/v2/sports/{sport}/scoreboard"
         
         try:
-            data = requests.get(url, timeout=5).json()
+            data = requests.get(base, timeout=4).json()
         except:
             continue
             
         for e in data.get('events', []):
-            # 1. Competitors
+            if e['id'] in processed_ids: continue
+
+            # 1. Clubhouse Check (The Bouncer)
             try:
                 c = e['competitions'][0]
-                h = c['competitors'][0]
-                a = c['competitors'][1]
-                h_name = h['team']['displayName']
-                a_name = a['team']['displayName']
+                h_team = c['competitors'][0]['team']['displayName']
+                a_team = c['competitors'][1]['team']['displayName']
             except: continue
-
-            # 2. Strict Filtering
-            h_region = get_team_region(h_name)
-            a_region = get_team_region(a_name)
             
-            if not h_region and not a_region:
-                continue # Kills games like "North Texas vs UAB"
-
-            # 3. Time Processing
-            dt_obj, date_disp, time_disp = parse_game_time(e['date'])
+            # If NEITHER team is in the clubhouse, skip it.
+            if not is_clubhouse_team(h_team) and not is_clubhouse_team(a_team):
+                continue
             
-            # Window Check (keep only recent/soon games)
-            now = datetime.now() - timedelta(hours=7) # Approx AZ time
-            if abs((dt_obj.replace(tzinfo=None) - now).days) > WINDOW_DAYS:
+            processed_ids.add(e['id'])
+
+            # 2. Date Check (Window)
+            az_dt = get_az_time(e['date'])
+            days_diff = (az_dt.date() - datetime.now().date()).days # Compare dates only
+            
+            if abs(days_diff) > WINDOW_DAYS:
                 continue
 
-            # 4. Game Details
-            status_state = c['status']['type']['state'] # pre, in, post
-            status_detail = c['status']['type']['detail'] # "Final", "10:34 4th"
+            # 3. Data Extraction
+            status = c['status']['type']['state'] # pre, in, post
+            clock = c['status']['type']['detail'] # "Final", "Top 4th", "10:00"
             
-            # Quarter Scores (if available)
-            h_lines = [x.get('value') for x in h.get('linescores', [])]
-            a_lines = [x.get('value') for x in a.get('linescores', [])]
+            # TV Channel
+            broadcast = ""
+            if 'broadcasts' in c:
+                for b in c['broadcasts']:
+                    broadcast = b.get('names', [''])[0]
+                    break
             
-            # Headlines/Notes
-            note = ""
-            if 'headlines' in e and e['headlines']:
-                note = e['headlines'][0].get('shortLinkText') or e['headlines'][0].get('description')
-            
+            # Determine correct league display
+            league_disp = (league or sport).upper()
+            if "CRICKET" in league_disp and "IPL" not in league_disp:
+                # Try to detect MLC or specific leagues from context if needed
+                if "Major League" in e.get('name', ''): league_disp = "MLC"
+
             game = {
                 "id": e['id'],
-                "sport": (league or sport).upper().replace("MENS-COLLEGE-", "NCAA "),
-                "sort_dt": dt_obj,
-                "date": date_disp,
-                "time": time_disp,
-                "status_state": status_state,
-                "status_detail": status_detail,
-                "note": note,
+                "sport": league_disp,
+                "dt": az_dt,
+                "date_str": az_dt.strftime("%a %d"),
+                "time_str": az_dt.strftime("%I:%M %p"),
+                "status": status,
+                "clock": clock,
+                "tv": broadcast,
                 "home": {
-                    "name": h_name,
-                    "score": h.get('score', '0'),
-                    "record": h.get('records', [{}])[0].get('summary', ''),
-                    "logo": h['team'].get('logo', ''),
-                    "lines": h_lines
+                    "name": h_team,
+                    "score": c['competitors'][0].get('score', ''),
+                    "logo": c['competitors'][0]['team'].get('logo', '')
                 },
                 "away": {
-                    "name": a_name,
-                    "score": a.get('score', '0'),
-                    "record": a.get('records', [{}])[0].get('summary', ''),
-                    "logo": a['team'].get('logo', ''),
-                    "lines": a_lines
+                    "name": a_team,
+                    "score": c['competitors'][1].get('score', ''),
+                    "logo": c['competitors'][1]['team'].get('logo', '')
                 }
             }
-            valid_games.append(game)
+            dashboard.append(game)
+            
+    return dashboard
 
-    return valid_games
+# --- DASHBOARD RENDERER ---
 
-# --- HTML GENERATOR ---
-
-def generate_box_score_html(g):
-    """Creates a mini table for quarter/inning scores."""
-    if not g['home']['lines']: return ""
+def render_dashboard(games):
+    games.sort(key=lambda x: x['dt'])
     
-    # Header row (1, 2, 3, 4...)
-    th_cells = "".join([f"<th>{i+1}</th>" for i in range(len(g['home']['lines']))])
+    # Group by Date Headers
+    html_rows = ""
+    current_date = ""
     
-    # Data rows
-    a_cells = "".join([f"<td>{x}</td>" for x in g['away']['lines']])
-    h_cells = "".join([f"<td>{x}</td>" for x in g['home']['lines']])
-    
-    return f"""
-    <table class="linescore">
-        <thead><tr><th></th>{th_cells}</tr></thead>
-        <tbody>
-            <tr><td class="tm-code">{g['away']['name'][:3].upper()}</td>{a_cells}</tr>
-            <tr><td class="tm-code">{g['home']['name'][:3].upper()}</td>{h_cells}</tr>
-        </tbody>
-    </table>
-    """
-
-def publish(games):
-    games.sort(key=lambda x: x['sort_dt'])
-    
-    cards_html = ""
     for g in games:
-        state_class = g['status_state'] # pre, in, post
-        
-        # Dynamic "Action Button"
-        action_btn = ""
-        if state_class == 'post':
-            action_btn = f"<div class='story-btn'>Read Recap</div>"
-        elif state_class == 'in':
-            action_btn = f"<div class='story-btn live-pulse'>Live Updates</div>"
-        else:
-            action_btn = f"<div class='story-btn'>Preview</div>"
+        # Date Header Logic
+        g_date = g['dt'].strftime("%A, %B %d")
+        if g_date != current_date:
+            html_rows += f"<div class='date-header'>{g_date}</div>"
+            current_date = g_date
             
-        # Box Score (only if live/post)
-        linescore = generate_box_score_html(g) if state_class != 'pre' else ""
-        
-        cards_html += f"""
-        <article class="game-card {state_class}">
-            <div class="card-top">
-                <span class="league-tag">{g['sport']}</span>
-                <span class="game-time">{g['date']} @ {g['time']} AZT</span>
-            </div>
+        # Status Styling
+        status_class = "future"
+        status_dot = "upcoming-dot"
+        if g['status'] == 'in': 
+            status_class = "live"
+            status_dot = "live-dot"
+        elif g['status'] == 'post': 
+            status_class = "final"
+            status_dot = "final-dot"
             
-            <div class="matchup">
-                <div class="team away">
-                    <img src="{g['away']['logo']}" onerror="this.style.display='none'">
-                    <div class="tm-info">
-                        <div class="tm-name">{g['away']['name']}</div>
-                        <div class="tm-record">{g['away']['record']}</div>
-                    </div>
-                    <div class="tm-score">{g['away']['score']}</div>
-                </div>
-                
-                <div class="game-meta">
-                    <div class="status">{g['status_detail']}</div>
-                    {linescore}
-                </div>
+        # Score Logic (Hide scores if game hasn't started)
+        h_score = g['home']['score'] if g['status'] != 'pre' else ""
+        a_score = g['away']['score'] if g['status'] != 'pre' else ""
+        
+        # Highlight Logic (Bold the user's team)
+        h_class = "my-team" if is_clubhouse_team(g['home']['name']) else "opp-team"
+        a_class = "my-team" if is_clubhouse_team(g['away']['name']) else "opp-team"
 
-                <div class="team home">
-                    <div class="tm-score">{g['home']['score']}</div>
-                    <div class="tm-info">
-                        <div class="tm-name">{g['home']['name']}</div>
-                        <div class="tm-record">{g['home']['record']}</div>
-                    </div>
-                    <img src="{g['home']['logo']}" onerror="this.style.display='none'">
+        html_rows += f"""
+        <div class="match-row {status_class}">
+            <div class="time-col">
+                <div class="time">{g['time_str']}</div>
+                <div class="league">{g['sport']}</div>
+            </div>
+            
+            <div class="game-info">
+                <div class="team-line">
+                    <img src="{g['away']['logo']}" class="logo" onerror="this.style.display='none'">
+                    <span class="name {a_class}">{g['away']['name']}</span>
+                    <span class="score">{a_score}</span>
+                </div>
+                <div class="team-line">
+                    <img src="{g['home']['logo']}" class="logo" onerror="this.style.display='none'">
+                    <span class="name {h_class}">{g['home']['name']}</span>
+                    <span class="score">{h_score}</span>
                 </div>
             </div>
             
-            <div class="card-footer">
-                <div class="game-note">{g['note'] or "Regional Coverage"}</div>
-                <details>
-                    <summary>{action_btn}</summary>
-                    <div class="full-story">
-                        <p><strong>{g['away']['name']} vs {g['home']['name']}</strong></p>
-                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
-                    </div>
-                </details>
+            <div class="status-col">
+                <div class="status-indicator">
+                    <div class="dot {status_dot}"></div>
+                    <span>{g['clock']}</span>
+                </div>
+                <div class="tv-channel">{g['tv']}</div>
             </div>
-        </article>
+        </div>
         """
-        
-    if not cards_html:
-        cards_html = "<div class='empty'>No games found for your teams in the current window.</div>"
+
+    if not html_rows:
+        html_rows = "<div class='empty-state'>The wires are silent. No games found for your teams.</div>"
 
     html = f"""
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>The Tempe Torch</title>
+        <title>Clubhouse</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="300">
         <style>
             :root {{
-                --bg: #eef2f5; --card: #ffffff; --text: #111; 
-                --gray: #666; --border: #e0e0e0;
-                --az-red: #B1063A; --accent: #2c3e50;
+                --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
+                --accent: #bb86fc; --border: #333;
+                --live: #cf6679; --green: #03dac6;
             }}
-            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; }}
+            body {{ background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }}
             
-            h1 {{ text-align: center; font-family: 'Georgia', serif; color: var(--accent); margin-bottom: 5px; }}
-            .header-info {{ text-align: center; color: var(--gray); font-size: 0.9rem; margin-bottom: 30px; font-style: italic; }}
-
-            .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }}
+            .header {{ padding: 20px; border-bottom: 1px solid var(--border); background: #1f1f1f; position: sticky; top: 0; z-index: 10; }}
+            h1 {{ margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }}
+            .sub {{ font-size: 0.8rem; color: #777; margin-top: 5px; }}
             
-            .game-card {{ background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }}
+            .container {{ max-width: 800px; margin: 0 auto; padding: 20px; }}
             
-            /* Status Colors */
-            .game-card.in {{ border-left: 5px solid #d32f2f; }} /* Live */
-            .game-card.post {{ border-left: 5px solid #333; }} /* Final */
-            .game-card.pre {{ border-left: 5px solid #1976d2; }} /* Future */
-
-            .card-top {{ background: #f8f9fa; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }}
-            .league-tag {{ font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; color: var(--gray); text-transform: uppercase; }}
-            .game-time {{ font-weight: 600; font-size: 0.85rem; color: var(--accent); }}
-
-            .matchup {{ padding: 20px; display: flex; align-items: center; justify-content: space-between; }}
-            
-            .team {{ display: flex; align-items: center; gap: 15px; flex: 1; }}
-            .team.away {{ justify-content: flex-start; }}
-            .team.home {{ justify-content: flex-end; text-align: right; }}
-            .team img {{ height: 40px; width: 40px; object-fit: contain; }}
-            
-            .tm-info {{ display: flex; flex-direction: column; }}
-            .tm-name {{ font-weight: 700; font-size: 1.1rem; line-height: 1.1; }}
-            .tm-record {{ font-size: 0.75rem; color: var(--gray); margin-top: 2px; }}
-            .tm-score {{ font-size: 2rem; font-weight: 800; color: #000; font-variant-numeric: tabular-nums; }}
-
-            .team.away .tm-score {{ margin-left: auto; padding-right: 15px; }}
-            .team.home .tm-score {{ margin-right: auto; padding-left: 15px; }}
-
-            .game-meta {{ display: flex; flex-direction: column; align-items: center; min-width: 100px; }}
-            .status {{ font-size: 0.8rem; font-weight: bold; color: var(--az-red); margin-bottom: 5px; text-transform: uppercase; }}
-            
-            /* Box Score Mini Table */
-            .linescore {{ border-collapse: collapse; font-size: 0.7rem; color: var(--gray); }}
-            .linescore td, .linescore th {{ padding: 2px 5px; text-align: center; border: 1px solid #eee; }}
-            .tm-code {{ font-weight: bold; color: #000; }}
-
-            .card-footer {{ padding: 10px 20px; background: #fff; border-top: 1px solid #f0f0f0; }}
-            .game-note {{ font-size: 0.85rem; color: #555; margin-bottom: 10px; font-style: italic; min-height: 1.2em; }}
-            
-            details summary {{ list-style: none; outline: none; }}
-            details summary::-webkit-details-marker {{ display: none; }}
-            
-            .story-btn {{ 
-                display: block; width: 100%; text-align: center; 
-                background: #f1f3f4; padding: 8px 0; border-radius: 6px; 
-                font-weight: 600; font-size: 0.9rem; color: #333; cursor: pointer; transition: 0.2s; 
+            .date-header {{ 
+                margin: 25px 0 10px 0; 
+                font-size: 0.9rem; 
+                font-weight: bold; 
+                color: #888; 
+                text-transform: uppercase; 
+                border-bottom: 1px solid var(--border); 
+                padding-bottom: 5px;
             }}
-            .story-btn:hover {{ background: #e0e0e0; }}
-            .story-btn.live-pulse {{ background: #ffebee; color: #c62828; animation: pulse 2s infinite; }}
-
-            .full-story {{ padding: 15px; background: #fafafa; margin-top: 10px; border-radius: 8px; font-size: 0.9rem; color: #444; }}
-
-            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.7; }} 100% {{ opacity: 1; }} }}
             
-            @media (max-width: 600px) {{
-                .matchup {{ flex-direction: column; gap: 15px; }}
-                .team {{ width: 100%; justify-content: space-between !important; }}
-                .team.home {{ flex-direction: row-reverse; }}
-                .team.away .tm-score {{ margin: 0; }}
-                .team.home .tm-score {{ margin: 0; }}
+            .match-row {{ 
+                display: flex; 
+                align-items: center; 
+                background: var(--card); 
+                margin-bottom: 12px; 
+                padding: 15px; 
+                border-radius: 8px; 
+                border: 1px solid var(--border);
+            }}
+            
+            .match-row.live {{ border: 1px solid var(--live); box-shadow: 0 0 10px rgba(207, 102, 121, 0.2); }}
+            
+            .time-col {{ width: 80px; text-align: center; border-right: 1px solid #333; padding-right: 15px; margin-right: 15px; }}
+            .time {{ font-weight: bold; font-size: 0.9rem; }}
+            .league {{ font-size: 0.6rem; color: #666; margin-top: 4px; overflow: hidden; white-space: nowrap; }}
+            
+            .game-info {{ flex: 1; }}
+            .team-line {{ display: flex; align-items: center; margin: 4px 0; justify-content: space-between; }}
+            .logo {{ width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }}
+            .name {{ font-size: 1rem; flex: 1; }}
+            .name.my-team {{ font-weight: bold; color: #fff; }}
+            .name.opp-team {{ color: #aaa; }}
+            .score {{ font-weight: bold; font-family: monospace; font-size: 1.1rem; }}
+            
+            .status-col {{ width: 100px; text-align: right; padding-left: 15px; border-left: 1px solid #333; margin-left: 15px; }}
+            .status-indicator {{ display: flex; align-items: center; justify-content: flex-end; font-size: 0.8rem; gap: 6px; }}
+            .dot {{ width: 8px; height: 8px; border-radius: 50%; }}
+            .live-dot {{ background: var(--live); animation: pulse 1.5s infinite; }}
+            .upcoming-dot {{ background: #555; }}
+            .final-dot {{ background: #333; }}
+            
+            .tv-channel {{ font-size: 0.7rem; color: #666; margin-top: 5px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }}
+            
+            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} 100% {{ opacity: 1; }} }}
+            
+            @media (max-width: 500px) {{
+                .match-row {{ flex-wrap: wrap; }}
+                .status-col {{ width: 100%; border-left: none; margin-left: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; text-align: left; display: flex; justify-content: space-between; }}
+                .time-col {{ width: 60px; }}
             }}
         </style>
     </head>
     <body>
-        <h1>The Tempe Torch</h1>
-        <div class="header-info">
-            Strict Geofence Active • All Times Arizona (MST) • Updated {datetime.now().strftime('%I:%M %p')}
+        <div class="header">
+            <div class="container" style="padding:0">
+                <h1>Clubhouse Wire</h1>
+                <div class="sub">Tempe, AZ • {datetime.now().strftime("%I:%M %p MST")}</div>
+            </div>
         </div>
-        <div class="grid">
-            {cards_html}
+        
+        <div class="container">
+            {html_rows}
         </div>
     </body>
     </html>
     """
     
-    with open(OUTPUT_HTML_PATH, "w", encoding="utf-8") as f:
-        f.write(html)
-    print(f"✅ Published {len(games)} games to {OUTPUT_HTML_PATH}")
+    with open(OUTPUT_HTML_PATH, "w", encoding='utf-8') as f: f.write(html)
+    print(f"✅ Dashboard Updated: {OUTPUT_HTML_PATH}")
 
 if __name__ == "__main__":
     if os.environ.get('CI') == 'true':
-        publish(fetch_games())
+        render_dashboard(fetch_wire())
     else:
         while True:
-            publish(fetch_games())
+            render_dashboard(fetch_wire())
             print(f"Sleeping {REFRESH_RATE_MINUTES}m...")
             time.sleep(REFRESH_RATE_MINUTES * 60)
