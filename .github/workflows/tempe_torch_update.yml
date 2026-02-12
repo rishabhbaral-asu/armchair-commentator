@@ -31,11 +31,15 @@ jobs:
           CI: true  # Tells the script "Do not loop, just run once"
         run: python scripts/newsroom.py
 
-      - name: Commit and Push Changes
+      - name: Commit and Push
         run: |
-          git config --global user.name "Tempe Torch Bot"
-          git config --global user.email "bot@tempetorch.com"
-          git add data/daily_scores.json
-          git add data/daily_stories.json
-          # Only commit if there are changes
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Ticker Update: $(date)" && git push origin main --force)
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Force add the file to the staging area
+          git add index.html
+          
+          # Commit only if there are changes (avoids error if no games were found)
+          git commit -m "Update Gazette: $(date)" || exit 0
+          
+          git push origin main --force
