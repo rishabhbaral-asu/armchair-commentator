@@ -2,75 +2,103 @@ import json
 import time
 import os
 import requests
-from datetime import datetime, timedelta
+import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # --- CONFIGURATION ---
 OUTPUT_HTML_PATH = Path("index.html")
-REFRESH_RATE_MINUTES = 15
-WINDOW_DAYS_BACK = 14  # Look back 2 weeks (Catch recent past games)
-WINDOW_DAYS_FWD = 7    # Look forward 1 week
+REFRESH_RATE_MINUTES = 10
+WINDOW_DAYS_BACK = 30
+WINDOW_DAYS_FWD = 14
 
-# --- THE CLUBHOUSE (STRICT ADMITTANCE) ---
+# --- THE CLUBHOUSE ROSTER ---
+# "Safe" keywords allow partial matching (e.g. "Suns" matches "Phoenix Suns").
+# "Strict" keywords require the full string to be present.
+
 CLUBHOUSE = {
-    # ARIZONA
-    "Arizona Cardinals", "Phoenix Suns", "Arizona Diamondbacks", "Arizona State", 
-    "Arizona Wildcats", "Phoenix Mercury", "Tucson", "Sun Devils",
-    # CALIFORNIA
-    "Lakers", "Clippers", "Warriors", "Sacramento Kings", 
-    "Dodgers", "Giants", "Padres", "Angels",
-    "Rams", "Chargers", "49ers",
-    "USC", "UCLA", "Cal Bears", "Stanford",
-    # TEXAS
-    "Cowboys", "Texans", "Mavericks", "Rockets", "Spurs",
-    "Rangers", "Astros", "Stars",
-    "Longhorns", "Aggies", "Red Raiders", "Baylor", "TCU", "SMU", "Cougars",
-    # ILLINOIS
-    "Bears", "Bulls", "Blackhawks", "Cubs", "White Sox", "Fighting Illini", "Northwestern",
-    # GEORGIA
-    "Falcons", "Hawks", "Braves", "Atlanta United", "Bulldogs", "Yellow Jackets",
-    # DMV
-    "Commanders", "Wizards", "Capitals", "Nationals", "Ravens", "Orioles", "Terrapins", 
-    "Cavaliers", "Hokies", "Hoyas",
-    # INT'L SOCCER
-    "Fulham", "Leeds", "Barcelona",
-    # CRICKET (IPL + MLC + NATIONAL)
-    "Super Kings", "Capitals", "Titans", "Knight Riders", "Super Giants", "Mumbai Indians", 
-    "Punjab Kings", "Royals", "Royal Challengers", "Sunrisers",
-    "Unicorns", "Orcas", "Freedom", "India", "United States", "USA", "Namibia"
+    # --- ARIZONA (Broad match allowed for state pride) ---
+    "Arizona Cardinals", "Phoenix Suns", "Arizona Diamondbacks", "Arizona Coyotes", "Phoenix Mercury",
+    "Arizona State", "Sun Devils", "Arizona Wildcats", "Tucson Roadrunners",
+    "Northern Arizona", "NAU", "Lumberjacks", "Grand Canyon Antelopes", "GCU", "Lopes",
+    "Arizona Christian", "Firestorm", "Phoenix Rising",
+
+    # --- CALIFORNIA (Strict to avoid 'Warriors' ambiguity) ---
+    "Los Angeles Lakers", "LA Lakers", "Los Angeles Clippers", "LA Clippers",
+    "Golden State Warriors", "Sacramento Kings", 
+    "Los Angeles Dodgers", "San Francisco Giants", "San Diego Padres", "Los Angeles Angels",
+    "Los Angeles Rams", "Los Angeles Chargers", "San Francisco 49ers",
+    "USC Trojans", "UCLA Bruins", "California Golden Bears", "Stanford Cardinal",
+    "San Jose Sharks", "Anaheim Ducks", 
+    "LA Galaxy", "Los Angeles FC", "San Diego FC", # MLS
+    "Angel City FC", "San Diego Wave", "Bay FC",   # NWSL
+
+    # --- TEXAS ---
+    "Dallas Cowboys", "Houston Texans", "Dallas Mavericks", "Houston Rockets", "San Antonio Spurs",
+    "Texas Rangers", "Houston Astros", "Dallas Stars",
+    "Texas Longhorns", "Texas A&M Aggies", "Texas Tech Red Raiders", "Baylor Bears", 
+    "TCU Horned Frogs", "SMU Mustangs", "Houston Cougars",
+    "Houston Dash", # NWSL
+
+    # --- ILLINOIS ---
+    "Chicago Bears", "Chicago Bulls", "Chicago Blackhawks", "Chicago Cubs", "Chicago White Sox",
+    "Illinois Fighting Illini", "Northwestern Wildcats",
+    "Chicago Red Stars", # NWSL
+
+    # --- GEORGIA ---
+    "Atlanta Falcons", "Atlanta Hawks", "Atlanta Braves", "Atlanta United",
+    "Georgia Bulldogs", "Georgia Tech Yellow Jackets",
+
+    # --- DMV (DC/MD/VA) ---
+    "Washington Commanders", "Washington Wizards", "Washington Capitals", "Washington Nationals",
+    "Baltimore Ravens", "Baltimore Orioles", "Maryland Terrapins", 
+    "Virginia Cavaliers", "Virginia Tech Hokies", "Georgetown Hoyas",
+    "Washington Spirit", # NWSL
+
+    # --- INT'L SOCCER ---
+    "Fulham", "Leeds United", "Barcelona", "FC Barcelona",
+
+    # --- CRICKET (Specific Franchises) ---
+    "Chennai Super Kings", "Delhi Capitals", "Gujarat Titans", "Kolkata Knight Riders", 
+    "Lucknow Super Giants", "Mumbai Indians", "Punjab Kings", "Rajasthan Royals", 
+    "Royal Challengers", "Sunrisers Hyderabad",
+    "Los Angeles Knight Riders", "MI New York", "San Francisco Unicorns",
+    "Seattle Orcas", "Texas Super Kings", "Washington Freedom",
+    
+    # --- NATIONAL TEAMS (Handled via Strict Regex below) ---
+    "India", "United States", "USA", "Namibia"
 }
 
-# Teams/Keywords to strictly BLOCK (prevents "India" matching "Indiana Pacers")
-BLOCKLIST = {"Pacers", "Hoosiers", "Fever", "Indianapolis"}
-
 def is_clubhouse_team(name):
-    # 1. Blocklist Check
-    for bad in BLOCKLIST:
-        if bad in name: return False
-        
-    # 2. Allowlist Check
-    for member in CLUBHOUSE:
-        if member.lower() in name.lower():
+    clean_name = name.strip()
+    
+    # 1. Strict National Team Check (Word Boundaries)
+    # Prevents "India" matching "Indiana"
+    national_teams = ["India", "USA", "United States", "Namibia"]
+    for nat in national_teams:
+        if re.search(rf"\b{nat}\b", clean_name, re.IGNORECASE):
+            # Extra safety: If it contains "Indiana", it's NOT India.
+            if "Indiana" in clean_name and nat == "India": return False
             return True
+
+    # 2. Roster Check
+    for member in CLUBHOUSE:
+        if member in national_teams: continue
+        
+        # Case insensitive match
+        if member.lower() in clean_name.lower():
+            return True
+            
     return False
 
 def is_championship_event(event):
-    """
-    Returns True if this is a major final (Super Bowl, World Series, etc)
-    so we can watch it even if our teams aren't playing.
-    """
-    # Check headlines/notes for keywords
-    search_text = ""
+    search_text = event.get('name', '')
     if event.get('competitions'):
         notes = event['competitions'][0].get('notes', [])
         if notes: search_text += " " + str(notes[0].get('headline', ''))
-        
-    keywords = ["Super Bowl", "World Series", "NBA Finals", "Stanley Cup", "Championship Game", "Final"]
     
-    # Simple check: If it's a "Final" in a major league, let it through
-    if any(k in search_text for k in keywords):
-        return True
-    return False
+    keywords = ["Super Bowl", "World Series", "NBA Finals", "Stanley Cup", "Final", "Championship"]
+    return any(k.lower() in search_text.lower() for k in keywords)
 
 # --- STORYTELLER ENGINE ---
 
@@ -80,83 +108,71 @@ class Storyteller:
         self.h = game['home']
         self.a = game['away']
         
-    def write_preview(self):
-        return f"""
-        <div class="story-body">
-            <div class="story-lede">
-                <strong>PREVIEW:</strong> The {self.h['name']} prepare to host the {self.a['name']} 
-                at {self.g['venue']}.
-            </div>
-            <div class="tale-tape">
-                <h4>Tale of the Tape</h4>
-                <ul>
-                    <li><strong>Matchup:</strong> {self.a['name']} vs {self.h['name']}</li>
-                    <li><strong>Venue:</strong> {self.g['venue']}</li>
-                    <li><strong>Broadcast:</strong> {self.g['tv'] or "Check Local Listings"}</li>
-                </ul>
-            </div>
-            <p>Both squads are looking to make a statement in this {self.g['sport']} clash.</p>
-        </div>
-        """
-
-    def write_recap(self):
-        # Determine winner
+    def get_headline(self):
+        if self.g['status'] == 'pre':
+            return f"{self.a['name']} at {self.h['name']}"
+        
         try:
-            h_s = int(self.h['score'])
-            a_s = int(self.a['score'])
+            h_s = int(self.h['score'] or 0)
+            a_s = int(self.a['score'] or 0)
             winner = self.h['name'] if h_s > a_s else self.a['name']
+            loser = self.a['name'] if h_s > a_s else self.h['name']
             margin = abs(h_s - a_s)
-            verb = "edged out" if margin < 10 else "dominated"
-        except:
-            winner = "The winner"
-            verb = "defeated"
-
-        # Build Box Score Table
-        box_html = ""
-        if self.h['lines'] and self.a['lines']:
-            # Create header rows (1, 2, 3...)
-            headers = "".join([f"<th>{i+1}</th>" for i in range(len(self.h['lines']))])
-            h_row = "".join([f"<td>{x}</td>" for x in self.h['lines']])
-            a_row = "".join([f"<td>{x}</td>" for x in self.a['lines']])
             
-            box_html = f"""
-            <div class="box-score-container">
-                <table class="box-score">
-                    <thead><tr><th>Team</th>{headers}<th>T</th></tr></thead>
-                    <tbody>
-                        <tr><td class="tm">{self.a['name']}</td>{a_row}<td class="tot">{self.a['score']}</td></tr>
-                        <tr><td class="tm">{self.h['name']}</td>{h_row}<td class="tot">{self.h['score']}</td></tr>
-                    </tbody>
-                </table>
+            if margin == 0: return f"{self.h['name']} and {self.a['name']} Draw"
+            if "CRICKET" in self.g['sport']: return f"{winner} defeats {loser}"
+            
+            verb = "edge" if margin < 4 else ("rout" if margin > 20 else "defeat")
+            return f"{winner} {verb} {loser}, {max(h_s, a_s)}-{min(h_s, a_s)}"
+        except:
+            return f"{self.h['name']} vs {self.a['name']}"
+
+    def write_body(self):
+        headline = self.get_headline()
+        
+        if self.g['status'] == 'pre':
+            odds_html = ""
+            if self.g['odds']:
+                odds_html = f"""
+                <div class="betting-line">
+                    <span class="odds-tag">VEGAS</span> 
+                    <strong>{self.g['odds']}</strong> • O/U: {self.g['overunder']}
+                </div>
+                """
+            
+            # Pass UTC timestamp to JS for accurate countdown
+            content = f"""
+            <div class="countdown-box" id="timer-{self.g['id']}" data-utc="{self.g['utc_ts']}">
+                Loading...
+            </div>
+            {odds_html}
+            <p><strong>PREVIEW —</strong> The {self.g['sport']} action continues as {self.a['name']} visit {self.h['name']} at {self.g['venue']}.</p>
+            <div class="metadata-grid">
+                <div><strong>TV:</strong> {self.g['tv'] or 'N/A'}</div>
+                <div><strong>Time:</strong> {self.g['time_str']} AZT</div>
             </div>
             """
-
+        elif self.g['status'] == 'in':
+            content = f"""
+            <p class="live-pulse-text"><strong>LIVE ACTION</strong></p>
+            <p><strong>Situation:</strong> {self.g['clock']}</p>
+            <p>Watch on {self.g['tv']}.</p>
+            """
+        else:
+            note_html = f"<p><em>{self.g['note']}</em></p>" if self.g['note'] else ""
+            content = f"""
+            <p><strong>RECAP —</strong> {headline}.</p>
+            {note_html}
+            <div class="metadata-grid">
+                <div><strong>Venue:</strong> {self.g['venue']}</div>
+                <div><strong>Final:</strong> {self.g['clock']}</div>
+            </div>
+            """
+            
         return f"""
-        <div class="story-body">
-            <div class="story-lede">
-                <strong>RECAP:</strong> {winner} {verb} the opposition with a final score of 
-                {self.h['score']}-{self.a['score']}.
-            </div>
-            {box_html}
-            <div class="notebook">
-                <h4>Game Notes</h4>
-                <p>{self.g['note'] or "No specific game notes were filed for this event."}</p>
-            </div>
-        </div>
-        """
-
-    def write_live(self):
-        return f"""
-        <div class="story-body">
-            <div class="story-lede live-pulse-text">
-                <strong>LIVE ACTION:</strong> This game is currently in progress.
-            </div>
-            <div class="tale-tape">
-                <ul>
-                    <li><strong>Clock:</strong> {self.g['clock']}</li>
-                    <li><strong>TV:</strong> {self.g['tv']}</li>
-                </ul>
-            </div>
+        <div class="story-container">
+            <h2 class="story-headline">{headline}</h2>
+            {content}
         </div>
         """
 
@@ -165,17 +181,21 @@ class Storyteller:
 def get_az_time(utc_str):
     try:
         clean = utc_str.replace("Z", "")
-        dt_utc = datetime.fromisoformat(clean)
-        return dt_utc - timedelta(hours=7)
-    except: return datetime.now()
+        # Parse as UTC
+        dt_utc = datetime.fromisoformat(clean).replace(tzinfo=timezone.utc)
+        # Convert to AZ (UTC-7 fixed for simplicity, or use zoneinfo if installed)
+        dt_az = dt_utc - timedelta(hours=7)
+        return dt_az, dt_utc.timestamp() * 1000 # Return AZ datetime and UTC ms timestamp
+    except: 
+        return datetime.now(), 0
 
 def fetch_wire():
     print("  -> Scanning Global Wires...")
     sources = [
         ("basketball", "nba"), ("football", "nfl"), ("football", "college-football"),
         ("basketball", "mens-college-basketball"), ("baseball", "mlb"),
-        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "usa.1"),
-        ("cricket", "ipl"), ("cricket", None) 
+        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "usa.1"), ("soccer", "usa.nwsl"),
+        ("cricket", "ipl"), ("cricket", None)
     ]
     
     dashboard = []
@@ -184,91 +204,109 @@ def fetch_wire():
     for sport, league in sources:
         base = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard" if league else f"https://site.api.espn.com/apis/site/v2/sports/{sport}/scoreboard"
         try:
-            data = requests.get(base, timeout=4).json()
+            data = requests.get(base, params={'limit': '900'}, timeout=5).json()
         except: continue
             
         for e in data.get('events', []):
             if e['id'] in seen_ids: continue
             
-            # 1. Clubhouse & Championship Filter
             try:
                 c = e['competitions'][0]
                 h_tm = c['competitors'][0]['team']
                 a_tm = c['competitors'][1]['team']
             except: continue
 
-            # PASS if: Home is Clubhouse OR Away is Clubhouse OR It's a Major Final
-            if not (is_clubhouse_team(h_tm['displayName']) or 
-                    is_clubhouse_team(a_tm['displayName']) or 
-                    is_championship_event(e)):
+            # --- FILTER CHECK ---
+            home_ok = is_clubhouse_team(h_tm['displayName'])
+            away_ok = is_clubhouse_team(a_tm['displayName'])
+            champ_ok = is_championship_event(e)
+            
+            if not (home_ok or away_ok or champ_ok):
                 continue
 
             seen_ids.add(e['id'])
 
-            # 2. Window Check (Expanded)
-            az_dt = get_az_time(e['date'])
+            az_dt, utc_ts = get_az_time(e['date'])
             days_diff = (az_dt.date() - datetime.now().date()).days
             if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD:
                 continue
 
-            # 3. Parse Data
+            # Parsing
             status = c['status']['type']['state']
             note = c.get('notes', [{}])[0].get('headline', '') if c.get('notes') else ""
             
-            # Linescores
-            h_lines = [x.get('value') for x in c['competitors'][0].get('linescores', [])]
-            a_lines = [x.get('value') for x in c['competitors'][1].get('linescores', [])]
+            odds_txt = ""
+            ou_txt = ""
+            if c.get('odds'):
+                odds_txt = c['odds'][0].get('details', 'Even')
+                ou_txt = c['odds'][0].get('overUnder', '--')
 
             game = {
                 "id": e['id'],
-                "sport": (league or sport).upper(),
+                "sport": (league or sport).upper().replace("None", "INTL"),
                 "dt": az_dt,
-                "date_str": az_dt.strftime("%a %b %d"),
+                "utc_ts": utc_ts,
+                "date_str": az_dt.strftime("%b %d"),
                 "time_str": az_dt.strftime("%I:%M %p"),
                 "status": status,
                 "clock": c['status']['type']['detail'],
                 "venue": c.get('venue', {}).get('fullName', 'Unknown Venue'),
                 "tv": c.get('broadcasts', [{}])[0].get('names', [''])[0] if c.get('broadcasts') else "",
                 "note": note,
-                "home": { "name": h_tm['displayName'], "score": c['competitors'][0].get('score',''), "logo": h_tm.get('logo',''), "lines": h_lines },
-                "away": { "name": a_tm['displayName'], "score": c['competitors'][1].get('score',''), "logo": a_tm.get('logo',''), "lines": a_lines }
+                "odds": odds_txt,
+                "overunder": ou_txt,
+                "home": { 
+                    "name": h_tm['displayName'], 
+                    "score": c['competitors'][0].get('score',''), 
+                    "logo": h_tm.get('logo','')
+                },
+                "away": { 
+                    "name": a_tm['displayName'], 
+                    "score": c['competitors'][1].get('score',''), 
+                    "logo": a_tm.get('logo','')
+                }
             }
             
-            # Generate Story HTML
             story = Storyteller(game)
-            if status == 'pre': game['story_html'] = story.write_preview()
-            elif status == 'post': game['story_html'] = story.write_recap()
-            else: game['story_html'] = story.write_live()
-            
+            game['story_html'] = story.write_body()
             dashboard.append(game)
             
     return dashboard
 
-# --- DASHBOARD RENDERER ---
+# --- RENDERER ---
 
 def render_dashboard(games):
-    games.sort(key=lambda x: x['dt'], reverse=True) # Newest first usually better for mixed lists, or sort Ascending.
-    # Let's sort Ascending (Oldest to Newest) so upcoming games are at bottom? 
-    # Actually, for a news feed, usually we want "Today" near top. 
-    # Let's sort by date descending (Newest first).
+    # Sorting
+    live = [g for g in games if g['status'] == 'in']
+    completed = [g for g in games if g['status'] == 'post']
+    upcoming = [g for g in games if g['status'] == 'pre']
+    
+    live.sort(key=lambda x: x['dt'], reverse=True)
+    completed.sort(key=lambda x: x['dt'], reverse=True)
+    upcoming.sort(key=lambda x: x['dt'])
+    
+    sorted_games = live + completed + upcoming
     
     html_rows = ""
     current_date = ""
     
-    for g in games:
-        # Date Header
+    for g in sorted_games:
         g_date = g['dt'].strftime("%A, %B %d")
         if g_date != current_date:
             html_rows += f"<div class='date-header'>{g_date}</div>"
             current_date = g_date
             
         status_class = "live" if g['status'] == 'in' else g['status']
-        h_score = g['home']['score'] if g['status'] != 'pre' else ""
-        a_score = g['away']['score'] if g['status'] != 'pre' else ""
         
-        # Highlight logic
+        if g['status'] == 'pre':
+            status_display = f"<span style='color:#ffd700'>{g['odds']}</span>" if g['odds'] else g['time_str']
+        else:
+            status_display = g['clock']
+
         h_cls = "my-team" if is_clubhouse_team(g['home']['name']) else ""
         a_cls = "my-team" if is_clubhouse_team(g['away']['name']) else ""
+        h_score = g['home']['score'] if g['status'] != 'pre' else ""
+        a_score = g['away']['score'] if g['status'] != 'pre' else ""
 
         html_rows += f"""
         <details class="match-card {status_class}">
@@ -292,88 +330,113 @@ def render_dashboard(games):
                 </div>
                 
                 <div class="status-col">
-                    <div class="status-txt">{g['clock']}</div>
-                    <div class="expand-icon">▼</div>
+                    <div class="status-txt">{status_display}</div>
+                    <div class="expand-btn">EXPAND</div>
                 </div>
             </summary>
             
-            <div class="match-story">
+            <div class="article-content">
                 {g['story_html']}
             </div>
         </details>
         """
 
-    if not html_rows: html_rows = "<div class='empty'>No games found.</div>"
+    if not html_rows: html_rows = "<div class='empty'>No games on the wire.</div>"
 
     html = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>The Clubhouse</title>
+        <title>Clubhouse Wire</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="refresh" content="300">
+        <meta http-equiv="refresh" content="600">
         <style>
-            :root {{
-                --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
-                --accent: #bb86fc; --border: #333; --live: #cf6679;
-            }}
-            body {{ background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: 50px; }}
+            :root {{ --bg: #0f0f0f; --card: #1a1a1a; --text: #eee; --accent: #3b82f6; --border: #333; --live: #ef4444; }}
+            body {{ background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; }}
             
-            .header {{ background: #1f1f1f; padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 99; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }}
-            h1 {{ margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }}
+            .header {{ background: #111; padding: 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 99; display: flex; justify-content: space-between; align-items: center; }}
+            h1 {{ margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }}
+            #live-clock {{ font-family: monospace; font-size: 0.9rem; color: #888; background: #222; padding: 4px 8px; border-radius: 4px; border: 1px solid #333; }}
             
-            .container {{ max-width: 700px; margin: 0 auto; padding: 10px; }}
-            .date-header {{ margin: 25px 0 10px; font-weight: bold; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 0.9rem; text-transform: uppercase; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 10px; padding-bottom: 50px; }}
+            .date-header {{ margin: 25px 0 8px; color: #666; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #222; }}
             
-            /* CARD STYLES */
-            .match-card {{ background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: 0.2s; }}
-            .match-card[open] {{ border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }}
-            .match-card.live {{ border-left: 4px solid var(--live); }}
-            
-            .match-summary {{ list-style: none; display: flex; padding: 15px; cursor: pointer; align-items: center; }}
+            .match-card {{ background: var(--card); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; }}
+            .match-card.live {{ border-left: 3px solid var(--live); }}
+            .match-summary {{ list-style: none; display: flex; padding: 12px; align-items: center; cursor: pointer; }}
             .match-summary::-webkit-details-marker {{ display: none; }}
             
-            .time-col {{ width: 60px; text-align: center; border-right: 1px solid #333; margin-right: 15px; padding-right: 10px; flex-shrink: 0; }}
-            .time {{ font-weight: bold; font-size: 0.85rem; }}
-            .league {{ font-size: 0.65rem; color: #777; margin-top: 4px; }}
+            .time-col {{ width: 50px; text-align: center; border-right: 1px solid #333; margin-right: 10px; padding-right: 5px; opacity: 0.7; }}
+            .time {{ font-weight: bold; font-size: 0.75rem; }}
+            .league {{ font-size: 0.55rem; margin-top: 2px; }}
             
             .score-col {{ flex: 1; }}
-            .team-row {{ display: flex; align-items: center; margin: 3px 0; justify-content: space-between; }}
-            .logo {{ width: 22px; height: 22px; margin-right: 8px; object-fit: contain; }}
-            .name {{ font-size: 0.95rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+            .team-row {{ display: flex; align-items: center; margin: 2px 0; justify-content: space-between; }}
+            .logo {{ width: 18px; height: 18px; margin-right: 8px; object-fit: contain; }}
+            .name {{ font-size: 0.9rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
             .name.my-team {{ font-weight: bold; color: #fff; }}
-            .score {{ font-weight: bold; font-family: monospace; font-size: 1.1rem; }}
+            .score {{ font-weight: bold; font-family: monospace; font-size: 1rem; }}
             
-            .status-col {{ width: 90px; text-align: right; padding-left: 10px; border-left: 1px solid #333; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }}
-            .status-txt {{ font-size: 0.75rem; color: #888; }}
-            .expand-icon {{ font-size: 0.7rem; color: #555; margin-top: 5px; transition: transform 0.2s; }}
-            .match-card[open] .expand-icon {{ transform: rotate(180deg); }}
+            .status-col {{ width: 80px; text-align: right; border-left: 1px solid #333; margin-left: 8px; padding-left: 8px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }}
+            .status-txt {{ font-size: 0.65rem; color: #aaa; margin-bottom: 4px; font-weight: bold; }}
+            .expand-btn {{ font-size: 0.55rem; background: #333; padding: 2px 5px; border-radius: 3px; color: #fff; }}
             
-            /* STORY STYLES */
-            .match-story {{ background: #252525; border-top: 1px solid #333; padding: 20px; animation: slideDown 0.2s; }}
-            .story-lede {{ font-size: 1rem; line-height: 1.5; margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px; }}
-            .tale-tape li {{ margin-bottom: 5px; font-size: 0.9rem; color: #ccc; }}
+            .article-content {{ background: #222; padding: 15px; border-top: 1px solid #333; animation: fade 0.2s; }}
+            .story-headline {{ margin: 0 0 10px; font-size: 1rem; color: #fff; }}
+            .betting-line {{ background: #2a2a2a; border-left: 3px solid #ffd700; padding: 8px; margin-bottom: 10px; font-size: 0.85rem; color: #ddd; }}
+            .odds-tag {{ font-weight: bold; color: #ffd700; font-size: 0.7rem; margin-right: 5px; }}
             
-            .box-score-container {{ overflow-x: auto; margin: 15px 0; }}
-            .box-score {{ width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; }}
-            .box-score th {{ background: #333; padding: 6px; }}
-            .box-score td {{ border-bottom: 1px solid #444; padding: 6px; }}
-            .box-score .tm {{ text-align: left; font-weight: bold; color: #ddd; }}
-            .box-score .tot {{ font-weight: bold; background: #2a2a2a; }}
+            .countdown-box {{ text-align: center; font-family: monospace; font-size: 1.1rem; color: var(--accent); margin-bottom: 10px; padding: 10px; background: #151515; border-radius: 4px; border: 1px solid #333; }}
+            .metadata-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; font-size: 0.75rem; color: #888; }}
             
-            .notebook {{ background: #2a2a2a; padding: 15px; border-radius: 6px; margin-top: 15px; }}
-            .notebook h4 {{ margin: 0 0 5px 0; font-size: 0.8rem; text-transform: uppercase; color: #888; }}
-            .notebook p {{ margin: 0; font-size: 0.9rem; color: #ccc; line-height: 1.4; }}
-            
-            @keyframes slideDown {{ from {{ opacity: 0; transform: translateY(-5px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+            .live-pulse-text {{ color: var(--live); font-weight: bold; animation: pulse 1.5s infinite; }}
+            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.5; }} 100% {{ opacity: 1; }} }}
+            @keyframes fade {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
         </style>
+        <script>
+            function updateClock() {
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const azTime = new Date(utc - (3600000 * 7));
+                let hours = azTime.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; 
+                const minutes = azTime.getMinutes().toString().padStart(2, '0');
+                const seconds = azTime.getSeconds().toString().padStart(2, '0');
+                document.getElementById('live-clock').textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+            }
+            
+            function updateCountdowns() {
+                const nowUTC = new Date().getTime();
+                document.querySelectorAll('.countdown-box').forEach(box => {
+                    const targetUTC = parseFloat(box.dataset.utc);
+                    const diff = targetUTC - nowUTC;
+                    
+                    if (diff < 0) {
+                        box.innerHTML = "GAME TIME / FINISHED";
+                        return;
+                    }
+                    
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    if (d > 0) box.innerHTML = `T-MINUS: ${d}d ${h}h ${m}m`;
+                    else box.innerHTML = `T-MINUS: ${h}h ${m}m ${s}s`;
+                });
+            }
+
+            setInterval(updateClock, 1000);
+            setInterval(updateCountdowns, 1000);
+            window.onload = function() { updateClock(); updateCountdowns(); };
+        </script>
     </head>
     <body>
         <div class="header">
-            <div class="container" style="padding:0">
-                <h1>Clubhouse Wire</h1>
-                <div style="font-size: 0.8rem; color:#777;">Tempe, AZ • {datetime.now().strftime("%I:%M %p")}</div>
-            </div>
+            <h1>Clubhouse Wire</h1>
+            <div id="live-clock">--:--:--</div>
         </div>
         <div class="container">
             {html_rows}
