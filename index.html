@@ -1,229 +1,536 @@
 
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
-        <meta charset="UTF-8">
-        <title>The Tempe Torch: Sunday Edition</title>
+        <title>The Tempe Torch</title>
+        <meta http-equiv="refresh" content="1800">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&display=swap');
+            body { background: #fdfbf7; color: #111; font-family: 'Merriweather', serif; padding: 40px; }
+            h1 { font-family: 'Playfair Display'; font-size: 4rem; text-align: center; margin-bottom: 10px; }
+            .subhead { text-align: center; font-style: italic; color: #555; margin-bottom: 50px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
             
-            :root { --paper: #f9f7f1; --ink: #222; --accent: #8b0000; }
+            .section-title { border-bottom: 2px solid #800000; color: #800000; font-family: 'Playfair Display'; margin-top: 40px; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 40px; }
             
-            body { 
-                background-color: var(--paper); 
-                color: var(--ink); 
-                font-family: 'Lora', serif; 
-                margin: 0; 
-                padding: 40px; 
-                line-height: 1.6;
-            }
-            
-            /* MASTHEAD */
-            header { 
-                text-align: center; 
-                border-bottom: 4px double var(--ink); 
-                padding-bottom: 20px; 
-                margin-bottom: 50px; 
-            }
-            h1 { 
-                font-family: 'Playfair Display', serif; 
-                font-size: 5rem; 
-                margin: 0; 
-                text-transform: uppercase; 
-                letter-spacing: -2px; 
-            }
-            .tagline { 
-                font-family: 'Lora', serif; 
-                font-style: italic; 
-                font-size: 1.1rem; 
-                margin-top: 10px; 
-            }
-            
-            /* LAYOUT */
-            .desk { margin-bottom: 80px; }
-            .desk h3 { 
-                font-family: 'Playfair Display'; 
-                font-size: 2rem; 
-                border-bottom: 2px solid var(--accent); 
-                display: inline-block; 
-                margin-bottom: 30px; 
-            }
-            
-            article { 
-                max-width: 800px; 
-                margin: 0 auto 60px auto; 
-            }
-            
-            h2 { 
-                font-family: 'Playfair Display'; 
-                font-size: 2.5rem; 
-                line-height: 1.1; 
-                margin-bottom: 20px; 
-            }
-            
-            .article-meta { 
-                font-family: sans-serif; 
-                font-size: 0.8rem; 
-                font-weight: bold; 
-                color: var(--accent); 
-                margin-bottom: 10px; 
-                text-transform: uppercase; 
-                letter-spacing: 1px; 
-            }
-            
-            .article-body { 
-                font-size: 1.15rem; 
-                text-align: justify; 
-            }
-            
-            .article-body h4 {
-                font-family: sans-serif;
-                font-size: 0.9rem;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                color: #555;
-                margin-top: 30px;
-                margin-bottom: 5px;
-                border-bottom: 1px solid #ddd;
-            }
-            
-            .dateline { 
-                font-weight: bold; 
-                text-transform: uppercase; 
-            }
-            
-            .story-divider {
-                border: 0;
-                height: 1px;
-                background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
-                margin: 50px 0;
-            }
-            
-            .article-footer {
-                margin-top: 30px;
-                font-size: 0.8rem;
-                text-align: center;
-                color: #888;
-                font-family: sans-serif;
-            }
+            .story-card { background: #fff; padding: 30px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+            .story-card h3 { font-family: 'Playfair Display'; font-size: 1.8rem; margin: 10px 0; }
+            .meta { font-size: 0.8rem; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 1px; }
+            .body { font-size: 1rem; line-height: 1.7; color: #333; }
+            .body p { margin-bottom: 15px; }
+            .dateline { font-weight: bold; font-family: sans-serif; font-size: 0.85rem; color: #444; text-transform: uppercase; }
         </style>
     </head>
     <body>
-        <header>
-            <h1>The Tempe Torch</h1>
-            <div class="tagline">The Sunday Longform Edition • February 12, 2026</div>
-        </header>
-        <section class='desk'><h3>NBA DESK</h3>
-            <article>
-                <div class="article-meta">NBA • Feb 13</div>
-                <h2>Dallas Mavericks vs. Los Angeles Lakers: Everything You Need to Know</h2>
-                <div class="article-body">
-                    <span class='dateline'>LOS ANGELES</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Los Angeles Lakers (32-21) prepare to welcome the Dallas Mavericks to crypto.com Arena in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>The atmosphere inside crypto.com Arena is expected to be electric, with a sell-out crowd ready to make their presence felt. For the Los Angeles Lakers, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Dallas Mavericks arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Los Angeles Lakers can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Dallas Mavericks have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"The preparation has been good, now we just have to go out and play our game." The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at LAL -6.5. While the pundits may favor the home team slightly due to venue advantage, the Dallas Mavericks are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 03:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+        <h1>The Tempe Torch</h1>
+        <div class="subhead">Global Edition (Tempe • London • Barcelona • Mumbai) • February 12, 2026</div>
+        <h2 class='section-title'>CHAMPIONSHIP</h2><div class='grid'>
+            <article class="story-card">
+                <div class="meta">CHAMPIONSHIP • Sat Feb 14 • Sat, February 14th at 10:00 AM EST</div>
+                <h3>Sheffield United vs Portsmouth</h3>
+                <div class="body">
+        <p class="dateline">PORTSMOUTH (Preview) —</p>
+        <p>The Portsmouth prepare to host the Sheffield United at Fratton Park.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at SHU +130, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
-            </section><section class='desk'><h3>NCAA BASKETBALL DESK</h3>
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 12</div>
-                <h2>Deep Dive: Can New Hampshire Wildcats Defend Home Turf Against NJIT Highlanders?</h2>
-                <div class="article-body">
-                    <span class='dateline'>DURHAM</span> — The calendar reads Thursday, February 12, but the intensity surrounding this matchup suggests something far greater. The New Hampshire Wildcats (8-14) prepare to welcome the NJIT Highlanders to Lundholm Gymnasium in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into Lundholm Gymnasium for what promises to be a pivotal matchup. For the New Hampshire Wildcats, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting NJIT Highlanders arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the New Hampshire Wildcats can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the NJIT Highlanders have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at UNH -2.5. While the pundits may favor the home team slightly due to venue advantage, the NJIT Highlanders are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 11:00 PM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
-            </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 12</div>
-                <h2>Northern Kentucky Norse vs. IU Indianapolis Jaguars: Everything You Need to Know</h2>
-                <div class="article-body">
-                    <span class='dateline'>INDIANAPOLIS</span> — The calendar reads Thursday, February 12, but the intensity surrounding this matchup suggests something far greater. The IU Indianapolis Jaguars (7-19) prepare to welcome the Northern Kentucky Norse to The Jungle in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into The Jungle for what promises to be a pivotal matchup. For the IU Indianapolis Jaguars, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Northern Kentucky Norse arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the IU Indianapolis Jaguars can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Northern Kentucky Norse have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"The preparation has been good, now we just have to go out and play our game." The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at NKU -5.5. While the pundits may favor the home team slightly due to venue advantage, the Northern Kentucky Norse are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 11:30 PM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">CHAMPIONSHIP • Sat Feb 14 • Sat, February 14th at 10:00 AM EST</div>
+                <h3>Blackburn Rovers vs Queens Park Rangers</h3>
+                <div class="body">
+        <p class="dateline">LONDON (Preview) —</p>
+        <p>The Queens Park Rangers prepare to host the Blackburn Rovers at MATRADE Loftus Road.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at QPR +115, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
+            </div><h2 class='section-title'>NBA</h2><div class='grid'>
+            <article class="story-card">
+                <div class="meta">NBA • Fri Feb 13 • Thu, February 12th at 10:00 PM EST</div>
+                <h3>Dallas Mavericks vs Los Angeles Lakers</h3>
+                <div class="body">
+        <p class="dateline">LOS ANGELES (Preview) —</p>
+        <p>The Los Angeles Lakers prepare to host the Dallas Mavericks at crypto.com Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LAL -6.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            </div><h2 class='section-title'>NCAA BASKETBALL</h2><div class='grid'>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Valparaiso Beacons vs Illinois State Redbirds</h3>
+                <div class="body">
+        <p class="dateline">NORMAL (Preview) —</p>
+        <p>The Illinois State Redbirds prepare to host the Valparaiso Beacons at CEFCU Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at ILST -8.5, suggesting a tight battle.</p>
+        </div>
+            </article>
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Deep Dive: Can Merrimack Warriors Defend Home Turf Against Marist Red Foxes?</h2>
-                <div class="article-body">
-                    <span class='dateline'>NORTH ANDOVER</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Merrimack Warriors (16-9) prepare to welcome the Marist Red Foxes to Lawler Arena in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>The atmosphere inside Lawler Arena is expected to be electric, with a sell-out crowd ready to make their presence felt. For the Merrimack Warriors, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Marist Red Foxes arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Merrimack Warriors can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Marist Red Foxes have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at MRMK -3.5. While the pundits may favor the home team slightly due to venue advantage, the Marist Red Foxes are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 12:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Murray State Racers vs Indiana State Sycamores</h3>
+                <div class="body">
+        <p class="dateline">TERRE HAUTE (Preview) —</p>
+        <p>The Indiana State Sycamores prepare to host the Murray State Racers at Hulman Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at MUR -3.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>PREVIEW: Mercyhurst Lakers, Le Moyne Dolphins Set for Clash at Ted Grant Court</h2>
-                <div class="article-body">
-                    <span class='dateline'>SYRACUSE</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Le Moyne Dolphins (12-13) prepare to welcome the Mercyhurst Lakers to Ted Grant Court in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into Ted Grant Court for what promises to be a pivotal matchup. For the Le Moyne Dolphins, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Mercyhurst Lakers arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Le Moyne Dolphins can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Mercyhurst Lakers have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at LEM -2.5. While the pundits may favor the home team slightly due to venue advantage, the Mercyhurst Lakers are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 12:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Marist Red Foxes vs Merrimack Warriors</h3>
+                <div class="body">
+        <p class="dateline">NORTH ANDOVER (Preview) —</p>
+        <p>The Merrimack Warriors prepare to host the Marist Red Foxes at Lawler Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at MRMK -3.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Deep Dive: Can Morehead State Eagles Defend Home Turf Against Tennessee Tech Golden Eagles?</h2>
-                <div class="article-body">
-                    <span class='dateline'>MOREHEAD</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Morehead State Eagles (13-12) prepare to welcome the Tennessee Tech Golden Eagles to Ellis T. Johnson Arena in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>The atmosphere inside Ellis T. Johnson Arena is expected to be electric, with a sell-out crowd ready to make their presence felt. For the Morehead State Eagles, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Tennessee Tech Golden Eagles arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Morehead State Eagles can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Tennessee Tech Golden Eagles have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at MORE -4.5. While the pundits may favor the home team slightly due to venue advantage, the Tennessee Tech Golden Eagles are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 12:30 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Winthrop Eagles vs Gardner-Webb Runnin' Bulldogs</h3>
+                <div class="body">
+        <p class="dateline">BOILING SPRINGS (Preview) —</p>
+        <p>The Gardner-Webb Runnin' Bulldogs prepare to host the Winthrop Eagles at Paul Porter Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at WIN -20.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Deep Dive: Can Northern Arizona Lumberjacks Defend Home Turf Against Portland State Vikings?</h2>
-                <div class="article-body">
-                    <span class='dateline'>FLAGSTAFF</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Northern Arizona Lumberjacks (9-16) prepare to welcome the Portland State Vikings to J. Lawrence Walkup Skydome in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into J. Lawrence Walkup Skydome for what promises to be a pivotal matchup. For the Northern Arizona Lumberjacks, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Portland State Vikings arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Northern Arizona Lumberjacks can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Portland State Vikings have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at PRST -7.5. While the pundits may favor the home team slightly due to venue advantage, the Portland State Vikings are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 01:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>UNC Asheville Bulldogs vs Longwood Lancers</h3>
+                <div class="body">
+        <p class="dateline">FARMVILLE (Preview) —</p>
+        <p>The Longwood Lancers prepare to host the UNC Asheville Bulldogs at Joan Perry Brock Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LONG -2.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Memphis Tigers vs. North Texas Mean Green: Everything You Need to Know</h2>
-                <div class="article-body">
-                    <span class='dateline'>DENTON</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The North Texas Mean Green (13-11) prepare to welcome the Memphis Tigers to The Super Pit in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into The Super Pit for what promises to be a pivotal matchup. For the North Texas Mean Green, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Memphis Tigers arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the North Texas Mean Green can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Memphis Tigers have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at MEM -1.5. While the pundits may favor the home team slightly due to venue advantage, the Memphis Tigers are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 02:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Robert Morris Colonials vs Cleveland State Vikings</h3>
+                <div class="body">
+        <p class="dateline">CLEVELAND (Preview) —</p>
+        <p>The Cleveland State Vikings prepare to host the Robert Morris Colonials at Wolstein Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at RMU -3.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Stakes High as Idaho Vandals Host Weber State Wildcats in Pivotal Mens College Basketball Showdown</h2>
-                <div class="article-body">
-                    <span class='dateline'>MOSCOW</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Idaho Vandals (13-11) prepare to welcome the Weber State Wildcats to ICCU Arena in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>The atmosphere inside ICCU Arena is expected to be electric, with a sell-out crowd ready to make their presence felt. For the Idaho Vandals, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Weber State Wildcats arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Idaho Vandals can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Weber State Wildcats have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at IDHO -5.5. While the pundits may favor the home team slightly due to venue advantage, the Weber State Wildcats are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 02:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Central Connecticut Blue Devils vs New Haven Chargers</h3>
+                <div class="body">
+        <p class="dateline">WEST HAVEN (Preview) —</p>
+        <p>The New Haven Chargers prepare to host the Central Connecticut Blue Devils at Jeffery P. Hazell Athletics Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at CCSU -2.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Deep Dive: Can Abilene Christian Wildcats Defend Home Turf Against UT Arlington Mavericks?</h2>
-                <div class="article-body">
-                    <span class='dateline'>ABILENE</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Abilene Christian Wildcats (10-13) prepare to welcome the UT Arlington Mavericks to Moody Coliseum (Abilene) in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>Fans are filing into Moody Coliseum (Abilene) for what promises to be a pivotal matchup. For the Abilene Christian Wildcats, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting UT Arlington Mavericks arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Abilene Christian Wildcats can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the UT Arlington Mavericks have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"The preparation has been good, now we just have to go out and play our game." The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at UTA -1.5. While the pundits may favor the home team slightly due to venue advantage, the UT Arlington Mavericks are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 02:00 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Stonehill Skyhawks vs Chicago State Cougars</h3>
+                <div class="body">
+        <p class="dateline">CHICAGO (Preview) —</p>
+        <p>The Chicago State Cougars prepare to host the Stonehill Skyhawks at Jones Convocation Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at STO -1.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
             
-            <article>
-                <div class="article-meta">NCAA BASKETBALL • Feb 13</div>
-                <h2>Deep Dive: Can Cal State Bakersfield Roadrunners Defend Home Turf Against Hawai'i Rainbow Warriors?</h2>
-                <div class="article-body">
-                    <span class='dateline'>BAKERSFIELD</span> — The calendar reads Friday, February 13, but the intensity surrounding this matchup suggests something far greater. The Cal State Bakersfield Roadrunners (8-17) prepare to welcome the Hawai'i Rainbow Warriors to Icardo Center in a contest that carries significant implications for both programs. With the season's narrative still being written, tonight's chapter promises drama.<br><br>The atmosphere inside Icardo Center is expected to be electric, with a sell-out crowd ready to make their presence felt. For the Cal State Bakersfield Roadrunners, this game represents a chance to solidify their standing and send a message to the rest of the league. Consistency has been the watchword in practice all week. Meanwhile, the visiting Hawai'i Rainbow Warriors arrive with intentions of playing spoiler, knowing that a road victory in this environment would be a marquee addition to their resume.<br><br><h4>The Tactical Battle</h4>This appears to be an evenly matched tug-of-war, where execution in the final minutes will likely decide the outcome. Analysts are pointing to the battle in the trenches and perimeter defense as the deciding factors. If the Cal State Bakersfield Roadrunners can control the tempo and limit turnovers, they should be able to dictate the flow of the game. However, the Hawai'i Rainbow Warriors have shown resilience this season, often finding ways to grind out possessions when their offense stagnates.<br><br>Both teams rely on balanced scoring attacks, with depth being a major strength.<br><br><h4>Voices from the Locker Room</h4>"It's going to come down to who wants it more," sources close to the team emphasized. The sentiment in the locker room is one of focused determination. Neither side is taking this challenge lightly.<br><br><h4>Series History</h4>No recent data. Familiarity breeds contempt, and there is no shortage of competitive fire between these two. Longtime fans will remember previous battles that went down to the wire.<br><br><h4>The Verdict</h4>Vegas has set the line at HAW -12.5. While the pundits may favor the home team slightly due to venue advantage, the Hawai'i Rainbow Warriors are more than capable of an upset. Expect a physical, hard-fought contest that may come down to the final possession. Tip-off is scheduled for 02:30 AM.
-                </div>
-                <div class="article-footer">AP WIRE • TEMPE TORCH</div>
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Long Island University Sharks vs Wagner Seahawks</h3>
+                <div class="body">
+        <p class="dateline">STATEN ISLAND (Preview) —</p>
+        <p>The Wagner Seahawks prepare to host the Long Island University Sharks at Spiro Sports Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LIU -6.5, suggesting a tight battle.</p>
+        </div>
             </article>
-            <hr class="story-divider">
-            </section>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Mercyhurst Lakers vs Le Moyne Dolphins</h3>
+                <div class="body">
+        <p class="dateline">SYRACUSE (Preview) —</p>
+        <p>The Le Moyne Dolphins prepare to host the Mercyhurst Lakers at Ted Grant Court.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LEM -2.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Stony Brook Seawolves vs Towson Tigers</h3>
+                <div class="body">
+        <p class="dateline">TOWSON (Preview) —</p>
+        <p>The Towson Tigers prepare to host the Stony Brook Seawolves at SECU Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at TOW -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Monmouth Hawks vs Drexel Dragons</h3>
+                <div class="body">
+        <p class="dateline">PHILADELPHIA (Preview) —</p>
+        <p>The Drexel Dragons prepare to host the Monmouth Hawks at Daskalakis Athletic Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at DREX -2.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Elon Phoenix vs UNC Wilmington Seahawks</h3>
+                <div class="body">
+        <p class="dateline">WILMINGTON (Preview) —</p>
+        <p>The UNC Wilmington Seahawks prepare to host the Elon Phoenix at Trask Coliseum.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UNCW -7.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:00 PM EST</div>
+                <h3>Georgia State Panthers vs James Madison Dukes</h3>
+                <div class="body">
+        <p class="dateline">HARRISONBURG (Preview) —</p>
+        <p>The James Madison Dukes prepare to host the Georgia State Panthers at Atlantic Union Bank Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at JMU -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:30 PM EST</div>
+                <h3>UIC Flames vs Drake Bulldogs</h3>
+                <div class="body">
+        <p class="dateline">DES MOINES (Preview) —</p>
+        <p>The Drake Bulldogs prepare to host the UIC Flames at Knapp Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at DRKE -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 7:30 PM EST</div>
+                <h3>Tennessee Tech Golden Eagles vs Morehead State Eagles</h3>
+                <div class="body">
+        <p class="dateline">MOREHEAD (Preview) —</p>
+        <p>The Morehead State Eagles prepare to host the Tennessee Tech Golden Eagles at Ellis T. Johnson Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at MORE -4.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:00 PM EST</div>
+                <h3>Evansville Purple Aces vs Southern Illinois Salukis</h3>
+                <div class="body">
+        <p class="dateline">CARBONDALE (Preview) —</p>
+        <p>The Southern Illinois Salukis prepare to host the Evansville Purple Aces at Banterra Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at SIU -11.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:00 PM EST</div>
+                <h3>St. Thomas-Minnesota Tommies vs Omaha Mavericks</h3>
+                <div class="body">
+        <p class="dateline">OMAHA (Preview) —</p>
+        <p>The Omaha Mavericks prepare to host the St. Thomas-Minnesota Tommies at Baxter Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at STMN -3.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:00 PM EST</div>
+                <h3>Sacramento State Hornets vs Northern Colorado Bears</h3>
+                <div class="body">
+        <p class="dateline">GREELEY (Preview) —</p>
+        <p>The Northern Colorado Bears prepare to host the Sacramento State Hornets at Bank of Colorado Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UNCO -9.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:00 PM EST</div>
+                <h3>Portland State Vikings vs Northern Arizona Lumberjacks</h3>
+                <div class="body">
+        <p class="dateline">FLAGSTAFF (Preview) —</p>
+        <p>The Northern Arizona Lumberjacks prepare to host the Portland State Vikings at J. Lawrence Walkup Skydome.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at PRST -7.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:00 PM EST</div>
+                <h3>Tennessee State Tigers vs Southern Indiana Screaming Eagles</h3>
+                <div class="body">
+        <p class="dateline">EVANSVILLE (Preview) —</p>
+        <p>The Southern Indiana Screaming Eagles prepare to host the Tennessee State Tigers at Liberty Arena (IN).</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at TNST -6.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:30 PM EST</div>
+                <h3>Southeast Missouri State Redhawks vs SIU Edwardsville Cougars</h3>
+                <div class="body">
+        <p class="dateline">EDWARDSVILLE (Preview) —</p>
+        <p>The SIU Edwardsville Cougars prepare to host the Southeast Missouri State Redhawks at First Community Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at SIUE -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:30 PM EST</div>
+                <h3>Little Rock Trojans vs Western Illinois Leathernecks</h3>
+                <div class="body">
+        <p class="dateline">MACOMB (Preview) —</p>
+        <p>The Western Illinois Leathernecks prepare to host the Little Rock Trojans at Western Hall.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LR -6.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:30 PM EST</div>
+                <h3>UT Martin Skyhawks vs Lindenwood Lions</h3>
+                <div class="body">
+        <p class="dateline">SAINT CHARLES (Preview) —</p>
+        <p>The Lindenwood Lions prepare to host the UT Martin Skyhawks at Hyland Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UTM -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:30 PM EST</div>
+                <h3>California Baptist Lancers vs Southern Utah Thunderbirds</h3>
+                <div class="body">
+        <p class="dateline">CEDAR CITY (Preview) —</p>
+        <p>The Southern Utah Thunderbirds prepare to host the California Baptist Lancers at America First Events Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at CBU -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 8:30 PM EST</div>
+                <h3>Louisiana Tech Bulldogs vs Missouri State Bears</h3>
+                <div class="body">
+        <p class="dateline">SPRINGFIELD (Preview) —</p>
+        <p>The Missouri State Bears prepare to host the Louisiana Tech Bulldogs at Great Southern Bank Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at MOST -4.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>Oregon State Beavers vs San Francisco Dons</h3>
+                <div class="body">
+        <p class="dateline">SAN FRANCISCO (Preview) —</p>
+        <p>The San Francisco Dons prepare to host the Oregon State Beavers at The Sobrato Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at SF -9.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>Memphis Tigers vs North Texas Mean Green</h3>
+                <div class="body">
+        <p class="dateline">DENTON (Preview) —</p>
+        <p>The North Texas Mean Green prepare to host the Memphis Tigers at The Super Pit.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at MEM -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>Weber State Wildcats vs Idaho Vandals</h3>
+                <div class="body">
+        <p class="dateline">MOSCOW (Preview) —</p>
+        <p>The Idaho Vandals prepare to host the Weber State Wildcats at ICCU Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at IDHO -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>Idaho State Bengals vs Eastern Washington Eagles</h3>
+                <div class="body">
+        <p class="dateline">CHENEY (Preview) —</p>
+        <p>The Eastern Washington Eagles prepare to host the Idaho State Bengals at Reese Court.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at EWU -3.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>Utah Valley Wolverines vs Utah Tech Trailblazers</h3>
+                <div class="body">
+        <p class="dateline">ST. GEORGE (Preview) —</p>
+        <p>The Utah Tech Trailblazers prepare to host the Utah Valley Wolverines at Burns Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UVU -8.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:00 PM EST</div>
+                <h3>UT Arlington Mavericks vs Abilene Christian Wildcats</h3>
+                <div class="body">
+        <p class="dateline">ABILENE (Preview) —</p>
+        <p>The Abilene Christian Wildcats prepare to host the UT Arlington Mavericks at Moody Coliseum (Abilene).</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UTA -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 9:30 PM EST</div>
+                <h3>Hawai'i Rainbow Warriors vs Cal State Bakersfield Roadrunners</h3>
+                <div class="body">
+        <p class="dateline">BAKERSFIELD (Preview) —</p>
+        <p>The Cal State Bakersfield Roadrunners prepare to host the Hawai'i Rainbow Warriors at Icardo Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at HAW -12.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 10:00 PM EST</div>
+                <h3>UC Santa Barbara Gauchos vs UC Riverside Highlanders</h3>
+                <div class="body">
+        <p class="dateline">RIVERSIDE (Preview) —</p>
+        <p>The UC Riverside Highlanders prepare to host the UC Santa Barbara Gauchos at SRC Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UCSB -6.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 10:00 PM EST</div>
+                <h3>Cal State Fullerton Titans vs Long Beach State Beach</h3>
+                <div class="body">
+        <p class="dateline">LONG BEACH (Preview) —</p>
+        <p>The Long Beach State Beach prepare to host the Cal State Fullerton Titans at Walter Pyramid.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at LBSU -1.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 10:00 PM EST</div>
+                <h3>UC Irvine Anteaters vs Cal Poly Mustangs</h3>
+                <div class="body">
+        <p class="dateline">SAN LUIS OBISPO (Preview) —</p>
+        <p>The Cal Poly Mustangs prepare to host the UC Irvine Anteaters at Mott Athletics Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UCI -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Fri Feb 13 • Thu, February 12th at 10:00 PM EST</div>
+                <h3>UC Davis Aggies vs UC San Diego Tritons</h3>
+                <div class="body">
+        <p class="dateline">SAN DIEGO (Preview) —</p>
+        <p>The UC San Diego Tritons prepare to host the UC Davis Aggies at LionTree Arena.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UCSD -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Thu Feb 12 • Thu, February 12th at 6:00 PM EST</div>
+                <h3>NJIT Highlanders vs New Hampshire Wildcats</h3>
+                <div class="body">
+        <p class="dateline">DURHAM (Preview) —</p>
+        <p>The New Hampshire Wildcats prepare to host the NJIT Highlanders at Lundholm Gymnasium.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UNH -2.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Thu Feb 12 • Thu, February 12th at 6:00 PM EST</div>
+                <h3>UMBC Retrievers vs Maine Black Bears</h3>
+                <div class="body">
+        <p class="dateline">ORONO (Preview) —</p>
+        <p>The Maine Black Bears prepare to host the UMBC Retrievers at Skip Chappelle Court in Memorial Gymnasium.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UMBC -3.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Thu Feb 12 • Thu, February 12th at 6:00 PM EST</div>
+                <h3>Bryant Bulldogs vs UMass Lowell River Hawks</h3>
+                <div class="body">
+        <p class="dateline">LOWELL (Preview) —</p>
+        <p>The UMass Lowell River Hawks prepare to host the Bryant Bulldogs at Kennedy Family Athletic Complex.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at UML -3.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Thu Feb 12 • Thu, February 12th at 6:30 PM EST</div>
+                <h3>Northern Kentucky Norse vs IU Indianapolis Jaguars</h3>
+                <div class="body">
+        <p class="dateline">INDIANAPOLIS (Preview) —</p>
+        <p>The IU Indianapolis Jaguars prepare to host the Northern Kentucky Norse at The Jungle.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at NKU -5.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            
+            <article class="story-card">
+                <div class="meta">NCAA BASKETBALL • Thu Feb 12 • Thu, February 12th at 6:30 PM EST</div>
+                <h3>Middle Tennessee Blue Raiders vs Kennesaw State Owls</h3>
+                <div class="body">
+        <p class="dateline">KENNESAW (Preview) —</p>
+        <p>The Kennesaw State Owls prepare to host the Middle Tennessee Blue Raiders at KSU Convocation Center.</p>
+        <p>This matchup draws eyes from fans expecting a high-stakes contest. 
+        Vegas has set the line at KENN -3.5, suggesting a tight battle.</p>
+        </div>
+            </article>
+            </div><h2 class='section-title'>NFL</h2><div class='grid'>
+            <article class="story-card">
+                <div class="meta">NFL • Sun Feb 08 • Final</div>
+                <h3>Seattle Seahawks vs New England Patriots</h3>
+                <div class="body">
+        <p class="dateline">SANTA CLARA —</p>
+        <p>The Seattle Seahawks secured a victory over the New England Patriots 
+        with a final score of 13-29.</p>
+        <p>Key Performers: Drake Maye (27/43, 295 YDS, 2 TD, 2 INT), Kenneth Walker III (27 CAR, 135 YDS), Mack Hollins (4 REC, 78 YDS, 1 TD)</p>
+        </div>
+            </article>
+            </div>
     </body>
     </html>
     
