@@ -2,112 +2,1348 @@
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Clubhouse</title>
+        <title>The Clubhouse</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="300">
         <style>
             :root {
                 --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
-                --accent: #bb86fc; --border: #333;
-                --live: #cf6679; --green: #03dac6;
+                --accent: #bb86fc; --border: #333; --live: #cf6679;
             }
-            body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
+            body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: 50px; }
             
-            .header { padding: 20px; border-bottom: 1px solid var(--border); background: #1f1f1f; position: sticky; top: 0; z-index: 10; }
+            .header { background: #1f1f1f; padding: 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 99; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
             h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }
-            .sub { font-size: 0.8rem; color: #777; margin-top: 5px; }
             
-            .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+            .container { max-width: 700px; margin: 0 auto; padding: 10px; }
+            .date-header { margin: 25px 0 10px; font-weight: bold; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 0.9rem; text-transform: uppercase; }
             
-            .date-header { 
-                margin: 25px 0 10px 0; 
-                font-size: 0.9rem; 
-                font-weight: bold; 
-                color: #888; 
-                text-transform: uppercase; 
-                border-bottom: 1px solid var(--border); 
-                padding-bottom: 5px;
-            }
+            /* CARD STYLES */
+            .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: 0.2s; }
+            .match-card[open] { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+            .match-card.live { border-left: 4px solid var(--live); }
             
-            .match-row { 
-                display: flex; 
-                align-items: center; 
-                background: var(--card); 
-                margin-bottom: 12px; 
-                padding: 15px; 
-                border-radius: 8px; 
-                border: 1px solid var(--border);
-            }
+            .match-summary { list-style: none; display: flex; padding: 15px; cursor: pointer; align-items: center; }
+            .match-summary::-webkit-details-marker { display: none; }
             
-            .match-row.live { border: 1px solid var(--live); box-shadow: 0 0 10px rgba(207, 102, 121, 0.2); }
+            .time-col { width: 60px; text-align: center; border-right: 1px solid #333; margin-right: 15px; padding-right: 10px; flex-shrink: 0; }
+            .time { font-weight: bold; font-size: 0.85rem; }
+            .league { font-size: 0.65rem; color: #777; margin-top: 4px; }
             
-            .time-col { width: 80px; text-align: center; border-right: 1px solid #333; padding-right: 15px; margin-right: 15px; }
-            .time { font-weight: bold; font-size: 0.9rem; }
-            .league { font-size: 0.6rem; color: #666; margin-top: 4px; overflow: hidden; white-space: nowrap; }
-            
-            .game-info { flex: 1; }
-            .team-line { display: flex; align-items: center; margin: 4px 0; justify-content: space-between; }
-            .logo { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
-            .name { font-size: 1rem; flex: 1; }
+            .score-col { flex: 1; }
+            .team-row { display: flex; align-items: center; margin: 3px 0; justify-content: space-between; }
+            .logo { width: 22px; height: 22px; margin-right: 8px; object-fit: contain; }
+            .name { font-size: 0.95rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .name.my-team { font-weight: bold; color: #fff; }
-            .name.opp-team { color: #aaa; }
             .score { font-weight: bold; font-family: monospace; font-size: 1.1rem; }
             
-            .status-col { width: 100px; text-align: right; padding-left: 15px; border-left: 1px solid #333; margin-left: 15px; }
-            .status-indicator { display: flex; align-items: center; justify-content: flex-end; font-size: 0.8rem; gap: 6px; }
-            .dot { width: 8px; height: 8px; border-radius: 50%; }
-            .live-dot { background: var(--live); animation: pulse 1.5s infinite; }
-            .upcoming-dot { background: #555; }
-            .final-dot { background: #333; }
+            .status-col { width: 90px; text-align: right; padding-left: 10px; border-left: 1px solid #333; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+            .status-txt { font-size: 0.75rem; color: #888; }
+            .expand-icon { font-size: 0.7rem; color: #555; margin-top: 5px; transition: transform 0.2s; }
+            .match-card[open] .expand-icon { transform: rotate(180deg); }
             
-            .tv-channel { font-size: 0.7rem; color: #666; margin-top: 5px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+            /* STORY STYLES */
+            .match-story { background: #252525; border-top: 1px solid #333; padding: 20px; animation: slideDown 0.2s; }
+            .story-lede { font-size: 1rem; line-height: 1.5; margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px; }
+            .tale-tape li { margin-bottom: 5px; font-size: 0.9rem; color: #ccc; }
             
-            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+            .box-score-container { overflow-x: auto; margin: 15px 0; }
+            .box-score { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; }
+            .box-score th { background: #333; padding: 6px; }
+            .box-score td { border-bottom: 1px solid #444; padding: 6px; }
+            .box-score .tm { text-align: left; font-weight: bold; color: #ddd; }
+            .box-score .tot { font-weight: bold; background: #2a2a2a; }
             
-            @media (max-width: 500px) {
-                .match-row { flex-wrap: wrap; }
-                .status-col { width: 100%; border-left: none; margin-left: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; text-align: left; display: flex; justify-content: space-between; }
-                .time-col { width: 60px; }
-            }
+            .notebook { background: #2a2a2a; padding: 15px; border-radius: 6px; margin-top: 15px; }
+            .notebook h4 { margin: 0 0 5px 0; font-size: 0.8rem; text-transform: uppercase; color: #888; }
+            .notebook p { margin: 0; font-size: 0.9rem; color: #ccc; line-height: 1.4; }
+            
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         </style>
     </head>
     <body>
         <div class="header">
             <div class="container" style="padding:0">
                 <h1>Clubhouse Wire</h1>
-                <div class="sub">Tempe, AZ • 08:49 PM MST</div>
+                <div style="font-size: 0.8rem; color:#777;">Tempe, AZ • 08:55 PM</div>
+            </div>
+        </div>
+        <div class="container">
+            <div class='date-header'>Thursday, February 12</div>
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">08:00 PM</div>
+                    <div class="league">NBA</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Dallas Mavericks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Los Angeles Lakers</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 10:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Los Angeles Lakers prepare to host the Dallas Mavericks 
+                at crypto.com Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Dallas Mavericks vs Los Angeles Lakers</li>
+                    <li><strong>Venue:</strong> crypto.com Arena</li>
+                    <li><strong>Broadcast:</strong> Prime Video</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this NBA clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">08:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2239.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Cal State Fullerton Titans</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/299.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Long Beach State Beach</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 10:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Long Beach State Beach prepare to host the Cal State Fullerton Titans 
+                at Walter Pyramid.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Cal State Fullerton Titans vs Long Beach State Beach</li>
+                    <li><strong>Venue:</strong> Walter Pyramid</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">08:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/302.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UC Davis Aggies</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/28.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">UC San Diego Tritons</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 10:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The UC San Diego Tritons prepare to host the UC Davis Aggies 
+                at LionTree Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UC Davis Aggies vs UC San Diego Tritons</li>
+                    <li><strong>Venue:</strong> LionTree Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">07:30 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/62.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Hawai'i Rainbow Warriors</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2934.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Cal State Bakersfield Roadrunners</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 9:30 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Cal State Bakersfield Roadrunners prepare to host the Hawai'i Rainbow Warriors 
+                at Icardo Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Hawai'i Rainbow Warriors vs Cal State Bakersfield Roadrunners</li>
+                    <li><strong>Venue:</strong> Icardo Center</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">07:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/250.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UT Arlington Mavericks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2000.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Abilene Christian Wildcats</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 9:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Abilene Christian Wildcats prepare to host the UT Arlington Mavericks 
+                at Moody Coliseum (Abilene).
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UT Arlington Mavericks vs Abilene Christian Wildcats</li>
+                    <li><strong>Venue:</strong> Moody Coliseum (Abilene)</li>
+                    <li><strong>Broadcast:</strong> ESPNU</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:30 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2546.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Southeast Missouri State Redhawks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2565.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">SIU Edwardsville Cougars</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:30 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The SIU Edwardsville Cougars prepare to host the Southeast Missouri State Redhawks 
+                at First Community Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Southeast Missouri State Redhawks vs SIU Edwardsville Cougars</li>
+                    <li><strong>Venue:</strong> First Community Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:30 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2630.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UT Martin Skyhawks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2815.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Lindenwood Lions</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:30 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Lindenwood Lions prepare to host the UT Martin Skyhawks 
+                at Hyland Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UT Martin Skyhawks vs Lindenwood Lions</li>
+                    <li><strong>Venue:</strong> Hyland Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:30 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2348.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Louisiana Tech Bulldogs</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2623.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Missouri State Bears</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:30 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Missouri State Bears prepare to host the Louisiana Tech Bulldogs 
+                at Great Southern Bank Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Louisiana Tech Bulldogs vs Missouri State Bears</li>
+                    <li><strong>Venue:</strong> Great Southern Bank Arena</li>
+                    <li><strong>Broadcast:</strong> CBSSN</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2900.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">St. Thomas-Minnesota Tommies</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2437.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Omaha Mavericks</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Omaha Mavericks prepare to host the St. Thomas-Minnesota Tommies 
+                at Baxter Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> St. Thomas-Minnesota Tommies vs Omaha Mavericks</li>
+                    <li><strong>Venue:</strong> Baxter Arena</li>
+                    <li><strong>Broadcast:</strong> Summit League Network</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/16.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Sacramento State Hornets</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2458.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Northern Colorado Bears</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Northern Colorado Bears prepare to host the Sacramento State Hornets 
+                at Bank of Colorado Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Sacramento State Hornets vs Northern Colorado Bears</li>
+                    <li><strong>Venue:</strong> Bank of Colorado Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">06:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2634.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Tennessee State Tigers</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/88.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Southern Indiana Screaming Eagles</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 8:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Southern Indiana Screaming Eagles prepare to host the Tennessee State Tigers 
+                at Liberty Arena (IN).
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Tennessee State Tigers vs Southern Indiana Screaming Eagles</li>
+                    <li><strong>Venue:</strong> Liberty Arena (IN)</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:30 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/82.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">UIC Flames</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2181.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Drake Bulldogs</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:30 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Drake Bulldogs prepare to host the UIC Flames 
+                at Knapp Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UIC Flames vs Drake Bulldogs</li>
+                    <li><strong>Venue:</strong> Knapp Center</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/93.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Murray State Racers</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/282.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Indiana State Sycamores</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Indiana State Sycamores prepare to host the Murray State Racers 
+                at Hulman Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Murray State Racers vs Indiana State Sycamores</li>
+                    <li><strong>Venue:</strong> Hulman Center</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2368.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Marist Red Foxes</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2771.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Merrimack Warriors</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Merrimack Warriors prepare to host the Marist Red Foxes 
+                at Lawler Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Marist Red Foxes vs Merrimack Warriors</li>
+                    <li><strong>Venue:</strong> Lawler Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2737.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Winthrop Eagles</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2241.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Gardner-Webb Runnin' Bulldogs</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Gardner-Webb Runnin' Bulldogs prepare to host the Winthrop Eagles 
+                at Paul Porter Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Winthrop Eagles vs Gardner-Webb Runnin' Bulldogs</li>
+                    <li><strong>Venue:</strong> Paul Porter Arena</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2427.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UNC Asheville Bulldogs</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2344.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Longwood Lancers</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Longwood Lancers prepare to host the UNC Asheville Bulldogs 
+                at Joan Perry Brock Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UNC Asheville Bulldogs vs Longwood Lancers</li>
+                    <li><strong>Venue:</strong> Joan Perry Brock Center</li>
+                    <li><strong>Broadcast:</strong> ESPNU</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2174.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Detroit Mercy Titans</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2750.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Wright State Raiders</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Wright State Raiders prepare to host the Detroit Mercy Titans 
+                at Nutter Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Detroit Mercy Titans vs Wright State Raiders</li>
+                    <li><strong>Venue:</strong> Nutter Center</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2115.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Central Connecticut Blue Devils</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2441.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">New Haven Chargers</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The New Haven Chargers prepare to host the Central Connecticut Blue Devils 
+                at Jeffery P. Hazell Athletics Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Central Connecticut Blue Devils vs New Haven Chargers</li>
+                    <li><strong>Venue:</strong> Jeffery P. Hazell Athletics Center</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/284.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Stonehill Skyhawks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2130.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Chicago State Cougars</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Chicago State Cougars prepare to host the Stonehill Skyhawks 
+                at Jones Convocation Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Stonehill Skyhawks vs Chicago State Cougars</li>
+                    <li><strong>Venue:</strong> Jones Convocation Center</li>
+                    <li><strong>Broadcast:</strong> NEC Front Row</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/112358.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Long Island University Sharks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2681.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Wagner Seahawks</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Wagner Seahawks prepare to host the Long Island University Sharks 
+                at Spiro Sports Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Long Island University Sharks vs Wagner Seahawks</li>
+                    <li><strong>Venue:</strong> Spiro Sports Center</li>
+                    <li><strong>Broadcast:</strong> NEC Front Row</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2385.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Mercyhurst Lakers</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2330.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Le Moyne Dolphins</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Le Moyne Dolphins prepare to host the Mercyhurst Lakers 
+                at Ted Grant Court.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Mercyhurst Lakers vs Le Moyne Dolphins</li>
+                    <li><strong>Venue:</strong> Ted Grant Court</li>
+                    <li><strong>Broadcast:</strong> NEC Front Row</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2275.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Hofstra Pride</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/232.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Charleston Cougars</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Charleston Cougars prepare to host the Hofstra Pride 
+                at TD Arena.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Hofstra Pride vs Charleston Cougars</li>
+                    <li><strong>Venue:</strong> TD Arena</li>
+                    <li><strong>Broadcast:</strong> FloSports</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2405.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Monmouth Hawks</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2182.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Drexel Dragons</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Drexel Dragons prepare to host the Monmouth Hawks 
+                at Daskalakis Athletic Center.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Monmouth Hawks vs Drexel Dragons</li>
+                    <li><strong>Venue:</strong> Daskalakis Athletic Center</li>
+                    <li><strong>Broadcast:</strong> FloSports</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">05:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2210.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">Elon Phoenix</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/350.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UNC Wilmington Seahawks</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 7:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The UNC Wilmington Seahawks prepare to host the Elon Phoenix 
+                at Trask Coliseum.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Elon Phoenix vs UNC Wilmington Seahawks</li>
+                    <li><strong>Venue:</strong> Trask Coliseum</li>
+                    <li><strong>Broadcast:</strong> WITN-TV</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">04:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2378.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">UMBC Retrievers</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/311.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Maine Black Bears</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 6:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The Maine Black Bears prepare to host the UMBC Retrievers 
+                at Skip Chappelle Court in Memorial Gymnasium.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> UMBC Retrievers vs Maine Black Bears</li>
+                    <li><strong>Venue:</strong> Skip Chappelle Court in Memorial Gymnasium</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        
+        <details class="match-card pre">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">04:00 PM</div>
+                    <div class="league">MENS-COLLEGE-BASKETBALL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2803.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Bryant Bulldogs</span>
+                        <span class="score"></span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2349.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">UMass Lowell River Hawks</span>
+                        <span class="score"></span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Thu, February 12th at 6:00 PM EST</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>PREVIEW:</strong> The UMass Lowell River Hawks prepare to host the Bryant Bulldogs 
+                at Kennedy Family Athletic Complex.
+            </div>
+            <div class="tale-tape">
+                <h4>Tale of the Tape</h4>
+                <ul>
+                    <li><strong>Matchup:</strong> Bryant Bulldogs vs UMass Lowell River Hawks</li>
+                    <li><strong>Venue:</strong> Kennedy Family Athletic Complex</li>
+                    <li><strong>Broadcast:</strong> ESPN+</li>
+                </ul>
+            </div>
+            <p>Both squads are looking to make a statement in this MENS-COLLEGE-BASKETBALL clash.</p>
+        </div>
+        
+            </div>
+        </details>
+        <div class='date-header'>Sunday, February 08</div>
+        <details class="match-card post">
+            <summary class="match-summary">
+                <div class="time-col">
+                    <div class="time">04:30 PM</div>
+                    <div class="league">NFL</div>
+                </div>
+                
+                <div class="score-col">
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name my-team">Seattle Seahawks</span>
+                        <span class="score">29</span>
+                    </div>
+                    <div class="team-row">
+                        <img src="https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ne.png" class="logo" onerror="this.style.display='none'">
+                        <span class="name ">New England Patriots</span>
+                        <span class="score">13</span>
+                    </div>
+                </div>
+                
+                <div class="status-col">
+                    <div class="status-txt">Final</div>
+                    <div class="expand-icon">▼</div>
+                </div>
+            </summary>
+            
+            <div class="match-story">
+                
+        <div class="story-body">
+            <div class="story-lede">
+                <strong>RECAP:</strong> Seattle Seahawks dominated the opposition with a final score of 
+                13-29.
+            </div>
+            
+            <div class="box-score-container">
+                <table class="box-score">
+                    <thead><tr><th>Team</th><th>1</th><th>2</th><th>3</th><th>4</th><th>T</th></tr></thead>
+                    <tbody>
+                        <tr><td class="tm">Seattle Seahawks</td><td>3.0</td><td>6.0</td><td>3.0</td><td>17.0</td><td class="tot">29</td></tr>
+                        <tr><td class="tm">New England Patriots</td><td>0.0</td><td>0.0</td><td>0.0</td><td>13.0</td><td class="tot">13</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="notebook">
+                <h4>Game Notes</h4>
+                <p>Super Bowl LX</p>
             </div>
         </div>
         
-        <div class="container">
-            <div class='date-header'>Thursday, February 12</div>
-        <div class="match-row future">
-            <div class="time-col">
-                <div class="time">08:00 PM</div>
-                <div class="league">NBA</div>
             </div>
-            
-            <div class="game-info">
-                <div class="team-line">
-                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.display='none'">
-                    <span class="name my-team">Dallas Mavericks</span>
-                    <span class="score"></span>
-                </div>
-                <div class="team-line">
-                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.display='none'">
-                    <span class="name my-team">Los Angeles Lakers</span>
-                    <span class="score"></span>
-                </div>
-            </div>
-            
-            <div class="status-col">
-                <div class="status-indicator">
-                    <div class="dot upcoming-dot"></div>
-                    <span>Thu, February 12th at 10:00 PM EST</span>
-                </div>
-                <div class="tv-channel">Prime Video</div>
-            </div>
-        </div>
+        </details>
         
         </div>
     </body>
