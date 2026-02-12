@@ -3,6 +3,7 @@ import time
 import os
 import requests
 import re
+import random
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -13,74 +14,80 @@ WINDOW_DAYS_BACK = 30
 WINDOW_DAYS_FWD = 14
 
 # --- THE CLUBHOUSE ROSTER ---
-CLUBHOUSE = {
-    # --- ARIZONA ---
-    "Arizona Cardinals", "Phoenix Suns", "Arizona Diamondbacks", "Arizona Coyotes", "Phoenix Mercury",
-    "Arizona State", "Sun Devils", "Arizona Wildcats", "Tucson Roadrunners",
-    "Northern Arizona", "NAU", "Lumberjacks", "Grand Canyon Antelopes", "GCU", "Lopes",
+CLUBHOUSE_KEYS = {
+    # ARIZONA
+    "Arizona Cardinals", "Suns", "Diamondbacks", "Coyotes", "Mercury",
+    "Arizona State", "Sun Devils", "Arizona Wildcats", "Roadrunners",
+    "Northern Arizona", "NAU", "Lumberjacks", "Grand Canyon", "GCU", "Lopes",
     "Arizona Christian", "Firestorm", "Phoenix Rising",
 
-    # --- CALIFORNIA ---
-    "Los Angeles Lakers", "LA Lakers", "Los Angeles Clippers", "LA Clippers",
-    "Golden State Warriors", "Sacramento Kings", 
-    "Los Angeles Dodgers", "San Francisco Giants", "San Diego Padres", "Los Angeles Angels",
-    "Los Angeles Rams", "Los Angeles Chargers", "San Francisco 49ers",
-    "USC Trojans", "UCLA Bruins", "California Golden Bears", "Stanford Cardinal",
-    "San Jose Sharks", "Anaheim Ducks", 
-    "LA Galaxy", "Los Angeles FC", "San Diego FC",
-    "Angel City FC", "San Diego Wave", "Bay FC",
+    # CALIFORNIA
+    "Lakers", "Clippers", "Warriors", "Kings", 
+    "Dodgers", "Giants", "Padres", "Angels",
+    "Rams", "Chargers", "49ers",
+    "USC", "UCLA", "Cal Bears", "Stanford",
+    "Sharks", "Ducks", "Galaxy", "LA FC", "San Diego FC",
+    "Angel City", "San Diego Wave", "Bay FC",
 
-    # --- TEXAS ---
-    "Dallas Cowboys", "Houston Texans", "Dallas Mavericks", "Houston Rockets", "San Antonio Spurs",
-    "Texas Rangers", "Houston Astros", "Dallas Stars",
-    "Texas Longhorns", "Texas A&M Aggies", "Texas Tech Red Raiders", "Baylor Bears", 
-    "TCU Horned Frogs", "SMU Mustangs", "Houston Cougars",
-    "Houston Dash",
+    # TEXAS
+    "Cowboys", "Texans", "Mavericks", "Rockets", "Spurs",
+    "Rangers", "Astros", "Stars",
+    "Longhorns", "Texas A&M", "Texas Tech", "Baylor", 
+    "TCU", "SMU", "Cougars", "Houston Dash", "UTEP",
 
-    # --- ILLINOIS ---
-    "Chicago Bears", "Chicago Bulls", "Chicago Blackhawks", "Chicago Cubs", "Chicago White Sox",
-    "Illinois Fighting Illini", "Northwestern Wildcats",
-    "Chicago Red Stars",
+    # ILLINOIS
+    "Bears", "Bulls", "Blackhawks", "Cubs", "White Sox",
+    "Illini", "Northwestern", "Red Stars",
 
-    # --- GEORGIA ---
-    "Atlanta Falcons", "Atlanta Hawks", "Atlanta Braves", "Atlanta United",
-    "Georgia Bulldogs", "Georgia Tech Yellow Jackets",
+    # GEORGIA
+    "Falcons", "Hawks", "Braves", "Atlanta United",
+    "Bulldogs", "Yellow Jackets",
 
-    # --- DMV ---
-    "Washington Commanders", "Washington Wizards", "Washington Capitals", "Washington Nationals",
-    "Baltimore Ravens", "Baltimore Orioles", "Maryland Terrapins", 
-    "Virginia Cavaliers", "Virginia Tech Hokies", "Georgetown Hoyas",
-    "Washington Spirit",
+    # DMV & PA
+    "Commanders", "Wizards", "Capitals", "Nationals",
+    "Ravens", "Orioles", "Terrapins", "Maryland",
+    "Cavaliers", "Hokies", "Hoyas", "Spirit",
+    "Penn State", "Nittany Lions", "Liberty",
 
-    # --- INT'L SOCCER ---
-    "Fulham", "Leeds United", "Barcelona", "FC Barcelona",
+    # PNW
+    "Portland State", "Vikings",
 
-    # --- CRICKET ---
-    "Chennai Super Kings", "Delhi Capitals", "Gujarat Titans", "Kolkata Knight Riders", 
-    "Lucknow Super Giants", "Mumbai Indians", "Punjab Kings", "Rajasthan Royals", 
-    "Royal Challengers", "Sunrisers Hyderabad",
-    "Los Angeles Knight Riders", "MI New York", "San Francisco Unicorns",
-    "Seattle Orcas", "Texas Super Kings", "Washington Freedom",
-    
-    # --- NATIONAL TEAMS ---
-    "India", "United States", "USA", "Namibia"
+    # SOCCER
+    "Fulham", "Leeds", "Barcelona",
+
+    # CRICKET
+    "Super Kings", "Capitals", "Titans", "Knight Riders", 
+    "Super Giants", "Mumbai Indians", "Punjab Kings", "Royals", 
+    "Royal Challengers", "Sunrisers", "Unicorns", "Orcas", "Freedom"
+}
+
+SAFE_OVERRIDES = {
+    "Arizona State", "Penn State", "Texas A&M", "Virginia Tech", 
+    "Georgia Tech", "Texas Tech", "Golden State", "Portland State"
 }
 
 def is_clubhouse_team(name):
     clean_name = name.strip()
     
-    # 1. Strict National Team Check
-    national_teams = ["India", "USA", "United States", "Namibia"]
-    for nat in national_teams:
-        if re.search(rf"\b{nat}\b", clean_name, re.IGNORECASE):
-            if "Indiana" in clean_name and nat == "India": return False
-            return True
+    if re.search(r"\b(India|Ind)\b", clean_name, re.IGNORECASE):
+        if "Indiana" in clean_name: return False
+        return True
+    if re.search(r"\b(USA|United States|U\.S\.A\.|Namibia|Pakistan|Pak)\b", clean_name, re.IGNORECASE):
+        return True
 
-    # 2. Roster Check
-    for member in CLUBHOUSE:
-        if member in national_teams: continue
-        if member.lower() in clean_name.lower():
-            return True     
+    if "Texas" in clean_name:
+        if clean_name in ["Texas", "Texas Longhorns", "UT"]: return True
+        for safe in SAFE_OVERRIDES:
+            if safe in clean_name: return True
+        if any(x in clean_name for x in ["State", "Tech", "A&M", "San Antonio", "Arlington", "El Paso"]):
+             pass 
+
+    for key in CLUBHOUSE_KEYS:
+        if key.lower() in clean_name.lower():
+            for safe in SAFE_OVERRIDES:
+                if safe.lower() == key.lower(): return True
+            if key == "India" and "Indiana" in clean_name: return False
+            return True
     return False
 
 def is_championship_event(event):
@@ -88,84 +95,143 @@ def is_championship_event(event):
     if event.get('competitions'):
         notes = event['competitions'][0].get('notes', [])
         if notes: search_text += " " + str(notes[0].get('headline', ''))
-    
     keywords = ["Super Bowl", "World Series", "NBA Finals", "Stanley Cup", "Final", "Championship"]
     return any(k.lower() in search_text.lower() for k in keywords)
 
-# --- STORYTELLER ENGINE ---
+# --- THE AP-STYLE REPORTER ---
 
 class Storyteller:
     def __init__(self, game):
         self.g = game
         self.h = game['home']
         self.a = game['away']
+        self.city = game['city'].upper() if game['city'] else "THE ARENA"
         
-    def get_headline(self):
-        if self.g['status'] == 'pre':
-            return f"{self.a['name']} at {self.h['name']}"
+    def _get_record_str(self, team):
+        return f"({team['record']})" if team['record'] else ""
+
+    def _get_leader_text(self, team):
+        # Converts leader data (e.g. "Booker 32 pts") into narrative text
+        if not team['leader']: return None
+        return f"{team['leader']['displayValue']} {team['leader']['displayName']}"
+
+    def write_preview(self):
+        # DATELINE
+        dateline = f"<strong>{self.city}</strong> (AP) —"
         
+        # OPENER
+        h_rec = self._get_record_str(self.h)
+        a_rec = self._get_record_str(self.a)
+        
+        lines = [
+            f"The {self.h['name']} {h_rec} prepare to defend their home court against the visiting {self.a['name']} {a_rec}.",
+            f"All eyes will be on {self.g['venue']} tonight as the {self.h['name']} {h_rec} host the {self.a['name']} {a_rec}.",
+            f"The {self.a['name']} {a_rec} travel to {self.city} looking to spoil the party against the {self.h['name']} {h_rec}."
+        ]
+        opener = random.choice(lines)
+
+        # BETTING CONTEXT
+        odds_segment = ""
+        if self.g['odds'] and self.g['odds'] != "Even":
+            fav = "home" if "-" in self.g['odds'] and "favorites" not in self.g['odds'] else "away" 
+            # Simplified logic: usually odds string is like "ARI -5.5"
+            odds_segment = f" Vegas has set the line at {self.g['odds']}, with the Over/Under resting at {self.g['overunder']}."
+        
+        # CLOSER
+        closer = f"Tip-off is scheduled for {self.g['time_str']} AZT."
+
+        return f"""
+        <div class="story-container">
+            <h2 class="story-headline">{self.a['name']} at {self.h['name']}</h2>
+            <div class="countdown-box" id="timer-{self.g['id']}" data-utc="{self.g['utc_ts']}">Loading...</div>
+            <p>{dateline} {opener}{odds_segment} {closer}</p>
+            <div class="metadata-grid">
+                <div><strong>TV:</strong> {self.g['tv'] or 'Local'}</div>
+                <div><strong>Venue:</strong> {self.g['venue']}</div>
+            </div>
+        </div>
+        """
+
+    def write_recap(self):
         try:
             h_s = int(self.h['score'] or 0)
             a_s = int(self.a['score'] or 0)
-            winner = self.h['name'] if h_s > a_s else self.a['name']
-            loser = self.a['name'] if h_s > a_s else self.h['name']
-            margin = abs(h_s - a_s)
-            
-            if margin == 0: return f"{self.h['name']} and {self.a['name']} Draw"
-            if "CRICKET" in self.g['sport']: return f"{winner} defeats {loser}"
-            
-            verb = "edge" if margin < 4 else ("rout" if margin > 20 else "defeat")
-            return f"{winner} {verb} {loser}, {max(h_s, a_s)}-{min(h_s, a_s)}"
         except:
-            return f"{self.h['name']} vs {self.a['name']}"
+            return self.write_preview() # Fallback if score unavailable
 
-    def write_body(self):
-        headline = self.get_headline()
+        winner = self.h if h_s > a_s else self.a
+        loser = self.a if h_s > a_s else self.h
+        w_score = max(h_s, a_s)
+        l_score = min(h_s, a_s)
+        margin = w_score - l_score
         
-        if self.g['status'] == 'pre':
-            odds_html = ""
-            if self.g['odds']:
-                odds_html = f"""
-                <div class="betting-line">
-                    <span class="odds-tag">VEGAS</span> 
-                    <strong>{self.g['odds']}</strong> • O/U: {self.g['overunder']}
-                </div>
-                """
-            
-            content = f"""
-            <div class="countdown-box" id="timer-{self.g['id']}" data-utc="{self.g['utc_ts']}">
-                Loading...
-            </div>
-            {odds_html}
-            <p><strong>PREVIEW —</strong> The {self.g['sport']} action continues as {self.a['name']} visit {self.h['name']} at {self.g['venue']}.</p>
-            <div class="metadata-grid">
-                <div><strong>TV:</strong> {self.g['tv'] or 'N/A'}</div>
-                <div><strong>Time:</strong> {self.g['time_str']} AZT</div>
-            </div>
-            """
-        elif self.g['status'] == 'in':
-            content = f"""
-            <p class="live-pulse-text"><strong>LIVE ACTION</strong></p>
-            <p><strong>Situation:</strong> {self.g['clock']}</p>
-            <p>Watch on {self.g['tv']}.</p>
-            """
+        # VERB SELECTION
+        if margin == 0: verb = "drew with"
+        elif margin <= 3: verb = "narrowly escaped" if "CRICKET" not in self.g['sport'] else "defeated"
+        elif margin <= 10: verb = "defeated"
+        elif margin <= 20: verb = "handled"
+        else: verb = "routed"
+
+        # HEADLINE
+        headline = f"{winner['name']} {verb} {loser['name']}, {w_score}-{l_score}"
+        
+        # DATELINE
+        dateline = f"<strong>{self.city}</strong> (AP) —"
+
+        # STAR PLAYER NARRATIVE
+        hero_text = ""
+        w_leader = self._get_leader_text(winner)
+        if w_leader:
+            hero_text = f"Behind a stellar performance from {w_leader}, the "
         else:
-            note_html = f"<p><em>{self.g['note']}</em></p>" if self.g['note'] else ""
-            content = f"""
-            <p><strong>RECAP —</strong> {headline}.</p>
-            {note_html}
-            <div class="metadata-grid">
-                <div><strong>Venue:</strong> {self.g['venue']}</div>
-                <div><strong>Final:</strong> {self.g['clock']}</div>
-            </div>
-            """
-            
+            hero_text = "The "
+
+        # NARRATIVE CONSTRUCTION
+        if margin < 5 and "CRICKET" not in self.g['sport']:
+            narrative = f"{hero_text}{winner['name']} held on in the final moments to secure a {w_score}-{l_score} victory over the {loser['name']}."
+        elif margin > 20:
+            narrative = f"{hero_text}{winner['name']} dominated from start to finish, cruising to a {w_score}-{l_score} blowout win against the {loser['name']}."
+        else:
+            narrative = f"{hero_text}{winner['name']} {verb} the {loser['name']} {w_score}-{l_score} on {self.g['dt'].strftime('%A')}."
+
+        # VENUE CONTEXT
+        venue_text = f" The game was held at {self.g['venue']}."
+        
         return f"""
         <div class="story-container">
             <h2 class="story-headline">{headline}</h2>
-            {content}
+            <p>{dateline} {narrative}{venue_text}</p>
+            <div class="metadata-grid">
+                <div><strong>Winner:</strong> {winner['name']}</div>
+                <div><strong>Top Performer:</strong> {w_leader or 'N/A'}</div>
+            </div>
         </div>
         """
+
+    def write_live(self):
+        headline = f"LIVE: {self.a['name']} vs {self.h['name']}"
+        
+        leader_txt = ""
+        if self.h['leader']: leader_txt += f"<br>Home Leader: {self._get_leader_text(self.h)}"
+        if self.a['leader']: leader_txt += f"<br>Away Leader: {self._get_leader_text(self.a)}"
+
+        return f"""
+        <div class="story-container">
+            <h2 class="story-headline"><span style="color:#ef4444">●</span> {headline}</h2>
+            <p class="live-pulse-text" style="font-size: 1.2rem; margin: 10px 0;">
+                {self.h['score']} - {self.a['score']}
+            </p>
+            <p><strong>CURRENT SITUATION:</strong> {self.g['clock']}</p>
+            <p style="font-size: 0.85rem; color: #aaa;">
+                Broadcasting on {self.g['tv'] or 'N/A'}.{leader_txt}
+            </p>
+        </div>
+        """
+
+    def write_body(self):
+        if self.g['status'] == 'pre': return self.write_preview()
+        elif self.g['status'] == 'in': return self.write_live()
+        else: return self.write_recap()
 
 # --- DATA FETCHING ---
 
@@ -178,13 +244,33 @@ def get_az_time(utc_str):
     except: 
         return datetime.now(), 0
 
+def extract_leader(competitor):
+    # Try to grab the top stat leader (Points, Passing Yards, etc.)
+    try:
+        if 'leaders' in competitor:
+            # Usually leaders[-1] is points in basketball, or passing in NFL
+            # We take the last one as it's often the 'main' stat category in ESPN's sort
+            leader_cat = competitor['leaders'][-1]
+            leader_player = leader_cat['leaders'][0]
+            return {
+                "displayName": leader_player['athlete']['displayName'],
+                "displayValue": leader_player['displayValue'] # e.g. "32" or "250 yds"
+            }
+    except:
+        pass
+    return None
+
 def fetch_wire():
     print("  -> Scanning Global Wires...")
     sources = [
-        ("basketball", "nba"), ("football", "nfl"), ("football", "college-football"),
-        ("basketball", "mens-college-basketball"), ("baseball", "mlb"),
+        ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb"),
+        ("football", "college-football"),
+        ("basketball", "mens-college-basketball"), 
+        ("basketball", "womens-college-basketball"), 
+        ("baseball", "college-baseball"), 
+        ("baseball", "college-softball"), 
         ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "usa.1"), ("soccer", "usa.nwsl"),
-        ("cricket", "ipl"), ("cricket", None)
+        ("cricket", "ipl"), ("cricket", "icc"), ("cricket", None)
     ]
     
     dashboard = []
@@ -213,24 +299,30 @@ def fetch_wire():
                 continue
 
             seen_ids.add(e['id'])
-
             az_dt, utc_ts = get_az_time(e['date'])
             days_diff = (az_dt.date() - datetime.now().date()).days
-            if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD:
-                continue
+            if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD: continue
 
             status = c['status']['type']['state']
-            note = c.get('notes', [{}])[0].get('headline', '') if c.get('notes') else ""
             
-            odds_txt = ""
-            ou_txt = ""
-            if c.get('odds'):
-                odds_txt = c['odds'][0].get('details', 'Even')
-                ou_txt = c['odds'][0].get('overUnder', '--')
+            # --- EXTRACTING RICH DATA FOR STORYTELLER ---
+            h_rec = c['competitors'][0].get('records', [{}])[0].get('summary', '') if c['competitors'][0].get('records') else ''
+            a_rec = c['competitors'][1].get('records', [{}])[0].get('summary', '') if c['competitors'][1].get('records') else ''
+            
+            h_leader = extract_leader(c['competitors'][0])
+            a_leader = extract_leader(c['competitors'][1])
+            
+            city = c.get('venue', {}).get('address', {}).get('city', '')
+            
+            odds_txt = c['odds'][0].get('details', 'Even') if c.get('odds') else ""
+            ou_txt = c['odds'][0].get('overUnder', '--') if c.get('odds') else ""
+
+            sport_lbl = (league or sport).upper().replace("None", "INTL")
+            sport_lbl = sport_lbl.replace("COLLEGE-", "NCAA ").replace("MENS-", "M ").replace("WOMENS-", "W ")
 
             game = {
                 "id": e['id'],
-                "sport": (league or sport).upper().replace("None", "INTL"),
+                "sport": sport_lbl,
                 "dt": az_dt,
                 "utc_ts": utc_ts,
                 "date_str": az_dt.strftime("%b %d"),
@@ -238,19 +330,24 @@ def fetch_wire():
                 "status": status,
                 "clock": c['status']['type']['detail'],
                 "venue": c.get('venue', {}).get('fullName', 'Unknown Venue'),
+                "city": city,
                 "tv": c.get('broadcasts', [{}])[0].get('names', [''])[0] if c.get('broadcasts') else "",
-                "note": note,
+                "note": c.get('notes', [{}])[0].get('headline', '') if c.get('notes') else "",
                 "odds": odds_txt,
                 "overunder": ou_txt,
                 "home": { 
                     "name": h_tm['displayName'], 
                     "score": c['competitors'][0].get('score',''), 
-                    "logo": h_tm.get('logo','')
+                    "logo": h_tm.get('logo',''),
+                    "record": h_rec,
+                    "leader": h_leader
                 },
                 "away": { 
                     "name": a_tm['displayName'], 
                     "score": c['competitors'][1].get('score',''), 
-                    "logo": a_tm.get('logo','')
+                    "logo": a_tm.get('logo',''),
+                    "record": a_rec,
+                    "leader": a_leader
                 }
             }
             
@@ -329,7 +426,6 @@ def render_dashboard(games):
 
     if not html_rows: html_rows = "<div class='empty'>No games on the wire.</div>"
 
-    # NOTE: All CSS and JS braces below are doubled {{ }} to avoid Python f-string errors.
     html = f"""
     <!DOCTYPE html>
     <html>
