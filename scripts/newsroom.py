@@ -13,82 +13,74 @@ WINDOW_DAYS_BACK = 30
 WINDOW_DAYS_FWD = 14
 
 # --- THE CLUBHOUSE ROSTER ---
-# "Safe" keywords allow partial matching (e.g. "Suns" matches "Phoenix Suns").
-# "Strict" keywords require the full string to be present.
-
 CLUBHOUSE = {
-    # --- ARIZONA (Broad match allowed for state pride) ---
+    # --- ARIZONA ---
     "Arizona Cardinals", "Phoenix Suns", "Arizona Diamondbacks", "Arizona Coyotes", "Phoenix Mercury",
     "Arizona State", "Sun Devils", "Arizona Wildcats", "Tucson Roadrunners",
     "Northern Arizona", "NAU", "Lumberjacks", "Grand Canyon Antelopes", "GCU", "Lopes",
     "Arizona Christian", "Firestorm", "Phoenix Rising",
 
-    # --- CALIFORNIA (Strict to avoid 'Warriors' ambiguity) ---
+    # --- CALIFORNIA ---
     "Los Angeles Lakers", "LA Lakers", "Los Angeles Clippers", "LA Clippers",
     "Golden State Warriors", "Sacramento Kings", 
     "Los Angeles Dodgers", "San Francisco Giants", "San Diego Padres", "Los Angeles Angels",
     "Los Angeles Rams", "Los Angeles Chargers", "San Francisco 49ers",
     "USC Trojans", "UCLA Bruins", "California Golden Bears", "Stanford Cardinal",
     "San Jose Sharks", "Anaheim Ducks", 
-    "LA Galaxy", "Los Angeles FC", "San Diego FC", # MLS
-    "Angel City FC", "San Diego Wave", "Bay FC",   # NWSL
+    "LA Galaxy", "Los Angeles FC", "San Diego FC",
+    "Angel City FC", "San Diego Wave", "Bay FC",
 
     # --- TEXAS ---
     "Dallas Cowboys", "Houston Texans", "Dallas Mavericks", "Houston Rockets", "San Antonio Spurs",
     "Texas Rangers", "Houston Astros", "Dallas Stars",
     "Texas Longhorns", "Texas A&M Aggies", "Texas Tech Red Raiders", "Baylor Bears", 
     "TCU Horned Frogs", "SMU Mustangs", "Houston Cougars",
-    "Houston Dash", # NWSL
+    "Houston Dash",
 
     # --- ILLINOIS ---
     "Chicago Bears", "Chicago Bulls", "Chicago Blackhawks", "Chicago Cubs", "Chicago White Sox",
     "Illinois Fighting Illini", "Northwestern Wildcats",
-    "Chicago Red Stars", # NWSL
+    "Chicago Red Stars",
 
     # --- GEORGIA ---
     "Atlanta Falcons", "Atlanta Hawks", "Atlanta Braves", "Atlanta United",
     "Georgia Bulldogs", "Georgia Tech Yellow Jackets",
 
-    # --- DMV (DC/MD/VA) ---
+    # --- DMV ---
     "Washington Commanders", "Washington Wizards", "Washington Capitals", "Washington Nationals",
     "Baltimore Ravens", "Baltimore Orioles", "Maryland Terrapins", 
     "Virginia Cavaliers", "Virginia Tech Hokies", "Georgetown Hoyas",
-    "Washington Spirit", # NWSL
+    "Washington Spirit",
 
     # --- INT'L SOCCER ---
     "Fulham", "Leeds United", "Barcelona", "FC Barcelona",
 
-    # --- CRICKET (Specific Franchises) ---
+    # --- CRICKET ---
     "Chennai Super Kings", "Delhi Capitals", "Gujarat Titans", "Kolkata Knight Riders", 
     "Lucknow Super Giants", "Mumbai Indians", "Punjab Kings", "Rajasthan Royals", 
     "Royal Challengers", "Sunrisers Hyderabad",
     "Los Angeles Knight Riders", "MI New York", "San Francisco Unicorns",
     "Seattle Orcas", "Texas Super Kings", "Washington Freedom",
     
-    # --- NATIONAL TEAMS (Handled via Strict Regex below) ---
+    # --- NATIONAL TEAMS ---
     "India", "United States", "USA", "Namibia"
 }
 
 def is_clubhouse_team(name):
     clean_name = name.strip()
     
-    # 1. Strict National Team Check (Word Boundaries)
-    # Prevents "India" matching "Indiana"
+    # 1. Strict National Team Check
     national_teams = ["India", "USA", "United States", "Namibia"]
     for nat in national_teams:
         if re.search(rf"\b{nat}\b", clean_name, re.IGNORECASE):
-            # Extra safety: If it contains "Indiana", it's NOT India.
             if "Indiana" in clean_name and nat == "India": return False
             return True
 
     # 2. Roster Check
     for member in CLUBHOUSE:
         if member in national_teams: continue
-        
-        # Case insensitive match
         if member.lower() in clean_name.lower():
-            return True
-            
+            return True     
     return False
 
 def is_championship_event(event):
@@ -140,7 +132,6 @@ class Storyteller:
                 </div>
                 """
             
-            # Pass UTC timestamp to JS for accurate countdown
             content = f"""
             <div class="countdown-box" id="timer-{self.g['id']}" data-utc="{self.g['utc_ts']}">
                 Loading...
@@ -181,11 +172,9 @@ class Storyteller:
 def get_az_time(utc_str):
     try:
         clean = utc_str.replace("Z", "")
-        # Parse as UTC
         dt_utc = datetime.fromisoformat(clean).replace(tzinfo=timezone.utc)
-        # Convert to AZ (UTC-7 fixed for simplicity, or use zoneinfo if installed)
         dt_az = dt_utc - timedelta(hours=7)
-        return dt_az, dt_utc.timestamp() * 1000 # Return AZ datetime and UTC ms timestamp
+        return dt_az, dt_utc.timestamp() * 1000
     except: 
         return datetime.now(), 0
 
@@ -216,7 +205,6 @@ def fetch_wire():
                 a_tm = c['competitors'][1]['team']
             except: continue
 
-            # --- FILTER CHECK ---
             home_ok = is_clubhouse_team(h_tm['displayName'])
             away_ok = is_clubhouse_team(a_tm['displayName'])
             champ_ok = is_championship_event(e)
@@ -231,7 +219,6 @@ def fetch_wire():
             if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD:
                 continue
 
-            # Parsing
             status = c['status']['type']['state']
             note = c.get('notes', [{}])[0].get('headline', '') if c.get('notes') else ""
             
@@ -276,7 +263,6 @@ def fetch_wire():
 # --- RENDERER ---
 
 def render_dashboard(games):
-    # Sorting
     live = [g for g in games if g['status'] == 'in']
     completed = [g for g in games if g['status'] == 'post']
     upcoming = [g for g in games if g['status'] == 'pre']
@@ -343,6 +329,7 @@ def render_dashboard(games):
 
     if not html_rows: html_rows = "<div class='empty'>No games on the wire.</div>"
 
+    # NOTE: All CSS and JS braces below are doubled {{ }} to avoid Python f-string errors.
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -394,7 +381,7 @@ def render_dashboard(games):
             @keyframes fade {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
         </style>
         <script>
-            function updateClock() {
+            function updateClock() {{
                 const now = new Date();
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
                 const azTime = new Date(utc - (3600000 * 7));
@@ -405,32 +392,32 @@ def render_dashboard(games):
                 const minutes = azTime.getMinutes().toString().padStart(2, '0');
                 const seconds = azTime.getSeconds().toString().padStart(2, '0');
                 document.getElementById('live-clock').textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            }
+            }}
             
-            function updateCountdowns() {
+            function updateCountdowns() {{
                 const nowUTC = new Date().getTime();
-                document.querySelectorAll('.countdown-box').forEach(box => {
+                document.querySelectorAll('.countdown-box').forEach(box => {{
                     const targetUTC = parseFloat(box.dataset.utc);
                     const diff = targetUTC - nowUTC;
                     
-                    if (diff < 0) {
+                    if (diff < 0) {{
                         box.innerHTML = "GAME TIME / FINISHED";
                         return;
-                    }
+                    }}
                     
                     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                     const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const s = Math.floor((diff % (1000 * 60)) / 1000);
                     
-                    if (d > 0) box.innerHTML = `T-MINUS: ${d}d ${h}h ${m}m`;
-                    else box.innerHTML = `T-MINUS: ${h}h ${m}m ${s}s`;
-                });
-            }
+                    if (d > 0) box.innerHTML = `T-MINUS: ${{d}}d ${{h}}h ${{m}}m`;
+                    else box.innerHTML = `T-MINUS: ${{h}}h ${{m}}m ${{s}}s`;
+                }});
+            }}
 
             setInterval(updateClock, 1000);
             setInterval(updateCountdowns, 1000);
-            window.onload = function() { updateClock(); updateCountdowns(); };
+            window.onload = function() {{ updateClock(); updateCountdowns(); }};
         </script>
     </head>
     <body>
