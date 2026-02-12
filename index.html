@@ -1,263 +1,113 @@
 
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>The Tempe Torch</title>
+        <title>Clubhouse</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="300">
         <style>
             :root {
-                --bg: #eef2f5; --card: #ffffff; --text: #111; 
-                --gray: #666; --border: #e0e0e0;
-                --az-red: #B1063A; --accent: #2c3e50;
+                --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
+                --accent: #bb86fc; --border: #333;
+                --live: #cf6679; --green: #03dac6;
             }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+            body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
             
-            h1 { text-align: center; font-family: 'Georgia', serif; color: var(--accent); margin-bottom: 5px; }
-            .header-info { text-align: center; color: var(--gray); font-size: 0.9rem; margin-bottom: 30px; font-style: italic; }
-
-            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+            .header { padding: 20px; border-bottom: 1px solid var(--border); background: #1f1f1f; position: sticky; top: 0; z-index: 10; }
+            h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }
+            .sub { font-size: 0.8rem; color: #777; margin-top: 5px; }
             
-            .game-card { background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border); }
+            .container { max-width: 800px; margin: 0 auto; padding: 20px; }
             
-            /* Status Colors */
-            .game-card.in { border-left: 5px solid #d32f2f; } /* Live */
-            .game-card.post { border-left: 5px solid #333; } /* Final */
-            .game-card.pre { border-left: 5px solid #1976d2; } /* Future */
-
-            .card-top { background: #f8f9fa; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-            .league-tag { font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; color: var(--gray); text-transform: uppercase; }
-            .game-time { font-weight: 600; font-size: 0.85rem; color: var(--accent); }
-
-            .matchup { padding: 20px; display: flex; align-items: center; justify-content: space-between; }
-            
-            .team { display: flex; align-items: center; gap: 15px; flex: 1; }
-            .team.away { justify-content: flex-start; }
-            .team.home { justify-content: flex-end; text-align: right; }
-            .team img { height: 40px; width: 40px; object-fit: contain; }
-            
-            .tm-info { display: flex; flex-direction: column; }
-            .tm-name { font-weight: 700; font-size: 1.1rem; line-height: 1.1; }
-            .tm-record { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
-            .tm-score { font-size: 2rem; font-weight: 800; color: #000; font-variant-numeric: tabular-nums; }
-
-            .team.away .tm-score { margin-left: auto; padding-right: 15px; }
-            .team.home .tm-score { margin-right: auto; padding-left: 15px; }
-
-            .game-meta { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
-            .status { font-size: 0.8rem; font-weight: bold; color: var(--az-red); margin-bottom: 5px; text-transform: uppercase; }
-            
-            /* Box Score Mini Table */
-            .linescore { border-collapse: collapse; font-size: 0.7rem; color: var(--gray); }
-            .linescore td, .linescore th { padding: 2px 5px; text-align: center; border: 1px solid #eee; }
-            .tm-code { font-weight: bold; color: #000; }
-
-            .card-footer { padding: 10px 20px; background: #fff; border-top: 1px solid #f0f0f0; }
-            .game-note { font-size: 0.85rem; color: #555; margin-bottom: 10px; font-style: italic; min-height: 1.2em; }
-            
-            details summary { list-style: none; outline: none; }
-            details summary::-webkit-details-marker { display: none; }
-            
-            .story-btn { 
-                display: block; width: 100%; text-align: center; 
-                background: #f1f3f4; padding: 8px 0; border-radius: 6px; 
-                font-weight: 600; font-size: 0.9rem; color: #333; cursor: pointer; transition: 0.2s; 
+            .date-header { 
+                margin: 25px 0 10px 0; 
+                font-size: 0.9rem; 
+                font-weight: bold; 
+                color: #888; 
+                text-transform: uppercase; 
+                border-bottom: 1px solid var(--border); 
+                padding-bottom: 5px;
             }
-            .story-btn:hover { background: #e0e0e0; }
-            .story-btn.live-pulse { background: #ffebee; color: #c62828; animation: pulse 2s infinite; }
-
-            .full-story { padding: 15px; background: #fafafa; margin-top: 10px; border-radius: 8px; font-size: 0.9rem; color: #444; }
-
-            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
             
-            @media (max-width: 600px) {
-                .matchup { flex-direction: column; gap: 15px; }
-                .team { width: 100%; justify-content: space-between !important; }
-                .team.home { flex-direction: row-reverse; }
-                .team.away .tm-score { margin: 0; }
-                .team.home .tm-score { margin: 0; }
+            .match-row { 
+                display: flex; 
+                align-items: center; 
+                background: var(--card); 
+                margin-bottom: 12px; 
+                padding: 15px; 
+                border-radius: 8px; 
+                border: 1px solid var(--border);
+            }
+            
+            .match-row.live { border: 1px solid var(--live); box-shadow: 0 0 10px rgba(207, 102, 121, 0.2); }
+            
+            .time-col { width: 80px; text-align: center; border-right: 1px solid #333; padding-right: 15px; margin-right: 15px; }
+            .time { font-weight: bold; font-size: 0.9rem; }
+            .league { font-size: 0.6rem; color: #666; margin-top: 4px; overflow: hidden; white-space: nowrap; }
+            
+            .game-info { flex: 1; }
+            .team-line { display: flex; align-items: center; margin: 4px 0; justify-content: space-between; }
+            .logo { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
+            .name { font-size: 1rem; flex: 1; }
+            .name.my-team { font-weight: bold; color: #fff; }
+            .name.opp-team { color: #aaa; }
+            .score { font-weight: bold; font-family: monospace; font-size: 1.1rem; }
+            
+            .status-col { width: 100px; text-align: right; padding-left: 15px; border-left: 1px solid #333; margin-left: 15px; }
+            .status-indicator { display: flex; align-items: center; justify-content: flex-end; font-size: 0.8rem; gap: 6px; }
+            .dot { width: 8px; height: 8px; border-radius: 50%; }
+            .live-dot { background: var(--live); animation: pulse 1.5s infinite; }
+            .upcoming-dot { background: #555; }
+            .final-dot { background: #333; }
+            
+            .tv-channel { font-size: 0.7rem; color: #666; margin-top: 5px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+            
+            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+            
+            @media (max-width: 500px) {
+                .match-row { flex-wrap: wrap; }
+                .status-col { width: 100%; border-left: none; margin-left: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; text-align: left; display: flex; justify-content: space-between; }
+                .time-col { width: 60px; }
             }
         </style>
     </head>
     <body>
-        <h1>The Tempe Torch</h1>
-        <div class="header-info">
-            Strict Geofence Active • All Times Arizona (MST) • Updated 08:44 PM
+        <div class="header">
+            <div class="container" style="padding:0">
+                <h1>Clubhouse Wire</h1>
+                <div class="sub">Tempe, AZ • 08:49 PM MST</div>
+            </div>
         </div>
-        <div class="grid">
-            
-        <article class="game-card pre">
-            <div class="card-top">
-                <span class="league-tag">NCAA BASKETBALL</span>
-                <span class="game-time">Thu, Feb 12 @ 04:30 PM AZT</span>
-            </div>
-            
-            <div class="matchup">
-                <div class="team away">
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/94.png" onerror="this.style.display='none'">
-                    <div class="tm-info">
-                        <div class="tm-name">Northern Kentucky Norse</div>
-                        <div class="tm-record">15-11</div>
-                    </div>
-                    <div class="tm-score">0</div>
-                </div>
-                
-                <div class="game-meta">
-                    <div class="status">Thu, February 12th at 6:30 PM EST</div>
-                    
-                </div>
-
-                <div class="team home">
-                    <div class="tm-score">0</div>
-                    <div class="tm-info">
-                        <div class="tm-name">IU Indianapolis Jaguars</div>
-                        <div class="tm-record">7-19</div>
-                    </div>
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/85.png" onerror="this.style.display='none'">
-                </div>
-            </div>
-            
-            <div class="card-footer">
-                <div class="game-note">Regional Coverage</div>
-                <details>
-                    <summary><div class='story-btn'>Preview</div></summary>
-                    <div class="full-story">
-                        <p><strong>Northern Kentucky Norse vs IU Indianapolis Jaguars</strong></p>
-                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
-                    </div>
-                </details>
-            </div>
-        </article>
         
-        <article class="game-card pre">
-            <div class="card-top">
-                <span class="league-tag">NCAA BASKETBALL</span>
-                <span class="game-time">Thu, Feb 12 @ 05:00 PM AZT</span>
+        <div class="container">
+            <div class='date-header'>Thursday, February 12</div>
+        <div class="match-row future">
+            <div class="time-col">
+                <div class="time">08:00 PM</div>
+                <div class="league">NBA</div>
             </div>
             
-            <div class="matchup">
-                <div class="team away">
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/93.png" onerror="this.style.display='none'">
-                    <div class="tm-info">
-                        <div class="tm-name">Murray State Racers</div>
-                        <div class="tm-record">18-8</div>
-                    </div>
-                    <div class="tm-score">0</div>
+            <div class="game-info">
+                <div class="team-line">
+                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.display='none'">
+                    <span class="name my-team">Dallas Mavericks</span>
+                    <span class="score"></span>
                 </div>
-                
-                <div class="game-meta">
-                    <div class="status">Thu, February 12th at 7:00 PM EST</div>
-                    
-                </div>
-
-                <div class="team home">
-                    <div class="tm-score">0</div>
-                    <div class="tm-info">
-                        <div class="tm-name">Indiana State Sycamores</div>
-                        <div class="tm-record">10-15</div>
-                    </div>
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/282.png" onerror="this.style.display='none'">
+                <div class="team-line">
+                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.display='none'">
+                    <span class="name my-team">Los Angeles Lakers</span>
+                    <span class="score"></span>
                 </div>
             </div>
             
-            <div class="card-footer">
-                <div class="game-note">Regional Coverage</div>
-                <details>
-                    <summary><div class='story-btn'>Preview</div></summary>
-                    <div class="full-story">
-                        <p><strong>Murray State Racers vs Indiana State Sycamores</strong></p>
-                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
-                    </div>
-                </details>
-            </div>
-        </article>
-        
-        <article class="game-card pre">
-            <div class="card-top">
-                <span class="league-tag">NCAA BASKETBALL</span>
-                <span class="game-time">Thu, Feb 12 @ 06:00 PM AZT</span>
-            </div>
-            
-            <div class="matchup">
-                <div class="team away">
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2634.png" onerror="this.style.display='none'">
-                    <div class="tm-info">
-                        <div class="tm-name">Tennessee State Tigers</div>
-                        <div class="tm-record">16-8</div>
-                    </div>
-                    <div class="tm-score">0</div>
+            <div class="status-col">
+                <div class="status-indicator">
+                    <div class="dot upcoming-dot"></div>
+                    <span>Thu, February 12th at 10:00 PM EST</span>
                 </div>
-                
-                <div class="game-meta">
-                    <div class="status">Thu, February 12th at 8:00 PM EST</div>
-                    
-                </div>
-
-                <div class="team home">
-                    <div class="tm-score">0</div>
-                    <div class="tm-info">
-                        <div class="tm-name">Southern Indiana Screaming Eagles</div>
-                        <div class="tm-record">5-19</div>
-                    </div>
-                    <img src="https://a.espncdn.com/i/teamlogos/ncaa/500/88.png" onerror="this.style.display='none'">
-                </div>
+                <div class="tv-channel">Prime Video</div>
             </div>
-            
-            <div class="card-footer">
-                <div class="game-note">Regional Coverage</div>
-                <details>
-                    <summary><div class='story-btn'>Preview</div></summary>
-                    <div class="full-story">
-                        <p><strong>Tennessee State Tigers vs Southern Indiana Screaming Eagles</strong></p>
-                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
-                    </div>
-                </details>
-            </div>
-        </article>
-        
-        <article class="game-card pre">
-            <div class="card-top">
-                <span class="league-tag">NBA</span>
-                <span class="game-time">Thu, Feb 12 @ 08:00 PM AZT</span>
-            </div>
-            
-            <div class="matchup">
-                <div class="team away">
-                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" onerror="this.style.display='none'">
-                    <div class="tm-info">
-                        <div class="tm-name">Dallas Mavericks</div>
-                        <div class="tm-record">19-34</div>
-                    </div>
-                    <div class="tm-score">0</div>
-                </div>
-                
-                <div class="game-meta">
-                    <div class="status">Thu, February 12th at 10:00 PM EST</div>
-                    
-                </div>
-
-                <div class="team home">
-                    <div class="tm-score">0</div>
-                    <div class="tm-info">
-                        <div class="tm-name">Los Angeles Lakers</div>
-                        <div class="tm-record">32-21</div>
-                    </div>
-                    <img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" onerror="this.style.display='none'">
-                </div>
-            </div>
-            
-            <div class="card-footer">
-                <div class="game-note">Regional Coverage</div>
-                <details>
-                    <summary><div class='story-btn'>Preview</div></summary>
-                    <div class="full-story">
-                        <p><strong>Dallas Mavericks vs Los Angeles Lakers</strong></p>
-                        <p>Detailed stats and play-by-play data would populate here in the full version.</p>
-                    </div>
-                </details>
-            </div>
-        </article>
+        </div>
         
         </div>
     </body>
