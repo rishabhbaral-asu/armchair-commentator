@@ -6,7 +6,7 @@ import sys
 import re  # Added for strict regex matching
 
 # --- CONFIGURATION ---
-WHITELIST_FILE = "whitelist.txt"  # File containing team names (one per line)
+WHITELIST_FILE = "scripts/whitelist.txt"  # File containing team names (one per line)
 DATE_WINDOW_DAYS = 3  # How many days ahead to look
 # ---------------------
 
