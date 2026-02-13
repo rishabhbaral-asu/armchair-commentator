@@ -7,130 +7,71 @@
         <meta http-equiv="refresh" content="300"> 
         <style>
             body { background: #111; color: #eee; font-family: "Georgia", serif; margin: 0; padding-bottom: 50px; }
-            .header { background: #000; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
-            h1 { margin: 0; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+            .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; font-family: -apple-system, sans-serif; }
+            h1 { margin: 0; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+            #live-clock { font-family: monospace; font-size: 0.9rem; color: #888; }
             .container { max-width: 650px; margin: 0 auto; padding: 10px; }
-            .match-card { background: #1a1a1a; margin-bottom: 12px; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
+            
+            .match-card { background: #1a1a1a; margin-bottom: 12px; border: 1px solid #333; border-radius: 4px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
             .match-card.live { border-left: 5px solid #ef4444; }
             .match-summary { display: flex; padding: 15px; cursor: pointer; align-items: center; background: #1e1e1e; font-family: -apple-system, sans-serif; }
             .match-summary::-webkit-details-marker { display: none; }
+            
             .time-col { width: 60px; font-size: 0.75rem; color: #888; text-align: center; border-right: 1px solid #333; margin-right: 15px; }
             .score-col { flex: 1; }
             .team-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 1rem; }
             .logo { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
-            .score { font-weight: 700; }
-            .status-col { font-size: 0.7rem; color: #aaa; width: 70px; text-align: right; }
-            .article-content { padding: 20px; background: #161616; border-top: 1px solid #333; }
-            .story-headline { margin: 0 0 12px; font-size: 1.4rem; color: #fff; }
+            .score { font-weight: 700; font-variant-numeric: tabular-nums; }
+            .status-col { font-size: 0.7rem; color: #aaa; width: 70px; text-align: right; font-weight: 600; }
+            
+            .article-content { padding: 20px; background: #161616; border-top: 1px solid #333; animation: fadeIn 0.3s ease; }
+            .story-headline { margin: 0 0 12px; font-size: 1.4rem; color: #fff; font-weight: bold; line-height: 1.2; font-family: "Georgia", serif; }
+            .dateline { font-weight: bold; color: #aaa; text-transform: uppercase; font-size: 0.85rem; font-family: -apple-system, sans-serif; }
+            .story-container p { line-height: 1.6; color: #ccc; margin-bottom: 10px; font-size: 1.05rem; }
+            .final-score { font-weight: bold; color: #fff; border-top: 1px solid #333; padding-top: 10px; margin-top: 15px; }
+            
+            .countdown-box { background: #222; border: 1px solid #333; color: #3b82f6; padding: 12px; text-align: center; font-family: monospace; margin: 15px 0; border-radius: 4px; font-size: 1.1rem; }
+            .live-dot { color: #ef4444; animation: pulse 1.5s infinite; }
+            
+            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         </style>
+        <script>
+            function updateClock() {
+                const now = new Date();
+                const azTime = new Date(now.getTime() - (3600000 * 7));
+                document.getElementById('live-clock').textContent = azTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+            setInterval(updateClock, 1000);
+            window.onload = updateClock;
+        </script>
     </head>
     <body>
-        <div class="header"><h1>Clubhouse Wire</h1></div>
+        <div class="header">
+            <h1>Clubhouse Wire</h1>
+            <div id="live-clock">--:--</div>
+        </div>
         <div class="container">
             
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    06:05 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png" class="logo" onerror="this.style.display='none'"> New York Yankees <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bal.png" class="logo" onerror="this.style.display='none'"> Baltimore Orioles <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Scheduled</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Baltimore Orioles vs New York Yankees</h2><p>Scheduled</p></div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    08:05 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/kc.png" class="logo" onerror="this.style.display='none'"> Kansas City Royals <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tex.png" class="logo" onerror="this.style.display='none'"> Texas Rangers <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Scheduled</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Texas Rangers vs Kansas City Royals</h2><p>Scheduled</p></div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    08:10 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ari.png" class="logo" onerror="this.style.display='none'"> Arizona Diamondbacks <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/col.png" class="logo" onerror="this.style.display='none'"> Colorado Rockies <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Scheduled</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Colorado Rockies vs Arizona Diamondbacks</h2><p>Scheduled</p></div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    08:10 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sd.png" class="logo" onerror="this.style.display='none'"> San Diego Padres <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sea.png" class="logo" onerror="this.style.display='none'"> Seattle Mariners <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Scheduled</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Seattle Mariners vs San Diego Padres</h2><p>Scheduled</p></div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    03:00 AM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">NBA</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.display='none'"> Dallas Mavericks <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.display='none'"> Los Angeles Lakers <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Thu, February 12th at 10:00 PM EST</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Los Angeles Lakers vs Dallas Mavericks</h2><p>Thu, February 12th at 10:00 PM EST</p></div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">
-                    05:45 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">UEFA.CHAM</span>
-                </div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/111.png" class="logo" onerror="this.style.display='none'"> Juventus <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/432.png" class="logo" onerror="this.style.display='none'"> Galatasaray <span class="score">0</span></div>
-                </div>
-                <div class="status-col">Tue, February 17th at 12:45 PM EST</div>
-            </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Galatasaray vs Juventus</h2><p>Tue, February 17th at 12:45 PM EST</p></div></div>
-        </details>
-        
-        <details class="match-card final">
+        <details class="match-card pre">
             <summary class="match-summary">
                 <div class="time-col">
                     08:00 PM<br>
-                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">UEFA.CHAM</span>
+                    <span style="font-size:0.6em; background:#f97316; color:#fff; padding:2px 4px; border-radius:3px;">NBA</span>
                 </div>
                 <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/160.png" class="logo" onerror="this.style.display='none'"> Paris Saint-Germain <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/174.png" class="logo" onerror="this.style.display='none'"> AS Monaco <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.opacity=0"> Dallas Mavericks <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.opacity=0"> Los Angeles Lakers <span class="score">0</span></div>
                 </div>
-                <div class="status-col">Tue, February 17th at 3:00 PM EST</div>
+                <div class="status-col">Thu, February 12th at 10:00 PM EST</div>
             </summary>
-            <div class="article-content"><div class='story-container'><h2 class='story-headline'>AS Monaco vs Paris Saint-Germain</h2><p>Tue, February 17th at 3:00 PM EST</p></div></div>
+            <div class="article-content">
+        <div class='story-container'>
+            <h2 class='story-headline'>PREVIEW: Dallas Mavericks vs Los Angeles Lakers</h2>
+            <div class="countdown-box">08:00 PM</div>
+            <p><span class="dateline">LOS ANGELES</span> — The Los Angeles Lakers prepare to host the Dallas Mavericks at crypto.com Arena. 
+            Both teams look to make a statement in this NBA matchup.</p>
+        </div></div>
         </details>
         
         </div>
