@@ -8,52 +8,38 @@ from pathlib import Path
 
 # --- CONFIGURATION ---
 OUTPUT_HTML_PATH = Path("index.html")
-REFRESH_RATE_MINUTES = 10
+REFRESH_RATE_MINUTES = 5  # Backend refreshes data every 5 mins
 WINDOW_DAYS_BACK = 30
 WINDOW_DAYS_FWD = 14
 
 # --- 1. LEAGUE VAULT (Automatic Approval) ---
-# Games in these leagues are ALWAYS approved, regardless of team name.
 SAFE_LEAGUES = {
-    # SOCCER - EUROPE
     "eng.1", "esp.1", "ger.1", "fra.1", 
     "uefa.champions", "uefa.europa", "uefa.euro",
-    
-    # SOCCER - INTERNATIONAL / AMERICAS
     "fifa.world", "conmebol.america", "concacaf.gold",
     "usa.1", "usa.nwsl", "ind.isl",
-    
-    # CRICKET
     "ind.ipl", "usa.mlc", "icc.worldcup", "icc.t20worldcup", "icc.ct"
 }
 
 # --- 2. PRECISE GEO-FILTERS ---
-# We ONLY match if the team name contains a specific City, State, or Unique School Name.
-# Generic nicknames (Ducks, Sharks, Tigers) are BANNED to prevent false positives.
-
 US_LOCATIONS = {
-    # CALIFORNIA (Cities & Unique Schools)
+    # CALIFORNIA
     "California", "Cal Poly", "Stanford", "UCLA", "USC", "San Diego", "San Francisco", 
     "Los Angeles", "L.A.", "Sacramento", "Oakland", "San Jose", "Fresno", "Anaheim",
     "Golden State", "Angel City", "Santa Barbara", "Irvine", "Long Beach", "Davis", 
     "Riverside", "St. Mary's", "Pepperdine", "Santa Clara", "Loyola Marymount", "Pacific",
-
     # ARIZONA
     "Arizona", "Phoenix", "Tempe", "Tucson", "Grand Canyon", "GCU", "NAU",
-
     # TEXAS
     "Texas", "Houston", "Dallas", "Austin", "San Antonio", "Fort Worth", "El Paso",
     "Arlington", "Lubbock", "Waco", "College Station", "Rice", "SMU", "TCU", "Baylor", 
     "UTEP", "UTSA", "Corpus Christi", "Abilene",
-
     # ILLINOIS
     "Illinois", "Chicago", "Northwestern", "Evanston", "Champaign", "DePaul", "Loyola",
     "Bradley", "Peoria", "Carbondale", "Northern Illinois", "Southern Illinois",
-
     # GEORGIA
     "Georgia", "Atlanta", "Athens", "Macon", "Statesboro", "Kennesaw", "Mercer",
     "Valdosta", "Savannah",
-
     # DMV (DC, MD, VA)
     "Washington", "D.C.", "District of Columbia", "Maryland", "Virginia", "Baltimore",
     "Richmond", "Norfolk", "Fairfax", "Charlottesville", "Blacksburg", "Arlington",
@@ -64,76 +50,46 @@ US_LOCATIONS = {
 }
 
 # --- 3. GLOBAL CLUB WATCHLIST ---
-# Major clubs to catch in friendlies/inter-league play.
 GLOBAL_CLUBS = {
-    # ENGLAND
     "Arsenal", "Aston Villa", "Chelsea", "Everton", "Liverpool", "Man City", 
     "Manchester City", "Man Utd", "Manchester United", "Newcastle", "Tottenham", "Spurs", 
-    "West Ham", "Leeds",
-    
-    # EUROPE GIANTS
-    "Real Madrid", "Barcelona", "Atlético", "Bayern", "Dortmund", "Leverkusen", 
-    "PSG", "Paris Saint-Germain", "Marseille", "Juventus", "AC Milan", "Inter Milan",
-
-    # INDIA (IPL/ISL Brands)
-    "Chennai Super Kings", "CSK", "Mumbai Indians", "MI", "RCB", "Royal Challengers", 
-    "Kolkata Knight Riders", "KKR", "Gujarat Titans", "Sunrisers", "Delhi Capitals", 
-    "Rajasthan Royals", "Lucknow Super Giants", "Punjab Kings", "Mohun Bagan", "East Bengal"
+    "West Ham", "Leeds", "Real Madrid", "Barcelona", "Atlético", "Bayern", "Dortmund", 
+    "Leverkusen", "PSG", "Paris Saint-Germain", "Marseille", "Juventus", "AC Milan", 
+    "Inter Milan", "Chennai Super Kings", "CSK", "Mumbai Indians", "MI", "RCB", 
+    "Royal Challengers", "Kolkata Knight Riders", "KKR", "Gujarat Titans", "Sunrisers", 
+    "Delhi Capitals", "Rajasthan Royals", "Lucknow Super Giants", "Punjab Kings", 
+    "Mohun Bagan", "East Bengal"
 }
 
 # --- 4. NATIONAL TEAMS ---
 TARGET_COUNTRIES = {
-    "USA", "United States", "USMNT", "USWNT",
-    "India", "Men in Blue",
-    "England", "Three Lions",
-    "Spain", "La Roja",
-    "Germany", "Die Mannschaft",
-    "France", "Les Bleus",
-    "Mexico", "El Tri",
-    "Canada", "Brazil", "Argentina"
+    "USA", "United States", "USMNT", "USWNT", "India", "Men in Blue",
+    "England", "Three Lions", "Spain", "La Roja", "Germany", "Die Mannschaft",
+    "France", "Les Bleus", "Mexico", "El Tri", "Canada", "Brazil", "Argentina"
 }
 
 # --- EXCLUSION LIST ---
-# Safety net for ambiguous names.
 BLACKLIST = {
-    "Washington State", # WA
-    "Eastern Washington", # WA
-    "Central Washington", # WA
-    "West Virginia", # WV
-    "Western Illinois" # IL (Technically in IL, remove if you want them!)
+    "Washington State", "Eastern Washington", "Central Washington", "West Virginia"
 }
 
 def is_clubhouse_game(event, league_slug):
-    # 1. League Whitelist (The "Golden Ticket")
-    if league_slug in SAFE_LEAGUES:
-        return True
-
-    # 2. Competitor Scan
+    if league_slug in SAFE_LEAGUES: return True
     try:
         c = event['competitions'][0]
         teams = [c['competitors'][0]['team']['displayName'], c['competitors'][1]['team']['displayName']]
     except: return False
     
     for team in teams:
-        clean_team = team.strip()
-        
-        # A. National Team Check
-        if any(re.search(rf"\b{country}\b", clean_team, re.IGNORECASE) for country in TARGET_COUNTRIES):
-            if "Indiana" in clean_team and "India" not in clean_team: pass
+        clean = team.strip()
+        if any(re.search(rf"\b{country}\b", clean, re.IGNORECASE) for country in TARGET_COUNTRIES):
+            if "Indiana" in clean and "India" not in clean: pass
             else: return True
-
-        # B. Global Club Whitelist
-        if any(club.lower() in clean_team.lower() for club in GLOBAL_CLUBS):
-            return True
-
-        # C. US Geographic Check (Strict Mode)
+        if any(club.lower() in clean.lower() for club in GLOBAL_CLUBS): return True
         for loc in US_LOCATIONS:
-            if loc.lower() in clean_team.lower():
-                # Check Blacklist
-                if any(bad.lower() in clean_team.lower() for bad in BLACKLIST):
-                    continue
+            if loc.lower() in clean.lower():
+                if any(bad.lower() in clean.lower() for bad in BLACKLIST): continue
                 return True
-                
     return False
 
 # --- STORYTELLER ENGINE ---
@@ -143,19 +99,39 @@ class Storyteller:
         self.g = game
         self.h = game['home']
         self.a = game['away']
-        self.city = game['city'].upper() if game['city'] else "THE STADIUM"
+        self.city = game['city'].upper() if game['city'] else "THE ARENA"
         
     def write_body(self):
+        # PRE-GAME: Show Countdown
         if self.g['status'] == 'pre': 
-            return f"""<div class='story-container'><h2 class='story-headline'>{self.a['name']} at {self.h['name']}</h2><p><strong>{self.city}</strong> — The {self.h['name']} host the {self.a['name']} at {self.g['venue']}. TV: {self.g['tv'] or 'N/A'}.</p></div>"""
+            return f"""
+            <div class='story-container'>
+                <h2 class='story-headline'>{self.a['name']} at {self.h['name']}</h2>
+                <div class="countdown-box" data-ts="{self.g['utc_ts']}">Loading...</div>
+                <p><strong>{self.city}</strong> — The {self.h['name']} host the {self.a['name']} at {self.g['venue']}.</p>
+                <div class="meta">TV: {self.g['tv'] or 'N/A'} • Odds: {self.g['odds']}</div>
+            </div>"""
+        
+        # LIVE: Show Pulsing Score
         elif self.g['status'] == 'in':
-            return f"""<div class='story-container'><h2 class='story-headline'><span style='color:#ef4444'>●</span> LIVE: {self.h['name']} {self.h['score']} - {self.a['score']} {self.a['name']}</h2><p>Action is underway at {self.g['venue']}. Clock: {self.g['clock']}</p></div>"""
+            return f"""
+            <div class='story-container'>
+                <h2 class='story-headline'><span class='live-dot'>●</span> LIVE: {self.h['name']} {self.h['score']} - {self.a['score']} {self.a['name']}</h2>
+                <p class='live-text'>Action is underway at {self.g['venue']}.</p>
+                <p class='game-clock'>{self.g['clock']}</p>
+            </div>"""
+        
+        # FINAL: Show Recap
         else:
             try:
                 h_s, a_s = int(self.h['score']), int(self.a['score'])
-                winner = self.h if h_s > a_s else self.a
-                loser = self.a if h_s > a_s else self.h
-                return f"""<div class='story-container'><h2 class='story-headline'>{winner['name']} Wins {winner['score']}-{loser['score']}</h2><p><strong>{self.city}</strong> — The {winner['name']} defeated the {loser['name']} at {self.g['venue']}.</p></div>"""
+                w = self.h if h_s > a_s else self.a
+                l = self.a if w == self.h else self.h
+                return f"""
+                <div class='story-container'>
+                    <h2 class='story-headline'>{w['name']} Wins {w['score']}-{l['score']}</h2>
+                    <p><strong>{self.city}</strong> — The {w['name']} defeated the {l['name']} at {self.g['venue']}.</p>
+                </div>"""
             except: return "Game Complete"
 
 # --- DATA FETCHING ---
@@ -211,6 +187,7 @@ def fetch_wire():
                 "venue": c.get('venue', {}).get('fullName', 'Stadium'),
                 "city": c.get('venue', {}).get('address', {}).get('city', ''),
                 "tv": c.get('broadcasts', [{}])[0].get('names', [''])[0] if c.get('broadcasts') else "",
+                "odds": c.get('odds', [{}])[0].get('details', '') if c.get('odds') else "",
                 "home": { "name": c['competitors'][0]['team']['displayName'], "score": c['competitors'][0].get('score','0'), "logo": c['competitors'][0]['team'].get('logo','') },
                 "away": { "name": c['competitors'][1]['team']['displayName'], "score": c['competitors'][1].get('score','0'), "logo": c['competitors'][1]['team'].get('logo','') }
             }
@@ -259,29 +236,82 @@ def render_dashboard(games):
     <head>
         <title>Clubhouse Wire</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="refresh" content="600">
+        <meta http-equiv="refresh" content="300"> 
         <style>
-            body {{ background: #111; color: #eee; font-family: sans-serif; margin: 0; padding-bottom: 50px; }}
-            .header {{ background: #000; padding: 10px; text-align: center; color: #3b82f6; border-bottom: 1px solid #333; }}
+            body {{ background: #111; color: #eee; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding-bottom: 50px; }}
+            .header {{ background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }}
+            h1 {{ margin: 0; font-size: 1.2rem; color: #3b82f6; letter-spacing: 1px; text-transform: uppercase; }}
+            #live-clock {{ font-family: monospace; font-size: 1rem; color: #fff; background: #222; padding: 5px 10px; border-radius: 4px; border: 1px solid #444; }}
             .container {{ max-width: 600px; margin: 0 auto; padding: 10px; }}
-            .date-header {{ margin: 20px 0 5px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; }}
+            .date-header {{ margin: 25px 0 8px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 1px; }}
             .match-card {{ background: #1a1a1a; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; }}
             .match-card.live {{ border-left: 4px solid #ef4444; }}
-            .match-summary {{ display: flex; padding: 10px; cursor: pointer; align-items: center; }}
+            .match-summary {{ display: flex; padding: 12px; cursor: pointer; align-items: center; }}
             .match-summary::-webkit-details-marker {{ display: none; }}
-            .time-col {{ width: 50px; font-size: 0.75rem; color: #aaa; text-align: center; border-right: 1px solid #333; margin-right: 10px; }}
+            .time-col {{ width: 55px; font-size: 0.75rem; color: #aaa; text-align: center; border-right: 1px solid #333; margin-right: 12px; }}
             .score-col {{ flex: 1; }}
-            .team-row {{ display: flex; align-items: center; justify-content: space-between; margin: 2px 0; }}
-            .logo {{ width: 16px; height: 16px; margin-right: 5px; }}
-            .score {{ font-weight: bold; font-family: monospace; }}
+            .team-row {{ display: flex; align-items: center; justify-content: space-between; margin: 3px 0; }}
+            .logo {{ width: 20px; height: 20px; margin-right: 8px; object-fit: contain; }}
+            .score {{ font-weight: bold; font-family: monospace; font-size: 1.1rem; }}
             .status-col {{ font-size: 0.7rem; color: #aaa; width: 60px; text-align: right; }}
             .article-content {{ padding: 15px; background: #222; border-top: 1px solid #333; }}
-            .story-headline {{ margin: 0 0 10px; font-size: 1.1rem; }}
+            .story-headline {{ margin: 0 0 10px; font-size: 1.1rem; color: #fff; }}
+            .countdown-box {{ background: #111; border: 1px solid #333; color: #3b82f6; padding: 10px; text-align: center; font-family: monospace; margin: 10px 0; border-radius: 4px; }}
+            .live-dot {{ color: #ef4444; animation: pulse 1.5s infinite; }}
+            .game-clock {{ font-size: 1.2rem; font-weight: bold; margin: 10px 0; }}
+            .meta {{ font-size: 0.8rem; color: #888; margin-top: 8px; }}
+            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} 100% {{ opacity: 1; }} }}
         </style>
+        <script>
+            function updateClock() {{
+                // Updates the main header clock (Arizona Time)
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const azTime = new Date(utc - (3600000 * 7)); // UTC-7
+                let h = azTime.getHours();
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                const m = azTime.getMinutes().toString().padStart(2, '0');
+                const s = azTime.getSeconds().toString().padStart(2, '0');
+                document.getElementById('live-clock').textContent = h + ':' + m + ':' + s + ' ' + ampm;
+            }}
+
+            function updateCountdowns() {{
+                // Updates every individual game countdown
+                const now = new Date().getTime();
+                document.querySelectorAll('.countdown-box').forEach(box => {{
+                    const target = parseFloat(box.dataset.ts);
+                    const diff = target - now;
+                    
+                    if (diff < 0) {{
+                        box.innerHTML = "STARTING SOON / LIVE";
+                        box.style.color = "#ef4444";
+                        return;
+                    }}
+                    
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    if (d > 0) box.innerHTML = `TIP-OFF IN: ${{d}}d ${{h}}h ${{m}}m ${{s}}s`;
+                    else box.innerHTML = `TIP-OFF IN: ${{h}}h ${{m}}m ${{s}}s`;
+                }});
+            }}
+            
+            setInterval(updateClock, 1000);
+            setInterval(updateCountdowns, 1000);
+            window.onload = function() {{ updateClock(); updateCountdowns(); }};
+        </script>
     </head>
     <body>
-        <div class="header"><h1>CLUBHOUSE WIRE</h1></div>
-        <div class="container">{html_rows or "<div style='text-align:center;padding:20px'>No Games Found</div>"}</div>
+        <div class="header">
+            <h1>Clubhouse Wire</h1>
+            <div id="live-clock">--:--:--</div>
+        </div>
+        <div class="container">
+            {html_rows or "<div style='text-align:center;padding:20px;color:#666'>No Games Found</div>"}
+        </div>
     </body>
     </html>
     """
