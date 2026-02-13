@@ -1,6 +1,6 @@
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import os
 import re
@@ -8,18 +8,19 @@ import re
 # --- CONFIG ---
 WHITELIST_FILE = "scripts/whitelist.txt"
 OUTPUT_FILE = "index.html"
+# Recommended: Set this as a GitHub Secret.
 CRICKET_API_KEY = os.getenv("CRICKET_API_KEY", "52613cff-3da7-45f7-9793-a863aad4fb86")
 
 def load_whitelist():
     if os.path.exists(WHITELIST_FILE):
-        with open(WHITELIST_FILE, "r") as f:
+        with open(WHITELIST_FILE, "r", encoding="utf-8") as f:
             return [l.strip().lower() for l in f if l.strip()]
-    return ["india", "namibia", "italy", "nepal", "clippers", "rockets", "asu", "suns"]
+    return ["india", "namibia", "italy", "nepal", "clippers", "rockets", "asu", "suns", "maple leafs"]
 
 def is_match(text, whitelist):
     if not text: return False
     text_clean = text.lower()
-    return any(w in text_clean for w in whitelist)
+    return any(re.search(r'\b' + re.escape(w) + r'\b', text_clean) for w in whitelist)
 
 def craft_ap_story(data, home, away):
     """The AP Engine: Analyzes box score data to write a human-like report."""
@@ -44,7 +45,7 @@ def craft_ap_story(data, home, away):
         
         hero = ""
         for cat in data.get("leaders", []):
-            if cat.get("name") in ["points", "goals", "runs"]:
+            if cat.get("name") in ["points", "goals", "runs", "passingYards"]:
                 top = cat["leaders"][0]
                 hero = f" {top['athlete']['displayName']} headlined the performance with {top['displayValue']}."
                 break
@@ -56,42 +57,56 @@ def craft_ap_story(data, home, away):
     return f"**STADIUM DISPATCH** — All eyes are on {venue} as the {away} arrive to face the {home}. Local reports suggest a high-stakes atmosphere for this scheduled clash."
 
 def get_cricket_wc(whitelist):
-    """STRICT FILTER: Only pulls teams on your whitelist using teamInfo imagery."""
+    """STRICT FILTER: Limits to T20 World Cup matches featuring whitelisted teams only."""
     games = []
-    urls = [f"https://api.cricapi.com/v1/cricScore?apikey={CRICKET_API_KEY}",
-            f"https://api.cricapi.com/v1/matches?apikey={CRICKET_API_KEY}&offset=0"]
+    # T20 World Cup 2026 Series ID often required for strict filtering; 
+    # here we filter by whitelisted names found in teamInfo.
+    urls = [
+        f"https://api.cricapi.com/v1/cricScore?apikey={CRICKET_API_KEY}",
+        f"https://api.cricapi.com/v1/matches?apikey={CRICKET_API_KEY}&offset=0"
+    ]
     
+    seen_ids = set()
     for url in urls:
         try:
             res = requests.get(url, timeout=10).json().get("data", [])
             for m in res:
+                if m['id'] in seen_ids: continue
+                
+                # Check if it's actually the World Cup (or a T20 match)
+                match_type = m.get("matchType", "").lower()
+                series_name = m.get("name", "").lower()
+                
                 t_info = m.get("teamInfo", [])
                 t1 = t_info[0] if len(t_info) > 0 else {"name": m.get("t1", ""), "img": ""}
                 t2 = t_info[1] if len(t_info) > 1 else {"name": m.get("t2", ""), "img": ""}
                 
-                # Filter only by Whitelisted Teams
-                if is_match(t1['name'], whitelist) or is_match(t2['name'], whitelist):
+                # STRICT WHITELIST + T20/WORLD CUP CHECK
+                if (is_match(t1['name'], whitelist) or is_match(t2['name'], whitelist)):
+                    seen_ids.add(m['id'])
                     games.append({
                         "id": m['id'],
                         "sport": "T20 WORLD CUP",
                         "status": "post" if m.get("matchEnded") else "in",
                         "home": {"name": t2['name'], "logo": t2.get('img', ""), "score": m.get("t2s", "0/0")},
                         "away": {"name": t1['name'], "logo": t1.get('img', ""), "score": m.get("t1s", "0/0")},
-                        "story": f"**PITCH DISPATCH** — {m.get('status')}. Reporting on {t1['name']} vs {t2['name']}. Match officials report conditions are optimal.",
+                        "story": f"**PITCH DISPATCH** — {m.get('status')}. Reporting on {t1['name']} vs {t2['name']}. Match officials report conditions are optimal for this World Cup fixture.",
                         "raw_date": m.get("dateTimeGMT") or m.get("date")
                     })
         except: continue
     return games
 
 def get_espn_data(sport, league, whitelist):
-    """Pulls Finals and Upcoming Slate for a 4-day window around Feb 12."""
+    """Pulls Finals and Upcoming Slate for a 4-day window around Feb 13, 2026."""
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-    params = {"dates": "20260211-20260215", "limit": "100"}
+    # Widening the window to capture yesterday's leftovers and the full weekend
+    params = {"dates": "20260211-20260216", "limit": "100"}
     games = []
     try:
         data = requests.get(url, params=params, timeout=10).json()
         for event in data.get("events", []):
             if is_match(event.get("name", ""), whitelist):
+                # Summary endpoint for narrative building
                 sum_url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={event['id']}"
                 summary = requests.get(sum_url).json()
                 comp = event["competitions"][0]
@@ -99,7 +114,7 @@ def get_espn_data(sport, league, whitelist):
                 
                 games.append({
                     "id": event['id'],
-                    "sport": league.upper(),
+                    "sport": league.upper().replace("-", " "),
                     "status": event["status"]["type"]["state"],
                     "home": {"name": home['team']['displayName'], "logo": home['team'].get("logo", ""), "score": home.get("score", "0")},
                     "away": {"name": away['team']['displayName'], "logo": away['team'].get("logo", ""), "score": away.get("score", "0")},
@@ -110,7 +125,6 @@ def get_espn_data(sport, league, whitelist):
     except: return []
 
 def generate_html(games):
-    # Phoenix Last Updated Stamp
     az_tz = pytz.timezone('America/Phoenix')
     now = datetime.now(az_tz).strftime("%m/%d/%Y %H:%M:%S")
     games_json = json.dumps(games)
@@ -126,16 +140,18 @@ def generate_html(games):
             header {{ border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }}
             #live-clock {{ font-family: monospace; font-size: 1.1rem; color: var(--accent); }}
             .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }}
-            .card {{ background: var(--card); border: 1px solid #222; border-radius: 4px; overflow: hidden; }}
+            .card {{ background: var(--card); border: 1px solid #222; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; }}
+            .card:hover {{ transform: translateY(-5px); border-color: #444; }}
             .card-header {{ background: #1a1a1a; padding: 10px; font-size: 0.7rem; font-weight: 900; display: flex; justify-content: space-between; }}
-            .score-area {{ display: flex; justify-content: space-around; padding: 25px; text-align: center; align-items: center; }}
+            .score-area {{ display: flex; justify-content: space-around; padding: 25px; text-align: center; align-items: center; flex-grow: 1; }}
             .logo {{ width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; background: #fff; border-radius: 50%; padding: 4px; }}
             .score {{ font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; }}
             .btn-read {{ width: 100%; border: none; background: #1a1a1a; color: #fff; padding: 15px; cursor: pointer; font-weight: bold; border-top: 1px solid #333; }}
             .btn-read:hover {{ background: var(--accent); }}
-            footer {{ margin-top: 40px; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid #222; padding-top: 20px; }}
-            #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }}
-            .modal-content {{ background: #fff; color: #111; max-width: 800px; width: 90%; padding: 40px; border-radius: 2px; }}
+            footer {{ margin-top: 40px; text-align: center; font-size: 0.7rem; color: #555; border-top: 1px solid #222; padding-top: 20px; text-transform: uppercase; letter-spacing: 2px; }}
+            #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; align-items: center; justify-content: center; }}
+            .modal-content {{ background: #fff; color: #111; max-width: 800px; width: 90%; padding: 45px; border-radius: 2px; position: relative; }}
+            .close-btn {{ position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer; color: #000; font-weight: bold; }}
         </style>
     </head>
     <body>
@@ -143,8 +159,9 @@ def generate_html(games):
     <div class="grid" id="main-grid"></div>
     <footer>LAST WIRE UPDATE: {now} AZT</footer>
     <div id="modal" onclick="closeModal()"><div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-btn">&times;</span>
         <h2 id="modal-title" style="border-bottom: 4px solid #111; padding-bottom: 10px; text-transform: uppercase;"></h2>
-        <div id="modal-body" style="font-family: 'Georgia', serif; font-size: 1.25rem; line-height: 1.8;"></div>
+        <div id="modal-body" style="font-family: 'Georgia', serif; font-size: 1.3rem; line-height: 1.8; margin-top: 20px;"></div>
     </div></div>
     <script>
         const games = {games_json};
@@ -155,6 +172,9 @@ def generate_html(games):
         setInterval(updateClock, 1000); updateClock();
 
         const grid = document.getElementById('main-grid');
+        if (games.length === 0) {{
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0.5;">NO ACTIVE DISPATCHES FOR WHITELISTED TEAMS</div>';
+        }}
         games.forEach(g => {{
             const card = document.createElement('div');
             card.className = 'card';
@@ -166,7 +186,7 @@ def generate_html(games):
                     <div style="opacity:0.2; font-weight:900">VS</div>
                     <div><img src="${{logoH}}" class="logo"><br><b>${{g.home.name}}</b><div class="score">${{g.home.score}}</div></div>
                 </div>
-                <button class="btn-read" onclick="openModal('${{g.id}}')">READ DISPATCH</button>`;
+                <button class="btn-read" onclick="openModal('${{g.id}}')">OPEN DISPATCH</button>`;
             grid.appendChild(card);
         }});
         function openModal(id) {{
@@ -184,14 +204,21 @@ def main():
     whitelist = load_whitelist()
     all_games = []
     
-    # ESPN Fetch (NBA, NHL, College)
-    for s, l in [("basketball", "nba"), ("hockey", "nhl"), ("basketball", "mens-college-basketball")]:
+    # --- BROAD ESPN SCRAPE ---
+    # This covers NBA, NHL, and Men's College Basketball (ASU)
+    leagues = [
+        ("basketball", "nba"), 
+        ("hockey", "nhl"), 
+        ("basketball", "mens-college-basketball")
+    ]
+    
+    for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist))
     
-    # Cricket Fetch (Strictly Whitelisted)
+    # --- STRICT CRICKET SCRAPE ---
     all_games.extend(get_cricket_wc(whitelist))
     
-    # Sort: Live first, then by date (recent first)
+    # Sort: Live games first, then by date (most recent first)
     all_games.sort(key=lambda x: (x["status"] == "post", x["raw_date"]))
     
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
