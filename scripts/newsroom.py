@@ -6,7 +6,7 @@ import os
 import re
 
 # --- CONFIG ---
-WHITELIST_FILE = "whitelist.txt"
+WHITELIST_FILE = "scripts/whitelist.txt"
 OUTPUT_FILE = "index.html"
 CRICKET_API_KEY = os.getenv("CRICKET_API_KEY", "52613cff-3da7-45f7-9793-a863aad4fb86")
 
