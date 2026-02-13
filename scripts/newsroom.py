@@ -11,15 +11,20 @@ OUTPUT_HTML_PATH = Path("index.html")
 WHITELIST_PATH = Path("scripts/whitelist.json")
 REFRESH_RATE_MINUTES = 5
 
+# SETTINGS: How far to look?
+HISTORY_DEPTH = 3   # Days in the past (for final scores)
+FUTURE_DEPTH = 5    # Days in the future (for upcoming previews)
+
 # --- HELPER: FUZZY MATCHING ---
 def load_whitelist():
     if not WHITELIST_PATH.exists():
+        # Default fallback if file missing
         return ["India", "Pakistan", "Australia", "England", "Lakers", "Liverpool", "Real Madrid"]
     with open(WHITELIST_PATH, "r") as f:
         return [t.strip() for t in json.load(f)]
 
 def fuzzy_match(name, whitelist):
-    if not whitelist: return True
+    if not whitelist: return True # If empty, show everything
     clean_name = name.lower()
     for item in whitelist:
         if item.lower() in clean_name: return True
@@ -36,7 +41,6 @@ class Storyteller:
         self.sport = game['sport']
 
     def get_leader_text(self, team_data):
-        # Tries to find a star player (ESPN only usually)
         try:
             leader = team_data.get('leaders', [{}])[0]
             player = leader.get('leaders', [{}])[0]
@@ -47,7 +51,7 @@ class Storyteller:
         except: return ""
 
     def write_recap(self):
-        # 1. Determine Winner
+        # Determine Winner
         try:
             h_s = int(re.sub(r'\D', '', str(self.h['score']).split('/')[0]))
             a_s = int(re.sub(r'\D', '', str(self.a['score']).split('/')[0]))
@@ -56,14 +60,12 @@ class Storyteller:
         if h_s > a_s: w, l = self.h, self.a
         else: w, l = self.a, self.h
 
-        # 2. Generate Lede
-        star_text = self.get_leader_text(w)
-        if self.g.get('summary'): # BBC often gives a pre-written summary
-            lede = self.g['summary']
-        elif star_text:
-            lede = f"{star_text} powered the {w['name']} past the {l['name']} in a decisive victory."
-        else:
-            lede = f"The {w['name']} defeated the {l['name']} today at {self.venue}."
+        # Generate Narrative
+        lede = self.g.get('summary', '')
+        if not lede:
+            star = self.get_leader_text(w)
+            if star: lede = f"{star} led the charge as {w['name']} defeated {l['name']}."
+            else: lede = f"The {w['name']} secured a victory over {l['name']} in {self.city}."
 
         return f"""
         <div class='story-container'>
@@ -75,10 +77,10 @@ class Storyteller:
     def write_preview(self):
         return f"""
         <div class='story-container'>
-            <h2 class='story-headline'>PREVIEW: {self.a['name']} vs {self.h['name']}</h2>
+            <h2 class='story-headline'>PREVIEW: {self.a['name']} at {self.h['name']}</h2>
             <div class="countdown-box">{self.g['time_str']}</div>
-            <p><span class="dateline">{self.city}</span> — The {self.h['name']} prepare to host the {self.a['name']} at {self.venue}. 
-            Both teams look to make a statement in this {self.sport} matchup.</p>
+            <p><span class="dateline">{self.city}</span> — The {self.h['name']} host the {self.a['name']} at {self.venue}. 
+            Both sides look to make a statement in this {self.sport} matchup.</p>
         </div>"""
 
     def write_live(self):
@@ -96,22 +98,24 @@ class Storyteller:
         elif self.g['status'] == 'in': return self.write_live()
         else: return self.write_recap()
 
-# --- ENGINE 1: BBC CRICKET (The Specialist) ---
+# --- ENGINE 1: BBC CRICKET (Range Fix) ---
 def fetch_bbc_cricket(whitelist):
     print("  -> 🏏 Polling BBC Cricket Feed...")
-    url = "https://push.api.bbci.co.uk/batch?t=%2Fdata%2Fbbc-morph-cricket-scores-lx-sports-data%2FendDate%2F{today}%2FstartDate%2F{today}%2FtodayDate%2F{today}%2Fversion%2F2.4.6?timeout=5"
-    today = datetime.now().strftime("%Y-%m-%d")
+    
+    # FIX: Use the expanded date window
+    start_date = (datetime.now() - timedelta(days=HISTORY_DEPTH)).strftime("%Y-%m-%d")
+    end_date = (datetime.now() + timedelta(days=FUTURE_DEPTH)).strftime("%Y-%m-%d")
+    
+    url = f"https://push.api.bbci.co.uk/batch?t=%2Fdata%2Fbbc-morph-cricket-scores-lx-sports-data%2FendDate%2F{end_date}%2FstartDate%2F{start_date}%2FtodayDate%2F{start_date}%2Fversion%2F2.4.6?timeout=5"
     
     dashboard = []
     try:
-        resp = requests.get(url.format(today=today), headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
+        resp = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
         if resp.status_code != 200: return []
         
-        # BBC JSON diving
         data = resp.json()
         try: matches = data['payload'][0]['body']['matchData']['matches']
         except: 
-            # Alternate path for some tournaments
             try: matches = data['payload'][0]['body']['matchData'][0]['tournamentDatesWithEvents'][0]['round']['events']
             except: return []
 
@@ -124,22 +128,27 @@ def fetch_bbc_cricket(whitelist):
             if whitelist and not (fuzzy_match(h_name, whitelist) or fuzzy_match(a_name, whitelist)):
                 continue
 
-            # Map BBC Status to Standard
             status_str = m.get('eventStatus', 'fixture').lower()
             if status_str in ['live', 'inprogress']: status = 'in'
             elif status_str in ['result', 'post-event']: status = 'post'
             else: status = 'pre'
 
+            # Date Parsing
+            if 'startTime' in m:
+                dt_obj = datetime.fromisoformat(m['startTime'].replace("Z", "+00:00"))
+                local_dt = dt_obj - timedelta(hours=7) # AZ Time
+            else: local_dt = datetime.now()
+
             game = {
                 "id": f"bbc_{m.get('eventKey', '0')}",
                 "sport": "CRICKET",
-                "dt": datetime.now(), 
-                "time_str": m.get('startTime', 'Today')[11:16] if 'startTime' in m else "TODAY",
+                "dt": local_dt, 
+                "time_str": local_dt.strftime("%I:%M %p"),
                 "status": status,
                 "clock": "LIVE" if status == 'in' else "FINAL",
                 "venue": m.get('venue', {}).get('name', {}).get('first', 'Cricket Ground'),
-                "city": m.get('venue', {}).get('name', {}).get('first', '').split(' ')[-1], # Guess city from venue
-                "summary": m.get('eventStatusNote', ''), # "India win by 10 runs"
+                "city": m.get('venue', {}).get('name', {}).get('first', '').split(' ')[-1],
+                "summary": m.get('eventStatusNote', ''),
                 "home": { 
                     "name": h_name, 
                     "score": m.get('homeTeam', {}).get('scores', {}).get('score', '0'), 
@@ -151,26 +160,34 @@ def fetch_bbc_cricket(whitelist):
                     "logo": "https://news.bbcimg.co.uk/view/3_0_0/high/news/img/furniture/site/sport/cricket/logo.png"
                 }
             }
-            # Generate AP Style Story
             game['story_html'] = Storyteller(game).write_body()
             dashboard.append(game)
 
     except Exception as e: print(f"     ⚠️ BBC Error: {e}")
     return dashboard
 
-# --- ENGINE 2: ESPN STANDARD (The Generalist) ---
+# --- ENGINE 2: ESPN WIRE (Restored Sources) ---
 def fetch_espn(whitelist):
     print("  -> 🏀 Polling ESPN Wire...")
+    
+    # RESTORED: The Full List from the Old Version
     sources = [
-        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "uefa.champions"),
-        ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb")
+        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "ger.1"), ("soccer", "fra.1"),
+        ("soccer", "uefa.champions"), ("soccer", "uefa.europa"), ("soccer", "usa.1"), 
+        ("soccer", "usa.nwsl"), ("soccer", "ind.isl"), ("soccer", "fifa.world"),
+        ("cricket", "ipl"), ("cricket", "icc"), ("cricket", "international"), ("cricket", "icc.world.t20"),
+        ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb"),
+        ("football", "college-football"), ("basketball", "mens-college-basketball"),
+        ("basketball", "womens-college-basketball")
     ]
     
     dashboard = []
     seen_ids = set()
     
-    # Check Yesterday, Today, Tomorrow
-    dates = [datetime.now() + timedelta(days=i) for i in range(-1, 2)]
+    # RESTORED: The Wide Date Window
+    dates = [datetime.now()]
+    for i in range(1, HISTORY_DEPTH + 1): dates.append(datetime.now() - timedelta(days=i))
+    for i in range(1, FUTURE_DEPTH + 1): dates.append(datetime.now() + timedelta(days=i))
 
     for sport, league in sources:
         for d in dates:
@@ -189,14 +206,13 @@ def fetch_espn(whitelist):
 
                     seen_ids.add(e['id'])
                     
-                    # Time Parsing
                     utc_str = e['date'].replace("Z", "")
                     dt_obj = datetime.fromisoformat(utc_str)
-                    local_dt = dt_obj - timedelta(hours=7) # Adjust to local time
+                    local_dt = dt_obj - timedelta(hours=7) # AZ Time
 
                     game = {
                         "id": e['id'],
-                        "sport": (league or sport).upper(),
+                        "sport": (league or sport).upper().replace("COLLEGE-", "NCAA ").replace("ICC.WORLD.T20", "T20 WC"),
                         "dt": local_dt,
                         "time_str": local_dt.strftime("%I:%M %p"),
                         "status": c['status']['type']['state'],
@@ -216,25 +232,30 @@ def fetch_espn(whitelist):
                             "leaders": c['competitors'][1].get('leaders', [])
                         }
                     }
-                    # Generate AP Style Story
                     game['story_html'] = Storyteller(game).write_body()
                     dashboard.append(game)
             except: continue
     return dashboard
 
-# --- RENDERER ---
+# --- RENDERER (Restored Date Headers) ---
 def render_dashboard(games):
-    # Sort: Live -> Future -> Past
+    # Sort: Status then Date
     games.sort(key=lambda x: (x['status'] != 'in', x['dt']))
     
     html_rows = ""
+    current_date_header = ""
+
     for g in games:
-        # Badge Colors
+        # Create Date Header if date changes
+        g_date = g['dt'].strftime("%A, %B %d")
+        if g_date != current_date_header:
+            html_rows += f"<div class='date-header'>{g_date}</div>"
+            current_date_header = g_date
+
         bg = "#666"
         if "CRICKET" in g['sport']: bg = "#10b981"
         elif "NBA" in g['sport']: bg = "#f97316"
         elif "NFL" in g['sport']: bg = "#3b82f6"
-        elif "SOCCER" in g['sport']: bg = "#a855f7"
         
         status_class = "live" if g['status'] == 'in' else "final" if g['status'] == 'post' else "pre"
         
@@ -268,6 +289,8 @@ def render_dashboard(games):
             h1 {{ margin: 0; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }}
             #live-clock {{ font-family: monospace; font-size: 0.9rem; color: #888; }}
             .container {{ max-width: 650px; margin: 0 auto; padding: 10px; }}
+            
+            .date-header {{ margin: 25px 0 8px; color: #555; font-size: 0.8rem; border-bottom: 1px solid #222; text-transform: uppercase; letter-spacing: 1px; font-family: -apple-system, sans-serif; }}
             
             .match-card {{ background: #1a1a1a; margin-bottom: 12px; border: 1px solid #333; border-radius: 4px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }}
             .match-card.live {{ border-left: 5px solid #ef4444; }}
@@ -309,7 +332,7 @@ def render_dashboard(games):
             <div id="live-clock">--:--</div>
         </div>
         <div class="container">
-            {html_rows or "<div style='text-align:center;padding:40px;color:#666;font-style:italic'>No games found. Checking Whitelist...</div>"}
+            {html_rows or "<div style='text-align:center;padding:40px;color:#666;font-style:italic'>No games found. Check Whitelist settings.</div>"}
         </div>
     </body>
     </html>
