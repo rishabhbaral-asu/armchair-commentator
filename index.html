@@ -6,831 +6,131 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="300"> 
         <style>
-            body { background: #111; color: #eee; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding-bottom: 50px; }
-            .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
-            h1 { margin: 0; font-size: 1.2rem; color: #3b82f6; letter-spacing: 1px; text-transform: uppercase; }
-            #live-clock { font-family: monospace; font-size: 1rem; color: #fff; background: #222; padding: 5px 10px; border-radius: 4px; border: 1px solid #444; }
-            .container { max-width: 600px; margin: 0 auto; padding: 10px; }
-            .date-header { margin: 25px 0 8px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 1px; }
-            .match-card { background: #1a1a1a; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; }
-            .match-card.live { border-left: 4px solid #ef4444; }
-            .match-summary { display: flex; padding: 12px; cursor: pointer; align-items: center; }
+            body { background: #111; color: #eee; font-family: "Georgia", serif; margin: 0; padding-bottom: 50px; }
+            .header { background: #000; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
+            h1 { margin: 0; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+            .container { max-width: 650px; margin: 0 auto; padding: 10px; }
+            .match-card { background: #1a1a1a; margin-bottom: 12px; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
+            .match-card.live { border-left: 5px solid #ef4444; }
+            .match-summary { display: flex; padding: 15px; cursor: pointer; align-items: center; background: #1e1e1e; font-family: -apple-system, sans-serif; }
             .match-summary::-webkit-details-marker { display: none; }
-            .time-col { width: 55px; font-size: 0.75rem; color: #aaa; text-align: center; border-right: 1px solid #333; margin-right: 12px; }
+            .time-col { width: 60px; font-size: 0.75rem; color: #888; text-align: center; border-right: 1px solid #333; margin-right: 15px; }
             .score-col { flex: 1; }
-            .team-row { display: flex; align-items: center; justify-content: space-between; margin: 3px 0; }
-            .logo { width: 20px; height: 20px; margin-right: 8px; object-fit: contain; }
-            .score { font-weight: bold; font-family: monospace; font-size: 1.1rem; }
-            .status-col { font-size: 0.7rem; color: #aaa; width: 60px; text-align: right; }
-            .article-content { padding: 15px; background: #222; border-top: 1px solid #333; }
-            .story-headline { margin: 0 0 10px; font-size: 1.1rem; color: #fff; }
-            .countdown-box { background: #111; border: 1px solid #333; color: #3b82f6; padding: 10px; text-align: center; font-family: monospace; margin: 10px 0; border-radius: 4px; }
-            .live-dot { color: #ef4444; animation: pulse 1.5s infinite; }
-            .game-clock { font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
-            .meta { font-size: 0.8rem; color: #888; margin-top: 8px; }
-            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+            .team-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 1rem; }
+            .logo { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
+            .score { font-weight: 700; }
+            .status-col { font-size: 0.7rem; color: #aaa; width: 70px; text-align: right; }
+            .article-content { padding: 20px; background: #161616; border-top: 1px solid #333; }
+            .story-headline { margin: 0 0 12px; font-size: 1.4rem; color: #fff; }
         </style>
-        <script>
-            function updateClock() {
-                const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const azTime = new Date(utc - (3600000 * 7)); // UTC-7
-                let h = azTime.getHours();
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                h = h % 12 || 12;
-                const m = azTime.getMinutes().toString().padStart(2, '0');
-                const s = azTime.getSeconds().toString().padStart(2, '0');
-                document.getElementById('live-clock').textContent = h + ':' + m + ':' + s + ' ' + ampm;
-            }
-
-            function updateCountdowns() {
-                const now = new Date().getTime();
-                document.querySelectorAll('.countdown-box').forEach(box => {
-                    const target = parseFloat(box.dataset.ts);
-                    const diff = target - now;
-                    if (diff < 0) {
-                        box.innerHTML = "STARTING SOON / LIVE";
-                        box.style.color = "#ef4444";
-                        return;
-                    }
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    if (d > 0) box.innerHTML = `TIP-OFF IN: ${d}d ${h}h ${m}m ${s}s`;
-                    else box.innerHTML = `TIP-OFF IN: ${h}h ${m}m ${s}s`;
-                });
-            }
-            
-            setInterval(updateClock, 1000);
-            setInterval(updateCountdowns, 1000);
-            window.onload = function() { updateClock(); updateCountdowns(); };
-        </script>
     </head>
     <body>
-        <div class="header">
-            <h1>Clubhouse Wire</h1>
-            <div id="live-clock">--:--:--</div>
-        </div>
+        <div class="header"><h1>Clubhouse Wire</h1></div>
         <div class="container">
-            <div class='date-header'>Thursday, February 12</div>
-        <details class="match-card live">
-            <summary class="match-summary">
-                <div class="time-col">05:30 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/251.png" class="logo"> Texas Longhorns <span class="score">56</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/238.png" class="logo"> Vanderbilt Commodores <span class="score">70</span></div>
-                </div>
-                <div class="status-col">9:23 - 4th Quarter</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'><span class='live-dot'>●</span> LIVE: Vanderbilt Commodores 70 - 56 Texas Longhorns</h2>
-                <p class='live-text'>Action is underway at Memorial Gymnasium (TN).</p>
-                <p class='game-clock'>9:23 - 4th Quarter</p>
-            </div></div>
-        </details>
-        
-        <details class="match-card live">
-            <summary class="match-summary">
-                <div class="time-col">06:30 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2856.png" class="logo"> California Baptist Lancers <span class="score">39</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/253.png" class="logo"> Southern Utah Thunderbirds <span class="score">28</span></div>
-                </div>
-                <div class="status-col">2:15 - 1st Half</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'><span class='live-dot'>●</span> LIVE: Southern Utah Thunderbirds 28 - 39 California Baptist Lancers</h2>
-                <p class='live-text'>Action is underway at America First Events Center.</p>
-                <p class='game-clock'>2:15 - 1st Half</p>
-            </div></div>
-        </details>
-        
-        <details class="match-card live">
-            <summary class="match-summary">
-                <div class="time-col">07:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/235.png" class="logo"> Memphis Tigers <span class="score">8</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/249.png" class="logo"> North Texas Mean Green <span class="score">2</span></div>
-                </div>
-                <div class="status-col">16:58 - 1st Half</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'><span class='live-dot'>●</span> LIVE: North Texas Mean Green 2 - 8 Memphis Tigers</h2>
-                <p class='live-text'>Action is underway at The Super Pit.</p>
-                <p class='game-clock'>16:58 - 1st Half</p>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">07:30 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/62.png" class="logo"> Hawai'i Rainbow Warriors <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2934.png" class="logo"> Cal State Bakersfield Roadrunners <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Hawai'i Rainbow Warriors at Cal State Bakersfield Roadrunners</h2>
-                <div class="countdown-box" data-ts="1770949800000.0">Loading...</div>
-                <p><strong>BAKERSFIELD</strong> — The Cal State Bakersfield Roadrunners host the Hawai'i Rainbow Warriors at Icardo Center.</p>
-                <div class="meta">TV: ESPN+ • Odds: HAW -13.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo"> Dallas Mavericks <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo"> Los Angeles Lakers <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Dallas Mavericks at Los Angeles Lakers</h2>
-                <div class="countdown-box" data-ts="1770951600000.0">Loading...</div>
-                <p><strong>LOS ANGELES</strong> — The Los Angeles Lakers host the Dallas Mavericks at crypto.com Arena.</p>
-                <div class="meta">TV: Prime Video • Odds: LAL -6.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2540.png" class="logo"> UC Santa Barbara Gauchos <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/27.png" class="logo"> UC Riverside Highlanders <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>UC Santa Barbara Gauchos at UC Riverside Highlanders</h2>
-                <div class="countdown-box" data-ts="1770951600000.0">Loading...</div>
-                <p><strong>RIVERSIDE</strong> — The UC Riverside Highlanders host the UC Santa Barbara Gauchos at SRC Arena.</p>
-                <div class="meta">TV: ESPN+ • Odds: UCSB -7.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2239.png" class="logo"> Cal State Fullerton Titans <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/299.png" class="logo"> Long Beach State Beach <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Cal State Fullerton Titans at Long Beach State Beach</h2>
-                <div class="countdown-box" data-ts="1770951600000.0">Loading...</div>
-                <p><strong>LONG BEACH</strong> — The Long Beach State Beach host the Cal State Fullerton Titans at Walter Pyramid.</p>
-                <div class="meta">TV: ESPN+ • Odds: LBSU -1.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/300.png" class="logo"> UC Irvine Anteaters <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" class="logo"> Cal Poly Mustangs <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>UC Irvine Anteaters at Cal Poly Mustangs</h2>
-                <div class="countdown-box" data-ts="1770951600000.0">Loading...</div>
-                <p><strong>SAN LUIS OBISPO</strong> — The Cal Poly Mustangs host the UC Irvine Anteaters at Mott Athletics Center.</p>
-                <div class="meta">TV: ESPN+ • Odds: UCI -5.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/302.png" class="logo"> UC Davis Aggies <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/28.png" class="logo"> UC San Diego Tritons <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>UC Davis Aggies at UC San Diego Tritons</h2>
-                <div class="countdown-box" data-ts="1770951600000.0">Loading...</div>
-                <p><strong>SAN DIEGO</strong> — The UC San Diego Tritons host the UC Davis Aggies at LionTree Arena.</p>
-                <div class="meta">TV: ESPN+ • Odds: UCSD -6.5</div>
-            </div></div>
-        </details>
-        <div class='date-header'>Friday, February 13</div>
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">12:30 PM<br><span style="font-size:0.6em">GER.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/2950.png" class="logo"> Mainz <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/124.png" class="logo"> Borussia Dortmund <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Mainz at Borussia Dortmund</h2>
-                <div class="countdown-box" data-ts="1771011000000.0">Loading...</div>
-                <p><strong>AUE</strong> — The Borussia Dortmund host the Mainz at Signal Iduna Park.</p>
-                <div class="meta">TV: ESPN+ • Odds: DOR -180</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:05 PM<br><span style="font-size:0.6em">FRA.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/165.png" class="logo"> Nantes <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/174.png" class="logo"> AS Monaco <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Nantes at AS Monaco</h2>
-                <div class="countdown-box" data-ts="1771013100000.0">Loading...</div>
-                <p><strong>MONACO</strong> — The AS Monaco host the Nantes at Stade Louis II.</p>
-                <div class="meta">TV:  • Odds: MON -205</div>
-            </div></div>
-        </details>
-        <div class='date-header'>Saturday, February 14</div>
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">07:30 AM<br><span style="font-size:0.6em">GER.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/270.png" class="logo"> St. Pauli <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/131.png" class="logo"> Bayer Leverkusen <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>St. Pauli at Bayer Leverkusen</h2>
-                <div class="countdown-box" data-ts="1771079400000.0">Loading...</div>
-                <p><strong>LEVERKUSEN</strong> — The Bayer Leverkusen host the St. Pauli at BayArena.</p>
-                <div class="meta">TV: ESPN+ • Odds: B04 -220</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">09:00 AM<br><span style="font-size:0.6em">FRA.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/180.png" class="logo"> Strasbourg <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/176.png" class="logo"> Marseille <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Strasbourg at Marseille</h2>
-                <div class="countdown-box" data-ts="1771084800000.0">Loading...</div>
-                <p><strong>MARSEILLE</strong> — The Marseille host the Strasbourg at Stade Vélodrome.</p>
-                <div class="meta">TV:  • Odds: OLM -140</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">10:45 AM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/26.png" class="logo"> UCLA Bruins <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/130.png" class="logo"> Michigan Wolverines <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>UCLA Bruins at Michigan Wolverines</h2>
-                <div class="countdown-box" data-ts="1771091100000.0">Loading...</div>
-                <p><strong>ANN ARBOR</strong> — The Michigan Wolverines host the UCLA Bruins at Crisler Center.</p>
-                <div class="meta">TV: CBS • Odds: MICH -16.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">11:00 AM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/245.png" class="logo"> Texas A&M Aggies <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/238.png" class="logo"> Vanderbilt Commodores <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Texas A&M Aggies at Vanderbilt Commodores</h2>
-                <div class="countdown-box" data-ts="1771092000000.0">Loading...</div>
-                <p><strong>NASHVILLE</strong> — The Vanderbilt Commodores host the Texas A&M Aggies at Memorial Gymnasium (TN).</p>
-                <div class="meta">TV: SEC Network • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:30 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Lady Raiders <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/197.png" class="logo"> Oklahoma State Cowgirls <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Texas Tech Lady Raiders at Oklahoma State Cowgirls</h2>
-                <div class="countdown-box" data-ts="1771101000000.0">Loading...</div>
-                <p><strong>STILLWATER</strong> — The Oklahoma State Cowgirls host the Texas Tech Lady Raiders at Gallagher-Iba Arena.</p>
-                <div class="meta">TV: ESPN+ • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">04:30 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Red Raiders <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/12.png" class="logo"> Arizona Wildcats <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Texas Tech Red Raiders at Arizona Wildcats</h2>
-                <div class="countdown-box" data-ts="1771111800000.0">Loading...</div>
-                <p><strong>TUCSON</strong> — The Arizona Wildcats host the Texas Tech Red Raiders at McKale Memorial Center.</p>
-                <div class="meta">TV: ESPN • Odds: ARIZ -9.5</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:30 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2250.png" class="logo"> Gonzaga Bulldogs <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2541.png" class="logo"> Santa Clara Broncos <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Gonzaga Bulldogs at Santa Clara Broncos</h2>
-                <div class="countdown-box" data-ts="1771126200000.0">Loading...</div>
-                <p><strong>SANTA CLARA</strong> — The Santa Clara Broncos host the Gonzaga Bulldogs at Leavey Center.</p>
-                <div class="meta">TV: ESPN • Odds: GONZ -3.5</div>
-            </div></div>
-        </details>
-        <div class='date-header'>Sunday, February 15</div>
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">12:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" class="logo"> Maryland Terrapins <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/194.png" class="logo"> Ohio State Buckeyes <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Maryland Terrapins at Ohio State Buckeyes</h2>
-                <div class="countdown-box" data-ts="1771182000000.0">Loading...</div>
-                <p><strong>COLUMBUS</strong> — The Ohio State Buckeyes host the Maryland Terrapins at Value City Arena.</p>
-                <div class="meta">TV: FS1 • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">12:45 PM<br><span style="font-size:0.6em">FRA.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/2502.png" class="logo"> Nice <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/167.png" class="logo"> Lyon <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Nice at Lyon</h2>
-                <div class="countdown-box" data-ts="1771184700000.0">Loading...</div>
-                <p><strong>LYON</strong> — The Lyon host the Nice at Groupama Stadium.</p>
-                <div class="meta">TV:  • Odds: LYON -165</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/84.png" class="logo"> Indiana Hoosiers <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/26.png" class="logo"> UCLA Bruins <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Indiana Hoosiers at UCLA Bruins</h2>
-                <div class="countdown-box" data-ts="1771185600000.0">Loading...</div>
-                <p><strong>LOS ANGELES</strong> — The UCLA Bruins host the Indiana Hoosiers at Pauley Pavilion.</p>
-                <div class="meta">TV: Peacock • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/251.png" class="logo"> Texas Longhorns <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2633_ncw.png" class="logo"> Tennessee Lady Volunteers <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Texas Longhorns at Tennessee Lady Volunteers</h2>
-                <div class="countdown-box" data-ts="1771185600000.0">Loading...</div>
-                <p><strong>KNOXVILLE</strong> — The Tennessee Lady Volunteers host the Texas Longhorns at Food City Center.</p>
-                <div class="meta">TV: ABC • Odds: </div>
-            </div></div>
-        </details>
-        <div class='date-header'>Tuesday, February 17</div>
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">10:45 AM<br><span style="font-size:0.6em">UEFA.CHAMPIONS</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/111.png" class="logo"> Juventus <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/432.png" class="logo"> Galatasaray <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Juventus at Galatasaray</h2>
-                <div class="countdown-box" data-ts="1771350300000.0">Loading...</div>
-                <p><strong>ISTANBUL</strong> — The Galatasaray host the Juventus at RAMS Park.</p>
-                <div class="meta">TV: Paramount+ • Odds: JUV +110</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:00 PM<br><span style="font-size:0.6em">UEFA.CHAMPIONS</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/160.png" class="logo"> Paris Saint-Germain <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/174.png" class="logo"> AS Monaco <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Paris Saint-Germain at AS Monaco</h2>
-                <div class="countdown-box" data-ts="1771358400000.0">Loading...</div>
-                <p><strong>MONACO</strong> — The AS Monaco host the Paris Saint-Germain at Stade Louis II.</p>
-                <div class="meta">TV: Paramount+ • Odds: PSG -185</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">06:30 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/26.png" class="logo"> UCLA Bruins <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/127.png" class="logo"> Michigan State Spartans <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>UCLA Bruins at Michigan State Spartans</h2>
-                <div class="countdown-box" data-ts="1771378200000.0">Loading...</div>
-                <p><strong>EAST LANSING</strong> — The Michigan State Spartans host the UCLA Bruins at Breslin Center.</p>
-                <div class="meta">TV: Peacock • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">09:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Red Raiders <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/9.png" class="logo"> Arizona State Sun Devils <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Texas Tech Red Raiders at Arizona State Sun Devils</h2>
-                <div class="countdown-box" data-ts="1771387200000.0">Loading...</div>
-                <p><strong>TEMPE</strong> — The Arizona State Sun Devils host the Texas Tech Red Raiders at Desert Financial Arena.</p>
-                <div class="meta">TV: ESPN2 • Odds: </div>
-            </div></div>
-        </details>
-        <div class='date-header'>Wednesday, February 18</div>
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">01:00 PM<br><span style="font-size:0.6em">UEFA.CHAMPIONS</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/131.png" class="logo"> Bayer Leverkusen <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/435.png" class="logo"> Olympiacos <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Bayer Leverkusen at Olympiacos</h2>
-                <div class="countdown-box" data-ts="1771444800000.0">Loading...</div>
-                <p><strong>PIRAEUS</strong> — The Olympiacos host the Bayer Leverkusen at Georgios Karaiskakis Stadium.</p>
-                <div class="meta">TV: Paramount+ • Odds: OLY +130</div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">05:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/239.png" class="logo"> Baylor Bears <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Lady Raiders <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Baylor Bears at Texas Tech Lady Raiders</h2>
-                <div class="countdown-box" data-ts="1771459200000.0">Loading...</div>
-                <p><strong>LUBBOCK</strong> — The Texas Tech Lady Raiders host the Baylor Bears at United Supermarkets Arena.</p>
-                <div class="meta">TV: ESPN+ • Odds: </div>
-            </div></div>
-        </details>
-        
-        <details class="match-card pre">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/356.png" class="logo"> Illinois Fighting Illini <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/30.png" class="logo"> USC Trojans <span class="score">0</span></div>
-                </div>
-                <div class="status-col">PRE</div>
-            </summary>
-            <div class="article-content">
-            <div class='story-container'>
-                <h2 class='story-headline'>Illinois Fighting Illini at USC Trojans</h2>
-                <div class="countdown-box" data-ts="1771470000000.0">Loading...</div>
-                <p><strong>LOS ANGELES</strong> — The USC Trojans host the Illinois Fighting Illini at Galen Center.</p>
-                <div class="meta">TV: BTN • Odds: </div>
-            </div></div>
-        </details>
-        <div class='date-header'>Thursday, February 12</div>
+            
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">05:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/213.png" class="logo"> Penn State Lady Lions <span class="score">62</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/120.png" class="logo"> Maryland Terrapins <span class="score">81</span></div>
+                <div class="time-col">
+                    06:05 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png" class="logo" onerror="this.style.display='none'"> New York Yankees <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/bal.png" class="logo" onerror="this.style.display='none'"> Baltimore Orioles <span class="score">0</span></div>
+                </div>
+                <div class="status-col">Scheduled</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Maryland Terrapins Wins 81-62</h2>
-                    <p><strong>COLLEGE PARK</strong> — The Maryland Terrapins defeated the Penn State Lady Lions at XFINITY Center.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Baltimore Orioles vs New York Yankees</h2><p>Scheduled</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">04:30 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/245.png" class="logo"> Texas A&M Aggies <span class="score">55</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/96.png" class="logo"> Kentucky Wildcats <span class="score">75</span></div>
+                <div class="time-col">
+                    08:05 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
                 </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Kentucky Wildcats Wins 75-55</h2>
-                    <p><strong>LEXINGTON</strong> — The Kentucky Wildcats defeated the Texas A&M Aggies at Memorial Coliseum (KY).</p>
-                </div></div>
-        </details>
-        <div class='date-header'>Wednesday, February 11</div>
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">08:00 PM<br><span style="font-size:0.6em">NBA</span></div>
                 <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/sa.png" class="logo"> San Antonio Spurs <span class="score">126</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/gs.png" class="logo"> Golden State Warriors <span class="score">113</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/kc.png" class="logo" onerror="this.style.display='none'"> Kansas City Royals <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/tex.png" class="logo" onerror="this.style.display='none'"> Texas Rangers <span class="score">0</span></div>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="status-col">Scheduled</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>San Antonio Spurs Wins 126-113</h2>
-                    <p><strong>SAN FRANCISCO</strong> — The San Antonio Spurs defeated the Golden State Warriors at Chase Center.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Texas Rangers vs Kansas City Royals</h2><p>Scheduled</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">07:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/okc.png" class="logo"> Oklahoma City Thunder <span class="score">136</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/phx.png" class="logo"> Phoenix Suns <span class="score">109</span></div>
+                <div class="time-col">
+                    08:10 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ari.png" class="logo" onerror="this.style.display='none'"> Arizona Diamondbacks <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/col.png" class="logo" onerror="this.style.display='none'"> Colorado Rockies <span class="score">0</span></div>
+                </div>
+                <div class="status-col">Scheduled</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Oklahoma City Thunder Wins 136-109</h2>
-                    <p><strong>PHOENIX</strong> — The Oklahoma City Thunder defeated the Phoenix Suns at Mortgage Matchup Center.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Colorado Rockies vs Arizona Diamondbacks</h2><p>Scheduled</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">07:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/sac.png" class="logo"> Sacramento Kings <span class="score">93</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/utah.png" class="logo"> Utah Jazz <span class="score">121</span></div>
+                <div class="time-col">
+                    08:10 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">MLB</span>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sd.png" class="logo" onerror="this.style.display='none'"> San Diego Padres <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/sea.png" class="logo" onerror="this.style.display='none'"> Seattle Mariners <span class="score">0</span></div>
+                </div>
+                <div class="status-col">Scheduled</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Utah Jazz Wins 121-93</h2>
-                    <p><strong>SALT LAKE CITY</strong> — The Utah Jazz defeated the Sacramento Kings at Delta Center.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Seattle Mariners vs San Diego Padres</h2><p>Scheduled</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">06:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lac.png" class="logo"> LA Clippers <span class="score">105</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/hou.png" class="logo"> Houston Rockets <span class="score">102</span></div>
+                <div class="time-col">
+                    03:00 AM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">NBA</span>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo" onerror="this.style.display='none'"> Dallas Mavericks <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lal.png" class="logo" onerror="this.style.display='none'"> Los Angeles Lakers <span class="score">0</span></div>
+                </div>
+                <div class="status-col">Thu, February 12th at 10:00 PM EST</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>LA Clippers Wins 105-102</h2>
-                    <p><strong>HOUSTON</strong> — The LA Clippers defeated the Houston Rockets at Toyota Center (Houston).</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Los Angeles Lakers vs Dallas Mavericks</h2><p>Thu, February 12th at 10:00 PM EST</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">06:00 PM<br><span style="font-size:0.6em">MENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/38.png" class="logo"> Colorado Buffaloes <span class="score">44</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Red Raiders <span class="score">78</span></div>
+                <div class="time-col">
+                    05:45 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">UEFA.CHAM</span>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/111.png" class="logo" onerror="this.style.display='none'"> Juventus <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/432.png" class="logo" onerror="this.style.display='none'"> Galatasaray <span class="score">0</span></div>
+                </div>
+                <div class="status-col">Tue, February 17th at 12:45 PM EST</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Texas Tech Red Raiders Wins 78-44</h2>
-                    <p><strong>LUBBOCK</strong> — The Texas Tech Red Raiders defeated the Colorado Buffaloes at United Supermarkets Arena.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>Galatasaray vs Juventus</h2><p>Tue, February 17th at 12:45 PM EST</p></div></div>
         </details>
         
         <details class="match-card final">
             <summary class="match-summary">
-                <div class="time-col">06:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/26.png" class="logo"> UCLA Bruins <span class="score">86</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/127.png" class="logo"> Michigan State Spartans <span class="score">63</span></div>
+                <div class="time-col">
+                    08:00 PM<br>
+                    <span style="font-size:0.6em; background:#666; color:#fff; padding:2px 4px; border-radius:3px;">UEFA.CHAM</span>
                 </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>UCLA Bruins Wins 86-63</h2>
-                    <p><strong>EAST LANSING</strong> — The UCLA Bruins defeated the Michigan State Spartans at Breslin Center.</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">05:00 PM<br><span style="font-size:0.6em">NBA</span></div>
                 <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/wsh.png" class="logo"> Washington Wizards <span class="score">113</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/cle.png" class="logo"> Cleveland Cavaliers <span class="score">138</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/160.png" class="logo" onerror="this.style.display='none'"> Paris Saint-Germain <span class="score">0</span></div>
+                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/174.png" class="logo" onerror="this.style.display='none'"> AS Monaco <span class="score">0</span></div>
                 </div>
-                <div class="status-col">POST</div>
+                <div class="status-col">Tue, February 17th at 3:00 PM EST</div>
             </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Cleveland Cavaliers Wins 138-113</h2>
-                    <p><strong>CLEVELAND</strong> — The Cleveland Cavaliers defeated the Washington Wizards at Rocket Arena.</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">12:40 PM<br><span style="font-size:0.6em">ENG.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/379.png" class="logo"> Burnley <span class="score">3</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/384.png" class="logo"> Crystal Palace <span class="score">2</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Burnley Wins 3-2</h2>
-                    <p><strong>LONDON</strong> — The Burnley defeated the Crystal Palace at Selhurst Park.</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">12:30 PM<br><span style="font-size:0.6em">ENG.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/370.png" class="logo"> Fulham <span class="score">0</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/382.png" class="logo"> Manchester City <span class="score">3</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Manchester City Wins 3-0</h2>
-                    <p><strong>MANCHESTER</strong> — The Manchester City defeated the Fulham at Etihad Stadium.</p>
-                </div></div>
-        </details>
-        <div class='date-header'>Tuesday, February 10</div>
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">07:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/dal.png" class="logo"> Dallas Mavericks <span class="score">111</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/phx.png" class="logo"> Phoenix Suns <span class="score">120</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Phoenix Suns Wins 120-111</h2>
-                    <p><strong>PHOENIX</strong> — The Phoenix Suns defeated the Dallas Mavericks at Mortgage Matchup Center.</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">06:00 PM<br><span style="font-size:0.6em">NBA</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/lac.png" class="logo"> LA Clippers <span class="score">95</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/hou.png" class="logo"> Houston Rockets <span class="score">102</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Houston Rockets Wins 102-95</h2>
-                    <p><strong>HOUSTON</strong> — The Houston Rockets defeated the LA Clippers at Toyota Center (Houston).</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">05:00 PM<br><span style="font-size:0.6em">WOMENS-NCAA BASKETBALL</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2305.png" class="logo"> Kansas Jayhawks <span class="score">65</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png" class="logo"> Texas Tech Lady Raiders <span class="score">70</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Texas Tech Lady Raiders Wins 70-65</h2>
-                    <p><strong>LUBBOCK</strong> — The Texas Tech Lady Raiders defeated the Kansas Jayhawks at United Supermarkets Arena.</p>
-                </div></div>
-        </details>
-        
-        <details class="match-card final">
-            <summary class="match-summary">
-                <div class="time-col">12:30 PM<br><span style="font-size:0.6em">ENG.1</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/357.png" class="logo"> Leeds United <span class="score">2</span></div>
-                    <div class="team-row"><img src="https://a.espncdn.com/i/teamlogos/soccer/500/363.png" class="logo"> Chelsea <span class="score">2</span></div>
-                </div>
-                <div class="status-col">POST</div>
-            </summary>
-            <div class="article-content">
-                <div class='story-container'>
-                    <h2 class='story-headline'>Leeds United Wins 2-2</h2>
-                    <p><strong>LONDON</strong> — The Leeds United defeated the Chelsea at Stamford Bridge.</p>
-                </div></div>
+            <div class="article-content"><div class='story-container'><h2 class='story-headline'>AS Monaco vs Paris Saint-Germain</h2><p>Tue, February 17th at 3:00 PM EST</p></div></div>
         </details>
         
         </div>
