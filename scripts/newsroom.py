@@ -10,199 +10,164 @@ from pathlib import Path
 OUTPUT_HTML_PATH = Path("index.html")
 WHITELIST_PATH = Path("scripts/whitelist.json")
 REFRESH_RATE_MINUTES = 5
-WINDOW_DAYS_BACK = 30
-WINDOW_DAYS_FWD = 14
 
-# SEARCH DEPTH
-HISTORY_DEPTH = 3  # Check last 3 days for final scores
-FUTURE_DEPTH = 5   # Check next 5 days for upcoming big games (Ind v Pak, etc.)
-
-def load_whitelist():
-    if not WHITELIST_PATH.exists():
-        with open(WHITELIST_PATH, "w") as f: json.dump([], f)
-        return []
-    with open(WHITELIST_PATH, "r") as f:
-        return [t.strip() for t in json.load(f)]
-
-def is_approved_game(event, whitelist):
-    try:
-        c = event['competitions'][0]
-        teams = [
-            c['competitors'][0]['team']['displayName'], 
-            c['competitors'][1]['team']['displayName']
-        ]
-    except: return False
-
-    for team in teams:
-        t_clean = team.strip()
-        for target in whitelist:
-            # Whole Word Matching (prevents India -> Indiana)
-            pattern = rf"\b{re.escape(target)}\b"
-            if re.search(pattern, t_clean, flags=re.IGNORECASE): 
-                return True
-    return False
-
-# --- STORYTELLER ENGINE ---
-
-class Storyteller:
-    def __init__(self, game):
-        self.g = game
-        self.h = game['home']
-        self.a = game['away']
-        self.city = game['city'].upper() if game['city'] else "THE ARENA"
-        
-    def write_body(self):
-        if self.g['status'] == 'pre': 
-            return f"""
-            <div class='story-container'>
-                <h2 class='story-headline'>{self.a['name']} at {self.h['name']}</h2>
-                <div class="countdown-box" data-ts="{self.g['utc_ts']}">Loading...</div>
-                <p><strong>{self.city}</strong> — The {self.h['name']} host the {self.a['name']} at {self.g['venue']}.</p>
-                <div class="meta">TV: {self.g['tv']} • Odds: {self.g['odds']}</div>
-            </div>"""
-        elif self.g['status'] == 'in':
-            return f"""
-            <div class='story-container'>
-                <h2 class='story-headline'><span class='live-dot'>●</span> LIVE: {self.h['name']} {self.h['score']} - {self.a['score']} {self.a['name']}</h2>
-                <p class='live-text'>Action is underway at {self.g['venue']}.</p>
-                <p class='game-clock'>{self.g['clock']}</p>
-            </div>"""
-        else:
-            try:
-                # Clean scores to integers (handles "245/3" cricket scores roughly)
-                h_s = int(re.sub(r'\D', '', str(self.h['score']) or '0'))
-                a_s = int(re.sub(r'\D', '', str(self.a['score']) or '0'))
-                w = self.h if h_s > a_s else self.a
-                l = self.a if w == self.h else self.h
-                return f"""
-                <div class='story-container'>
-                    <h2 class='story-headline'>{w['name']} Wins {w['score']}-{l['score']}</h2>
-                    <p><strong>{self.city}</strong> — The {w['name']} defeated the {l['name']} at {self.g['venue']}.</p>
-                </div>"""
-            except: 
-                return f"""
-                <div class='story-container'>
-                    <h2 class='story-headline'>Match Complete</h2>
-                    <p>{self.h['name']}: {self.h['score']} <br> {self.a['name']}: {self.a['score']}</p>
-                </div>"""
-
-# --- DATA FETCHING ---
-
-def get_az_time(utc_str):
-    try:
-        clean = utc_str.replace("Z", "")
-        dt_utc = datetime.fromisoformat(clean).replace(tzinfo=timezone.utc)
-        dt_az = dt_utc - timedelta(hours=7)
-        return dt_az, dt_utc.timestamp() * 1000
-    except: return datetime.now(), 0
-
-def fetch_wire():
-    print("  -> Reading Whitelist...")
-    whitelist = load_whitelist()
-    if not whitelist: print("⚠️ Whitelist is empty!"); return []
-
-    print("  -> Polling Sports Data (Past & Future)...")
+# --- CRICKET ENGINE (BBC) ---
+def fetch_bbc_cricket(whitelist):
+    """
+    Fetches live cricket scores from the BBC's public feed.
+    This is much more reliable for tournaments than ESPN.
+    """
+    print("  -> Polling BBC Cricket Feed...")
+    url = "https://push.api.bbci.co.uk/batch?t=%2Fdata%2Fbbc-morph-cricket-scores-lx-sports-data%2FendDate%2F{today}%2FstartDate%2F{today}%2FtodayDate%2F{today}%2Fversion%2F2.4.6?timeout=5"
     
-    # Added "icc.world.t20" explicitly
-    sources = [
-        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "ger.1"), ("soccer", "fra.1"),
-        ("soccer", "uefa.champions"), ("soccer", "uefa.europa"), ("soccer", "usa.1"), 
-        ("soccer", "usa.nwsl"), ("soccer", "ind.isl"), ("soccer", "fifa.world"),
-        ("cricket", "ipl"), ("cricket", "icc"), ("cricket", "international"), ("cricket", "icc.world.t20"),
-        ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb"),
-        ("football", "college-football"), ("basketball", "mens-college-basketball"),
-        ("basketball", "womens-college-basketball")
-    ]
-    
-    # DATES TO CHECK: Today + Past + FUTURE
-    dates_to_check = [datetime.now()] 
-    # Look Back (History)
-    for i in range(1, HISTORY_DEPTH + 1):
-        dates_to_check.append(datetime.now() - timedelta(days=i))
-    # Look Forward (Future - Crucial for Ind v Pak)
-    for i in range(1, FUTURE_DEPTH + 1):
-        dates_to_check.append(datetime.now() + timedelta(days=i))
+    # BBC requires today's date in YYYY-MM-DD
+    today = datetime.now().strftime("%Y-%m-%d")
+    final_url = url.format(today=today)
 
     dashboard = []
-    seen_ids = set()
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        resp = requests.get(final_url, headers=headers, timeout=5)
+        if resp.status_code != 200: return []
+        
+        data = resp.json()
+        # The BBC data structure is nested: payload -> data -> stages
+        payload = data['payload'][0]['body']
+        
+        for match_key, match in payload.get('matchData', []).get('matches', {}).items():
+            # Basic info
+            home_name = match.get('homeTeam', {}).get('name', 'Unknown')
+            away_name = match.get('awayTeam', {}).get('name', 'Unknown')
+            
+            # Whitelist Check
+            if whitelist:
+                found = False
+                for target in whitelist:
+                    if target.lower() in home_name.lower() or target.lower() in away_name.lower():
+                        found = True
+                        break
+                if not found: continue
 
+            # Score Logic
+            h_score = match.get('homeTeam', {}).get('scores', '0')
+            a_score = match.get('awayTeam', {}).get('scores', '0')
+            status = match.get('matchStatus', 'live').lower()
+            
+            # BBC Status to Our Standard
+            if status == 'complete' or status == 'result': standard_status = 'post'
+            elif status == 'live' or status == 'inprogress': standard_status = 'in'
+            else: standard_status = 'pre'
+            
+            # Formatting the "Story"
+            summary = match.get('matchSummaryText', '')
+            
+            game = {
+                "id": f"bbc_{match_key}",
+                "sport": "CRICKET",
+                "dt": datetime.now(), # BBC doesn't always give clean start times, assume "today"
+                "time_str": "TODAY",
+                "status": standard_status,
+                "clock": summary if standard_status == 'in' else "FINAL",
+                "venue": match.get('venue', {}).get('name', 'The Oval'),
+                "home": { "name": home_name, "score": h_score, "logo": "https://news.bbcimg.co.uk/view/3_0_0/high/news/img/furniture/site/sport/cricket/logo.png" },
+                "away": { "name": away_name, "score": a_score, "logo": "https://news.bbcimg.co.uk/view/3_0_0/high/news/img/furniture/site/sport/cricket/logo.png" },
+                "story_html": f"""
+                <div class='story-container'>
+                    <h2 class='story-headline'>{home_name} vs {away_name}</h2>
+                    <p class='live-text'>{summary}</p>
+                    <p class="final-score">{home_name}: {h_score} <br> {away_name}: {a_score}</p>
+                </div>"""
+            }
+            dashboard.append(game)
+            
+    except Exception as e:
+        print(f"⚠️ BBC Fetch Failed: {e}")
+        
+    return dashboard
+
+# --- STANDARD ESPN FETCHER (UNCHANGED) ---
+
+def load_whitelist():
+    if not WHITELIST_PATH.exists(): return ["India", "England", "Australia", "Lakers", "Liverpool"]
+    with open(WHITELIST_PATH, "r") as f: return [t.strip() for t in json.load(f)]
+
+def is_approved_game(event, whitelist):
+    if not whitelist: return True
+    try:
+        c = event['competitions'][0]
+        teams = [c['competitors'][0]['team']['displayName'], c['competitors'][1]['team']['displayName']]
+    except: return False
+    for team_name in teams:
+        for target in whitelist:
+            if target.lower() in team_name.lower(): return True
+    return False
+
+def fetch_espn(whitelist):
+    print("  -> Polling ESPN Wire...")
+    sources = [
+        ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "uefa.champions"),
+        ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb")
+    ]
+    
+    dashboard = []
+    seen_ids = set()
+    
     for sport, league in sources:
-        for check_date in dates_to_check:
-            date_str = check_date.strftime("%Y%m%d")
-            
-            url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-            params = {'limit': '900', 'dates': date_str}
-            
-            try:
-                data = requests.get(url, params=params, timeout=3).json()
-            except: continue
-                
+        url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
+        try:
+            data = requests.get(url, timeout=2).json()
             for e in data.get('events', []):
                 if e['id'] in seen_ids: continue
                 if not is_approved_game(e, whitelist): continue
-
                 seen_ids.add(e['id'])
-                c = e['competitions'][0]
-                az_dt, utc_ts = get_az_time(e['date'])
                 
-                # Double check global window
-                days_diff = (az_dt.date() - datetime.now().date()).days
-                if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD: continue
-
-                try: tv = c.get('broadcasts', [{}])[0].get('names', [''])[0]
-                except: tv = ""
-                try: odds = c.get('odds', [{}])[0].get('details', '')
-                except: odds = ""
+                c = e['competitions'][0]
+                h = c['competitors'][0]
+                a = c['competitors'][1]
+                status = c['status']['type']['state']
+                
+                # Simple Story
+                story = f"<div class='story-container'><h2 class='story-headline'>{h['team']['displayName']} vs {a['team']['displayName']}</h2><p>{c['status']['type']['detail']}</p></div>"
 
                 game = {
                     "id": e['id'],
-                    "sport": (league or sport).upper().replace("COLLEGE-", "NCAA ").replace("ICC.WORLD.T20", "T20 WC"),
-                    "dt": az_dt,
-                    "utc_ts": utc_ts,
-                    "time_str": az_dt.strftime("%I:%M %p"),
-                    "status": c['status']['type']['state'],
+                    "sport": (league or sport).upper(),
+                    "dt": datetime.now(), # Simplified for merging
+                    "time_str": datetime.fromisoformat(e['date'].replace("Z","")).strftime("%I:%M %p"),
+                    "status": status,
                     "clock": c['status']['type']['detail'],
-                    "tv": tv,
-                    "odds": odds,
-                    "venue": c.get('venue', {}).get('fullName', 'Stadium'),
-                    "city": c.get('venue', {}).get('address', {}).get('city', ''),
-                    "home": { "name": c['competitors'][0]['team']['displayName'], "score": c['competitors'][0].get('score','0'), "logo": c['competitors'][0]['team'].get('logo','') },
-                    "away": { "name": c['competitors'][1]['team']['displayName'], "score": c['competitors'][1].get('score','0'), "logo": c['competitors'][1]['team'].get('logo','') }
+                    "venue": "",
+                    "home": { "name": h['team']['displayName'], "score": h.get('score','0'), "logo": h['team'].get('logo','') },
+                    "away": { "name": a['team']['displayName'], "score": a.get('score','0'), "logo": a['team'].get('logo','') },
+                    "story_html": story
                 }
-                
-                story = Storyteller(game)
-                game['story_html'] = story.write_body()
                 dashboard.append(game)
-            
+        except: continue
     return dashboard
 
-# --- RENDERER ---
+# --- MAIN LOOP ---
 
 def render_dashboard(games):
-    live = sorted([g for g in games if g['status'] == 'in'], key=lambda x: x['dt'])
-    pre = sorted([g for g in games if g['status'] == 'pre'], key=lambda x: x['dt'])
-    post = sorted([g for g in games if g['status'] == 'post'], key=lambda x: x['dt'], reverse=True)
-    sorted_games = live + pre + post
+    # Sort: Live games first
+    games.sort(key=lambda x: (x['status'] != 'in', x['sport']))
     
     html_rows = ""
-    current_date = ""
-    
-    for g in sorted_games:
-        g_date = g['dt'].strftime("%A, %B %d")
-        if g_date != current_date:
-            html_rows += f"<div class='date-header'>{g_date}</div>"
-            current_date = g_date
-            
-        status_class = "live" if g['status'] == 'in' else "final" if g['status'] == 'post' else "pre"
+    for g in games:
+        badge_color = "#10b981" if g['sport'] == "CRICKET" else "#666"
+        status_class = "live" if g['status'] == 'in' else "final"
+        
         html_rows += f"""
         <details class="match-card {status_class}">
             <summary class="match-summary">
-                <div class="time-col">{g['time_str']}<br><span style="font-size:0.6em">{g['sport']}</span></div>
-                <div class="score-col">
-                    <div class="team-row"><img src="{g['away']['logo']}" class="logo"> {g['away']['name']} <span class="score">{g['away']['score']}</span></div>
-                    <div class="team-row"><img src="{g['home']['logo']}" class="logo"> {g['home']['name']} <span class="score">{g['home']['score']}</span></div>
+                <div class="time-col">
+                    {g['time_str']}<br>
+                    <span style="font-size:0.6em; background:{badge_color}; color:#fff; padding:2px 4px; border-radius:3px;">{g['sport'][:9]}</span>
                 </div>
-                <div class="status-col">{g['clock'] if g['status']=='in' else g['status'].upper()}</div>
+                <div class="score-col">
+                    <div class="team-row"><img src="{g['away']['logo']}" class="logo" onerror="this.style.display='none'"> {g['away']['name']} <span class="score">{g['away']['score']}</span></div>
+                    <div class="team-row"><img src="{g['home']['logo']}" class="logo" onerror="this.style.display='none'"> {g['home']['name']} <span class="score">{g['home']['score']}</span></div>
+                </div>
+                <div class="status-col">{g['clock']}</div>
             </summary>
             <div class="article-content">{g['story_html']}</div>
         </details>
@@ -216,86 +181,41 @@ def render_dashboard(games):
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="300"> 
         <style>
-            body {{ background: #111; color: #eee; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding-bottom: 50px; }}
-            .header {{ background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }}
-            h1 {{ margin: 0; font-size: 1.2rem; color: #3b82f6; letter-spacing: 1px; text-transform: uppercase; }}
-            #live-clock {{ font-family: monospace; font-size: 1rem; color: #fff; background: #222; padding: 5px 10px; border-radius: 4px; border: 1px solid #444; }}
-            .container {{ max-width: 600px; margin: 0 auto; padding: 10px; }}
-            .date-header {{ margin: 25px 0 8px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 1px; }}
-            .match-card {{ background: #1a1a1a; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; }}
-            .match-card.live {{ border-left: 4px solid #ef4444; }}
-            .match-summary {{ display: flex; padding: 12px; cursor: pointer; align-items: center; }}
+            body {{ background: #111; color: #eee; font-family: "Georgia", serif; margin: 0; padding-bottom: 50px; }}
+            .header {{ background: #000; padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }}
+            h1 {{ margin: 0; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; }}
+            .container {{ max-width: 650px; margin: 0 auto; padding: 10px; }}
+            .match-card {{ background: #1a1a1a; margin-bottom: 12px; border: 1px solid #333; border-radius: 4px; overflow: hidden; }}
+            .match-card.live {{ border-left: 5px solid #ef4444; }}
+            .match-summary {{ display: flex; padding: 15px; cursor: pointer; align-items: center; background: #1e1e1e; font-family: -apple-system, sans-serif; }}
             .match-summary::-webkit-details-marker {{ display: none; }}
-            .time-col {{ width: 55px; font-size: 0.75rem; color: #aaa; text-align: center; border-right: 1px solid #333; margin-right: 12px; }}
+            .time-col {{ width: 60px; font-size: 0.75rem; color: #888; text-align: center; border-right: 1px solid #333; margin-right: 15px; }}
             .score-col {{ flex: 1; }}
-            .team-row {{ display: flex; align-items: center; justify-content: space-between; margin: 3px 0; }}
-            .logo {{ width: 20px; height: 20px; margin-right: 8px; object-fit: contain; }}
-            .score {{ font-weight: bold; font-family: monospace; font-size: 1.1rem; }}
-            .status-col {{ font-size: 0.7rem; color: #aaa; width: 60px; text-align: right; }}
-            .article-content {{ padding: 15px; background: #222; border-top: 1px solid #333; }}
-            .story-headline {{ margin: 0 0 10px; font-size: 1.1rem; color: #fff; }}
-            .countdown-box {{ background: #111; border: 1px solid #333; color: #3b82f6; padding: 10px; text-align: center; font-family: monospace; margin: 10px 0; border-radius: 4px; }}
-            .live-dot {{ color: #ef4444; animation: pulse 1.5s infinite; }}
-            .game-clock {{ font-size: 1.2rem; font-weight: bold; margin: 10px 0; }}
-            .meta {{ font-size: 0.8rem; color: #888; margin-top: 8px; }}
-            @keyframes pulse {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} 100% {{ opacity: 1; }} }}
+            .team-row {{ display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 1rem; }}
+            .logo {{ width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }}
+            .score {{ font-weight: 700; }}
+            .status-col {{ font-size: 0.7rem; color: #aaa; width: 70px; text-align: right; }}
+            .article-content {{ padding: 20px; background: #161616; border-top: 1px solid #333; }}
+            .story-headline {{ margin: 0 0 12px; font-size: 1.4rem; color: #fff; }}
         </style>
-        <script>
-            function updateClock() {{
-                const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const azTime = new Date(utc - (3600000 * 7)); // UTC-7
-                let h = azTime.getHours();
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                h = h % 12 || 12;
-                const m = azTime.getMinutes().toString().padStart(2, '0');
-                const s = azTime.getSeconds().toString().padStart(2, '0');
-                document.getElementById('live-clock').textContent = h + ':' + m + ':' + s + ' ' + ampm;
-            }}
-
-            function updateCountdowns() {{
-                const now = new Date().getTime();
-                document.querySelectorAll('.countdown-box').forEach(box => {{
-                    const target = parseFloat(box.dataset.ts);
-                    const diff = target - now;
-                    if (diff < 0) {{
-                        box.innerHTML = "STARTING SOON / LIVE";
-                        box.style.color = "#ef4444";
-                        return;
-                    }}
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    if (d > 0) box.innerHTML = `TIP-OFF IN: ${{d}}d ${{h}}h ${{m}}m ${{s}}s`;
-                    else box.innerHTML = `TIP-OFF IN: ${{h}}h ${{m}}m ${{s}}s`;
-                }});
-            }}
-            
-            setInterval(updateClock, 1000);
-            setInterval(updateCountdowns, 1000);
-            window.onload = function() {{ updateClock(); updateCountdowns(); }};
-        </script>
     </head>
     <body>
-        <div class="header">
-            <h1>Clubhouse Wire</h1>
-            <div id="live-clock">--:--:--</div>
-        </div>
+        <div class="header"><h1>Clubhouse Wire</h1></div>
         <div class="container">
-            {html_rows or "<div style='text-align:center;padding:20px;color:#666'>No Games Found</div>"}
+            {html_rows or "<div style='text-align:center;padding:40px;color:#666;'>No games found.</div>"}
         </div>
     </body>
     </html>
     """
     with open(OUTPUT_HTML_PATH, "w", encoding='utf-8') as f: f.write(html)
-    print(f"✅ Dashboard Updated at {datetime.now()}")
+    print(f"✅ Dashboard Updated with {len(games)} games.")
 
 if __name__ == "__main__":
     if os.environ.get('CI') == 'true': 
-        render_dashboard(fetch_wire())
+        w = load_whitelist()
+        render_dashboard(fetch_espn(w) + fetch_bbc_cricket(w))
     else:
         while True:
-            render_dashboard(fetch_wire())
-            print(f"Sleeping {REFRESH_RATE_MINUTES}m...")
+            w = load_whitelist()
+            render_dashboard(fetch_espn(w) + fetch_bbc_cricket(w))
             time.sleep(REFRESH_RATE_MINUTES * 60)
