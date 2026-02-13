@@ -13,21 +13,18 @@ REFRESH_RATE_MINUTES = 5
 WINDOW_DAYS_BACK = 30
 WINDOW_DAYS_FWD = 14
 
+# SEARCH DEPTH
+HISTORY_DEPTH = 3  # Check last 3 days for final scores
+FUTURE_DEPTH = 5   # Check next 5 days for upcoming big games (Ind v Pak, etc.)
+
 def load_whitelist():
-    """Loads your manual list of teams."""
     if not WHITELIST_PATH.exists():
-        print("⚠️ No whitelist.json found! Creating empty one.")
         with open(WHITELIST_PATH, "w") as f: json.dump([], f)
         return []
     with open(WHITELIST_PATH, "r") as f:
-        # Load and clean list
         return [t.strip() for t in json.load(f)]
 
 def is_approved_game(event, whitelist):
-    """
-    Checks if a team is in the whitelist using WHOLE WORD matching only.
-    This prevents 'India' from matching 'Indiana'.
-    """
     try:
         c = event['competitions'][0]
         teams = [
@@ -37,15 +34,10 @@ def is_approved_game(event, whitelist):
     except: return False
 
     for team in teams:
-        # Normalize the team name from the API
         t_clean = team.strip()
-        
         for target in whitelist:
-            # Create a regex pattern that looks for the target word as a WHOLE word.
-            # \b matches the boundary between a word character and a non-word character.
-            # flags=re.IGNORECASE makes it case-insensitive.
+            # Whole Word Matching (prevents India -> Indiana)
             pattern = rf"\b{re.escape(target)}\b"
-            
             if re.search(pattern, t_clean, flags=re.IGNORECASE): 
                 return True
     return False
@@ -60,7 +52,6 @@ class Storyteller:
         self.city = game['city'].upper() if game['city'] else "THE ARENA"
         
     def write_body(self):
-        # PRE-GAME
         if self.g['status'] == 'pre': 
             return f"""
             <div class='story-container'>
@@ -69,8 +60,6 @@ class Storyteller:
                 <p><strong>{self.city}</strong> — The {self.h['name']} host the {self.a['name']} at {self.g['venue']}.</p>
                 <div class="meta">TV: {self.g['tv']} • Odds: {self.g['odds']}</div>
             </div>"""
-        
-        # LIVE
         elif self.g['status'] == 'in':
             return f"""
             <div class='story-container'>
@@ -78,11 +67,11 @@ class Storyteller:
                 <p class='live-text'>Action is underway at {self.g['venue']}.</p>
                 <p class='game-clock'>{self.g['clock']}</p>
             </div>"""
-        
-        # FINAL
         else:
             try:
-                h_s, a_s = int(self.h['score']), int(self.a['score'])
+                # Clean scores to integers (handles "245/3" cricket scores roughly)
+                h_s = int(re.sub(r'\D', '', str(self.h['score']) or '0'))
+                a_s = int(re.sub(r'\D', '', str(self.a['score']) or '0'))
                 w = self.h if h_s > a_s else self.a
                 l = self.a if w == self.h else self.h
                 return f"""
@@ -90,7 +79,12 @@ class Storyteller:
                     <h2 class='story-headline'>{w['name']} Wins {w['score']}-{l['score']}</h2>
                     <p><strong>{self.city}</strong> — The {w['name']} defeated the {l['name']} at {self.g['venue']}.</p>
                 </div>"""
-            except: return "Game Complete"
+            except: 
+                return f"""
+                <div class='story-container'>
+                    <h2 class='story-headline'>Match Complete</h2>
+                    <p>{self.h['name']}: {self.h['score']} <br> {self.a['name']}: {self.a['score']}</p>
+                </div>"""
 
 # --- DATA FETCHING ---
 
@@ -107,62 +101,78 @@ def fetch_wire():
     whitelist = load_whitelist()
     if not whitelist: print("⚠️ Whitelist is empty!"); return []
 
-    print("  -> Polling Sports Data...")
+    print("  -> Polling Sports Data (Past & Future)...")
+    
+    # Added "icc.world.t20" explicitly
     sources = [
         ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "ger.1"), ("soccer", "fra.1"),
         ("soccer", "uefa.champions"), ("soccer", "uefa.europa"), ("soccer", "usa.1"), 
         ("soccer", "usa.nwsl"), ("soccer", "ind.isl"), ("soccer", "fifa.world"),
-        ("cricket", "ipl"), ("cricket", "icc"), ("cricket", "usa.mlc"),
+        ("cricket", "ipl"), ("cricket", "icc"), ("cricket", "international"), ("cricket", "icc.world.t20"),
         ("basketball", "nba"), ("football", "nfl"), ("baseball", "mlb"),
         ("football", "college-football"), ("basketball", "mens-college-basketball"),
         ("basketball", "womens-college-basketball")
     ]
     
+    # DATES TO CHECK: Today + Past + FUTURE
+    dates_to_check = [datetime.now()] 
+    # Look Back (History)
+    for i in range(1, HISTORY_DEPTH + 1):
+        dates_to_check.append(datetime.now() - timedelta(days=i))
+    # Look Forward (Future - Crucial for Ind v Pak)
+    for i in range(1, FUTURE_DEPTH + 1):
+        dates_to_check.append(datetime.now() + timedelta(days=i))
+
     dashboard = []
     seen_ids = set()
 
     for sport, league in sources:
-        url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-        try:
-            data = requests.get(url, params={'limit': '900'}, timeout=5).json()
-        except: continue
+        for check_date in dates_to_check:
+            date_str = check_date.strftime("%Y%m%d")
             
-        for e in data.get('events', []):
-            if e['id'] in seen_ids: continue
-            if not is_approved_game(e, whitelist): continue
-
-            seen_ids.add(e['id'])
-            c = e['competitions'][0]
-            az_dt, utc_ts = get_az_time(e['date'])
+            url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
+            params = {'limit': '900', 'dates': date_str}
             
-            days_diff = (az_dt.date() - datetime.now().date()).days
-            if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD: continue
+            try:
+                data = requests.get(url, params=params, timeout=3).json()
+            except: continue
+                
+            for e in data.get('events', []):
+                if e['id'] in seen_ids: continue
+                if not is_approved_game(e, whitelist): continue
 
-            # Safe Getters (Prevents Crashes on NoneTypes)
-            try: tv = c.get('broadcasts', [{}])[0].get('names', [''])[0]
-            except: tv = ""
-            try: odds = c.get('odds', [{}])[0].get('details', '')
-            except: odds = ""
+                seen_ids.add(e['id'])
+                c = e['competitions'][0]
+                az_dt, utc_ts = get_az_time(e['date'])
+                
+                # Double check global window
+                days_diff = (az_dt.date() - datetime.now().date()).days
+                if days_diff < -WINDOW_DAYS_BACK or days_diff > WINDOW_DAYS_FWD: continue
 
-            game = {
-                "id": e['id'],
-                "sport": (league or sport).upper().replace("COLLEGE-", "NCAA "),
-                "dt": az_dt,
-                "utc_ts": utc_ts,
-                "time_str": az_dt.strftime("%I:%M %p"),
-                "status": c['status']['type']['state'],
-                "clock": c['status']['type']['detail'],
-                "tv": tv,
-                "odds": odds,
-                "venue": c.get('venue', {}).get('fullName', 'Stadium'),
-                "city": c.get('venue', {}).get('address', {}).get('city', ''),
-                "home": { "name": c['competitors'][0]['team']['displayName'], "score": c['competitors'][0].get('score','0'), "logo": c['competitors'][0]['team'].get('logo','') },
-                "away": { "name": c['competitors'][1]['team']['displayName'], "score": c['competitors'][1].get('score','0'), "logo": c['competitors'][1]['team'].get('logo','') }
-            }
-            
-            story = Storyteller(game)
-            game['story_html'] = story.write_body()
-            dashboard.append(game)
+                try: tv = c.get('broadcasts', [{}])[0].get('names', [''])[0]
+                except: tv = ""
+                try: odds = c.get('odds', [{}])[0].get('details', '')
+                except: odds = ""
+
+                game = {
+                    "id": e['id'],
+                    "sport": (league or sport).upper().replace("COLLEGE-", "NCAA ").replace("ICC.WORLD.T20", "T20 WC"),
+                    "dt": az_dt,
+                    "utc_ts": utc_ts,
+                    "time_str": az_dt.strftime("%I:%M %p"),
+                    "status": c['status']['type']['state'],
+                    "clock": c['status']['type']['detail'],
+                    "tv": tv,
+                    "odds": odds,
+                    "venue": c.get('venue', {}).get('fullName', 'Stadium'),
+                    "city": c.get('venue', {}).get('address', {}).get('city', ''),
+                    "home": { "name": c['competitors'][0]['team']['displayName'], "score": c['competitors'][0].get('score','0'), "logo": c['competitors'][0]['team'].get('logo','') },
+                    "away": { "name": c['competitors'][1]['team']['displayName'], "score": c['competitors'][1].get('score','0'), "logo": c['competitors'][1]['team'].get('logo','') }
+                }
+                
+                story = Storyteller(game)
+                game['story_html'] = story.write_body()
+                dashboard.append(game)
             
     return dashboard
 
