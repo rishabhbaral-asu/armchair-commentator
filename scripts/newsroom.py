@@ -8,11 +8,11 @@ from pathlib import Path
 
 # --- CONFIGURATION ---
 OUTPUT_HTML_PATH = Path("index.html")
-REFRESH_RATE_MINUTES = 5  # Backend refreshes data every 5 mins
+REFRESH_RATE_MINUTES = 5
 WINDOW_DAYS_BACK = 30
 WINDOW_DAYS_FWD = 14
 
-# --- 1. LEAGUE VAULT (Automatic Approval) ---
+# --- 1. LEAGUE VAULT ---
 SAFE_LEAGUES = {
     "eng.1", "esp.1", "ger.1", "fra.1", 
     "uefa.champions", "uefa.europa", "uefa.euro",
@@ -23,24 +23,18 @@ SAFE_LEAGUES = {
 
 # --- 2. PRECISE GEO-FILTERS ---
 US_LOCATIONS = {
-    # CALIFORNIA
     "California", "Cal Poly", "Stanford", "UCLA", "USC", "San Diego", "San Francisco", 
     "Los Angeles", "L.A.", "Sacramento", "Oakland", "San Jose", "Fresno", "Anaheim",
     "Golden State", "Angel City", "Santa Barbara", "Irvine", "Long Beach", "Davis", 
     "Riverside", "St. Mary's", "Pepperdine", "Santa Clara", "Loyola Marymount", "Pacific",
-    # ARIZONA
     "Arizona", "Phoenix", "Tempe", "Tucson", "Grand Canyon", "GCU", "NAU",
-    # TEXAS
     "Texas", "Houston", "Dallas", "Austin", "San Antonio", "Fort Worth", "El Paso",
     "Arlington", "Lubbock", "Waco", "College Station", "Rice", "SMU", "TCU", "Baylor", 
     "UTEP", "UTSA", "Corpus Christi", "Abilene",
-    # ILLINOIS
     "Illinois", "Chicago", "Northwestern", "Evanston", "Champaign", "DePaul", "Loyola",
     "Bradley", "Peoria", "Carbondale", "Northern Illinois", "Southern Illinois",
-    # GEORGIA
     "Georgia", "Atlanta", "Athens", "Macon", "Statesboro", "Kennesaw", "Mercer",
     "Valdosta", "Savannah",
-    # DMV (DC, MD, VA)
     "Washington", "D.C.", "District of Columbia", "Maryland", "Virginia", "Baltimore",
     "Richmond", "Norfolk", "Fairfax", "Charlottesville", "Blacksburg", "Arlington",
     "Navy", "Towson", "Mount St. Mary's", "Morgan State", "Coppin State",
@@ -68,7 +62,6 @@ TARGET_COUNTRIES = {
     "France", "Les Bleus", "Mexico", "El Tri", "Canada", "Brazil", "Argentina"
 }
 
-# --- EXCLUSION LIST ---
 BLACKLIST = {
     "Washington State", "Eastern Washington", "Central Washington", "West Virginia"
 }
@@ -92,6 +85,26 @@ def is_clubhouse_game(event, league_slug):
                 return True
     return False
 
+# --- SAFE DATA HELPERS ---
+
+def get_safe_odds(c):
+    """Safely extracts odds without crashing on NoneTypes."""
+    try:
+        if not c.get('odds'): return ""
+        first_odd = c['odds'][0]
+        if not first_odd: return "" # Handle [None] case
+        return first_odd.get('details', '')
+    except: return ""
+
+def get_safe_tv(c):
+    """Safely extracts TV info."""
+    try:
+        if not c.get('broadcasts'): return ""
+        first_b = c['broadcasts'][0]
+        if not first_b: return ""
+        return first_b.get('names', [''])[0]
+    except: return ""
+
 # --- STORYTELLER ENGINE ---
 
 class Storyteller:
@@ -102,7 +115,6 @@ class Storyteller:
         self.city = game['city'].upper() if game['city'] else "THE ARENA"
         
     def write_body(self):
-        # PRE-GAME: Show Countdown
         if self.g['status'] == 'pre': 
             return f"""
             <div class='story-container'>
@@ -111,8 +123,6 @@ class Storyteller:
                 <p><strong>{self.city}</strong> — The {self.h['name']} host the {self.a['name']} at {self.g['venue']}.</p>
                 <div class="meta">TV: {self.g['tv'] or 'N/A'} • Odds: {self.g['odds']}</div>
             </div>"""
-        
-        # LIVE: Show Pulsing Score
         elif self.g['status'] == 'in':
             return f"""
             <div class='story-container'>
@@ -120,8 +130,6 @@ class Storyteller:
                 <p class='live-text'>Action is underway at {self.g['venue']}.</p>
                 <p class='game-clock'>{self.g['clock']}</p>
             </div>"""
-        
-        # FINAL: Show Recap
         else:
             try:
                 h_s, a_s = int(self.h['score']), int(self.a['score'])
@@ -186,8 +194,12 @@ def fetch_wire():
                 "clock": c['status']['type']['detail'],
                 "venue": c.get('venue', {}).get('fullName', 'Stadium'),
                 "city": c.get('venue', {}).get('address', {}).get('city', ''),
-                "tv": c.get('broadcasts', [{}])[0].get('names', [''])[0] if c.get('broadcasts') else "",
-                "odds": c.get('odds', [{}])[0].get('details', '') if c.get('odds') else "",
+                
+                # --- SAFE HELPERS USED HERE ---
+                "tv": get_safe_tv(c),
+                "odds": get_safe_odds(c),
+                # -----------------------------
+                
                 "home": { "name": c['competitors'][0]['team']['displayName'], "score": c['competitors'][0].get('score','0'), "logo": c['competitors'][0]['team'].get('logo','') },
                 "away": { "name": c['competitors'][1]['team']['displayName'], "score": c['competitors'][1].get('score','0'), "logo": c['competitors'][1]['team'].get('logo','') }
             }
@@ -264,7 +276,6 @@ def render_dashboard(games):
         </style>
         <script>
             function updateClock() {{
-                // Updates the main header clock (Arizona Time)
                 const now = new Date();
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
                 const azTime = new Date(utc - (3600000 * 7)); // UTC-7
@@ -277,23 +288,19 @@ def render_dashboard(games):
             }}
 
             function updateCountdowns() {{
-                // Updates every individual game countdown
                 const now = new Date().getTime();
                 document.querySelectorAll('.countdown-box').forEach(box => {{
                     const target = parseFloat(box.dataset.ts);
                     const diff = target - now;
-                    
                     if (diff < 0) {{
                         box.innerHTML = "STARTING SOON / LIVE";
                         box.style.color = "#ef4444";
                         return;
                     }}
-                    
                     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                     const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    
                     if (d > 0) box.innerHTML = `TIP-OFF IN: ${{d}}d ${{h}}h ${{m}}m ${{s}}s`;
                     else box.innerHTML = `TIP-OFF IN: ${{h}}h ${{m}}m ${{s}}s`;
                 }});
