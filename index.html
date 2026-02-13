@@ -4,22 +4,956 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tempe Torch Sports Ticker</title>
+        <title>Tempe Torch Sports Wire</title>
+        <meta http-equiv="refresh" content="1800">
         <style>
-            body { font-family: 'Courier New', Courier, monospace; background: #222; color: #0f0; padding: 20px; }
-            h1 { border-bottom: 2px solid #0f0; padding-bottom: 10px; }
-            .game { border: 1px solid #444; padding: 10px; margin-bottom: 10px; background: #333; }
-            .time { color: #aaa; font-size: 0.9em; }
-            .sport { font-weight: bold; color: #fff; }
-            .matchup { font-size: 1.2em; color: #ffeb3b; }
-            .score { font-size: 1.1em; font-weight: bold; }
-            .footer { margin-top: 30px; color: #666; font-size: 0.8em; }
+            body { font-family: 'Verdana', sans-serif; background: #1a1a1a; color: #ddd; padding: 20px; max-width: 800px; margin: auto; }
+            h1 { border-bottom: 3px solid #e91e63; padding-bottom: 10px; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+            .game { background: #2d2d2d; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 5px solid #e91e63; }
+            .header { display: flex; justify-content: space-between; font-size: 0.85em; color: #888; margin-bottom: 5px; }
+            .matchup { font-size: 1.2em; font-weight: bold; color: #fff; margin-bottom: 5px; }
+            .score { font-size: 1.1em; color: #4caf50; font-family: monospace; }
+            .status { font-size: 0.9em; color: #ff9800; margin-top: 5px; }
+            .empty { color: #666; font-style: italic; }
+            .footer { margin-top: 40px; font-size: 0.8em; color: #555; text-align: center; }
         </style>
     </head>
     <body>
-        <h1>TEMPE TORCH SPORTS WIRE</h1>
-    <p>No games scheduled for tracked teams in the next 3 days.</p>
-        <div class="footer">Last Updated: 2026-02-13 03:22 UTC</div>
+        <h1>Tempe Torch • Sports Wire</h1>
+    
+            <div class="game">
+                <div class="header">
+                    <span>NCAA HOCKEY</span>
+                    <span>2026-02-14T00:00Z</span>
+                </div>
+                <div class="matchup">Western Michigan Broncos vs Arizona State Sun Devils</div>
+                <div class="score">WMU 0 - ASU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA HOCKEY</span>
+                    <span>2026-02-14T23:00Z</span>
+                </div>
+                <div class="matchup">Western Michigan Broncos vs Arizona State Sun Devils</div>
+                <div class="score">WMU 0 - ASU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T17:00Z</span>
+                </div>
+                <div class="matchup">Texas Tech Red Raiders vs Oklahoma Sooners</div>
+                <div class="score">TTU 0 - OU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T21:00Z</span>
+                </div>
+                <div class="matchup">UC Riverside Highlanders vs Utah Tech Trailblazers</div>
+                <div class="score">UCR 0 - UTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T21:00Z</span>
+                </div>
+                <div class="matchup">Charlotte 49ers vs San Diego Toreros</div>
+                <div class="score">CLT 0 - USD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T21:00Z</span>
+                </div>
+                <div class="matchup">UNC Wilmington Seahawks vs Maryland Terrapins</div>
+                <div class="score">UNCW 0 - MD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T22:00Z</span>
+                </div>
+                <div class="matchup">Southern Miss Golden Eagles vs UC Santa Barbara Gauchos</div>
+                <div class="score">USM 0 - UCSB 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-13T22:00Z</span>
+                </div>
+                <div class="matchup">Campbell Fighting Camels vs Cal Poly Mustangs</div>
+                <div class="score">CAM 0 - CP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T00:00Z</span>
+                </div>
+                <div class="matchup">Texas A&M Aggies vs Tennessee Tech Golden Eagles</div>
+                <div class="score">TA&M 0 - TNTC 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T00:30Z</span>
+                </div>
+                <div class="matchup">Texas Longhorns vs UC Davis Aggies</div>
+                <div class="score">TEX 0 - UCD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T00:30Z</span>
+                </div>
+                <div class="matchup">Texas State Bobcats vs Niagara Purple Eagles</div>
+                <div class="score">TXST 0 - NIA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T01:00Z</span>
+                </div>
+                <div class="matchup">UCLA Bruins vs UC San Diego Tritons</div>
+                <div class="score">UCLA 0 - UCSD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T01:00Z</span>
+                </div>
+                <div class="matchup">Grand Canyon Lopes vs Northeastern Huskies</div>
+                <div class="score">GCU 0 - NE 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T01:35Z</span>
+                </div>
+                <div class="matchup">Arizona State Sun Devils vs Omaha Mavericks</div>
+                <div class="score">ASU 0 - OMA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:00Z</span>
+                </div>
+                <div class="matchup">Long Beach State Beach vs San José State Spartans</div>
+                <div class="score">LBSU 0 - SJSU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:00Z</span>
+                </div>
+                <div class="matchup">Sacramento State Hornets vs UC Irvine Anteaters</div>
+                <div class="score">SAC 0 - UCI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:00Z</span>
+                </div>
+                <div class="matchup">USC Trojans vs Pepperdine Waves</div>
+                <div class="score">USC 0 - PEPP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:00Z</span>
+                </div>
+                <div class="matchup">Fresno State Bulldogs vs Utah Utes</div>
+                <div class="score">FRES 0 - UTAH 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:00Z</span>
+                </div>
+                <div class="matchup">California Golden Bears vs Santa Clara Broncos</div>
+                <div class="score">CAL 0 - SCU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:30Z</span>
+                </div>
+                <div class="matchup">Cal State Fullerton Titans vs California Baptist Lancers</div>
+                <div class="score">CSUF 0 - CBU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T02:30Z</span>
+                </div>
+                <div class="matchup">Cal State Bakersfield Roadrunners vs Southern Indiana Screaming Eagles</div>
+                <div class="score">CSUB 0 - USI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T17:00Z</span>
+                </div>
+                <div class="matchup">Texas Tech Red Raiders vs Vanderbilt Commodores</div>
+                <div class="score">TTU 0 - VAN 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T18:00Z</span>
+                </div>
+                <div class="matchup">Southern Miss Golden Eagles vs UC Santa Barbara Gauchos</div>
+                <div class="score">USM 0 - UCSB 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T19:00Z</span>
+                </div>
+                <div class="matchup">Charlotte 49ers vs San Diego Toreros</div>
+                <div class="score">CLT 0 - USD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:00Z</span>
+                </div>
+                <div class="matchup">Texas Longhorns vs UC Davis Aggies</div>
+                <div class="score">TEX 0 - UCD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:00Z</span>
+                </div>
+                <div class="matchup">Texas A&M Aggies vs Tennessee Tech Golden Eagles</div>
+                <div class="score">TA&M 0 - TNTC 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:00Z</span>
+                </div>
+                <div class="matchup">Campbell Fighting Camels vs Cal Poly Mustangs</div>
+                <div class="score">CAM 0 - CP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:00Z</span>
+                </div>
+                <div class="matchup">Penn State Nittany Lions vs Grand Canyon Lopes</div>
+                <div class="score">PSU 0 - GCU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:05Z</span>
+                </div>
+                <div class="matchup">Arizona State Sun Devils vs Omaha Mavericks</div>
+                <div class="score">ASU 0 - OMA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T20:30Z</span>
+                </div>
+                <div class="matchup">Texas State Bobcats vs Niagara Purple Eagles</div>
+                <div class="score">TXST 0 - NIA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T21:00Z</span>
+                </div>
+                <div class="matchup">UC Riverside Highlanders vs Utah Tech Trailblazers</div>
+                <div class="score">UCR 0 - UTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T21:00Z</span>
+                </div>
+                <div class="matchup">UNC Wilmington Seahawks vs Maryland Terrapins</div>
+                <div class="score">UNCW 0 - MD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T22:00Z</span>
+                </div>
+                <div class="matchup">UCLA Bruins vs UC San Diego Tritons</div>
+                <div class="score">UCLA 0 - UCSD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T22:00Z</span>
+                </div>
+                <div class="matchup">Sacramento State Hornets vs UC Irvine Anteaters</div>
+                <div class="score">SAC 0 - UCI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T22:05Z</span>
+                </div>
+                <div class="matchup">California Golden Bears vs Santa Clara Broncos</div>
+                <div class="score">CAL 0 - SCU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-14T23:00Z</span>
+                </div>
+                <div class="matchup">Fresno State Bulldogs vs Utah Utes</div>
+                <div class="score">FRES 0 - UTAH 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T00:00Z</span>
+                </div>
+                <div class="matchup">Cal State Bakersfield Roadrunners vs Southern Indiana Screaming Eagles</div>
+                <div class="score">CSUB 0 - USI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T01:00Z</span>
+                </div>
+                <div class="matchup">California Baptist Lancers vs Cal State Fullerton Titans</div>
+                <div class="score">CBU 0 - CSUF 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T01:30Z</span>
+                </div>
+                <div class="matchup">Santa Clara Broncos vs California Golden Bears</div>
+                <div class="score">SCU 0 - CAL 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T02:00Z</span>
+                </div>
+                <div class="matchup">USC Trojans vs Pepperdine Waves</div>
+                <div class="score">USC 0 - PEPP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T02:05Z</span>
+                </div>
+                <div class="matchup">Long Beach State Beach vs San José State Spartans</div>
+                <div class="score">LBSU 0 - SJSU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T18:00Z</span>
+                </div>
+                <div class="matchup">Texas Longhorns vs UC Davis Aggies</div>
+                <div class="score">TEX 0 - UCD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T18:00Z</span>
+                </div>
+                <div class="matchup">Texas A&M Aggies vs Tennessee Tech Golden Eagles</div>
+                <div class="score">TA&M 0 - TNTC 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T18:00Z</span>
+                </div>
+                <div class="matchup">Campbell Fighting Camels vs Cal Poly Mustangs</div>
+                <div class="score">CAM 0 - CP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T18:00Z</span>
+                </div>
+                <div class="matchup">Charlotte 49ers vs San Diego Toreros</div>
+                <div class="score">CLT 0 - USD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T18:00Z</span>
+                </div>
+                <div class="matchup">UNC Wilmington Seahawks vs Maryland Terrapins</div>
+                <div class="score">UNCW 0 - MD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T19:00Z</span>
+                </div>
+                <div class="matchup">Southern Miss Golden Eagles vs UC Santa Barbara Gauchos</div>
+                <div class="score">USM 0 - UCSB 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T19:00Z</span>
+                </div>
+                <div class="matchup">Texas State Bobcats vs Niagara Purple Eagles</div>
+                <div class="score">TXST 0 - NIA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T20:00Z</span>
+                </div>
+                <div class="matchup">Sacramento State Hornets vs UC Irvine Anteaters</div>
+                <div class="score">SAC 0 - UCI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T20:00Z</span>
+                </div>
+                <div class="matchup">USC Trojans vs Pepperdine Waves</div>
+                <div class="score">USC 0 - PEPP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T20:05Z</span>
+                </div>
+                <div class="matchup">Arizona State Sun Devils vs Omaha Mavericks</div>
+                <div class="score">ASU 0 - OMA 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T20:30Z</span>
+                </div>
+                <div class="matchup">Arkansas Razorbacks vs Texas Tech Red Raiders</div>
+                <div class="score">ARK 0 - TTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T21:00Z</span>
+                </div>
+                <div class="matchup">UCLA Bruins vs UC San Diego Tritons</div>
+                <div class="score">UCLA 0 - UCSD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T21:00Z</span>
+                </div>
+                <div class="matchup">UC Riverside Highlanders vs Utah Tech Trailblazers</div>
+                <div class="score">UCR 0 - UTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T21:00Z</span>
+                </div>
+                <div class="matchup">Long Beach State Beach vs San José State Spartans</div>
+                <div class="score">LBSU 0 - SJSU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T21:00Z</span>
+                </div>
+                <div class="matchup">Cal State Fullerton Titans vs California Baptist Lancers</div>
+                <div class="score">CSUF 0 - CBU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-15T22:00Z</span>
+                </div>
+                <div class="matchup">Fresno State Bulldogs vs Utah Utes</div>
+                <div class="score">FRES 0 - UTAH 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T00:00Z</span>
+                </div>
+                <div class="matchup">Cal State Bakersfield Roadrunners vs Southern Indiana Screaming Eagles</div>
+                <div class="score">CSUB 0 - USI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T00:30Z</span>
+                </div>
+                <div class="matchup">Nebraska Cornhuskers vs Grand Canyon Lopes</div>
+                <div class="score">NEB 0 - GCU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T20:00Z</span>
+                </div>
+                <div class="matchup">UC Riverside Highlanders vs Utah Tech Trailblazers</div>
+                <div class="score">UCR 0 - UTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T21:00Z</span>
+                </div>
+                <div class="matchup">Cal State Bakersfield Roadrunners vs Southern Indiana Screaming Eagles</div>
+                <div class="score">CSUB 0 - USI 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T22:00Z</span>
+                </div>
+                <div class="matchup">Fresno State Bulldogs vs Utah Utes</div>
+                <div class="score">FRES 0 - UTAH 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-16T23:00Z</span>
+                </div>
+                <div class="matchup">Santa Clara Broncos vs California Golden Bears</div>
+                <div class="score">SCU 0 - CAL 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T01:00Z</span>
+                </div>
+                <div class="matchup">California Baptist Lancers vs Cal State Fullerton Titans</div>
+                <div class="score">CBU 0 - CSUF 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T21:00Z</span>
+                </div>
+                <div class="matchup">San José State Spartans vs Cal Poly Mustangs</div>
+                <div class="score">SJSU 0 - CP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T21:00Z</span>
+                </div>
+                <div class="matchup">Maryland Terrapins vs Georgetown Hoyas</div>
+                <div class="score">MD 0 - GTWN 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T21:30Z</span>
+                </div>
+                <div class="matchup">Pepperdine Waves vs UC Santa Barbara Gauchos</div>
+                <div class="score">PEPP 0 - UCSB 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T22:00Z</span>
+                </div>
+                <div class="matchup">Baylor Bears vs Texas State Bobcats</div>
+                <div class="score">BAY 0 - TXST 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T22:05Z</span>
+                </div>
+                <div class="matchup">UC Riverside Highlanders vs UNLV Rebels</div>
+                <div class="score">UCR 0 - UNLV 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-17T23:00Z</span>
+                </div>
+                <div class="matchup">Texas Longhorns vs Lamar Cardinals</div>
+                <div class="score">TEX 0 - LAM 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T00:00Z</span>
+                </div>
+                <div class="matchup">Texas A&M Aggies vs Texas A&M-Corpus Christi Islanders</div>
+                <div class="score">TA&M 0 - AMCC 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T00:30Z</span>
+                </div>
+                <div class="matchup">UT Rio Grande Valley Vaqueros vs Texas Tech Red Raiders</div>
+                <div class="score">RGV 0 - TTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T01:00Z</span>
+                </div>
+                <div class="matchup">UCLA Bruins vs Tulane Green Wave</div>
+                <div class="score">UCLA 0 - TULN 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T01:35Z</span>
+                </div>
+                <div class="matchup">Arizona State Sun Devils vs UConn Huskies</div>
+                <div class="score">ASU 0 - CONN 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T02:00Z</span>
+                </div>
+                <div class="matchup">Long Beach State Beach vs San Diego Toreros</div>
+                <div class="score">LBSU 0 - USD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T02:00Z</span>
+                </div>
+                <div class="matchup">UC Irvine Anteaters vs San Diego State Aztecs</div>
+                <div class="score">UCI 0 - SDSU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T02:00Z</span>
+                </div>
+                <div class="matchup">USC Trojans vs Loyola Marymount Lions</div>
+                <div class="score">USC 0 - LMU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T02:30Z</span>
+                </div>
+                <div class="matchup">Cal State Bakersfield Roadrunners vs Utah Tech Trailblazers</div>
+                <div class="score">CSUB 0 - UTU 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>NCAA BASEBALL</span>
+                    <span>2026-02-18T22:00Z</span>
+                </div>
+                <div class="matchup">San Francisco Dons vs UC Davis Aggies</div>
+                <div class="score">SF 0 - UCD 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ENG.2</span>
+                    <span>2026-02-16T20:00Z</span>
+                </div>
+                <div class="matchup">Coventry City vs Middlesbrough</div>
+                <div class="score">COV 0 - MID 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ENG.2</span>
+                    <span>2026-02-17T19:45Z</span>
+                </div>
+                <div class="matchup">Bristol City vs Wrexham</div>
+                <div class="score">BRC 0 - WXM 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ITA</span>
+                    <span>2026-02-13T19:45Z</span>
+                </div>
+                <div class="matchup">Pisa vs AC Milan</div>
+                <div class="score">PIS 0 - MIL 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ITA</span>
+                    <span>2026-02-14T19:45Z</span>
+                </div>
+                <div class="matchup">Internazionale vs Juventus</div>
+                <div class="score">INT 0 - JUV 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ITA</span>
+                    <span>2026-02-15T14:00Z</span>
+                </div>
+                <div class="matchup">Parma vs Hellas Verona</div>
+                <div class="score">PAR 0 - VER 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>ITA</span>
+                    <span>2026-02-18T19:45Z</span>
+                </div>
+                <div class="matchup">AC Milan vs Como</div>
+                <div class="score">MIL 0 - COMO 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>GER</span>
+                    <span>2026-02-13T19:30Z</span>
+                </div>
+                <div class="matchup">Borussia Dortmund vs Mainz</div>
+                <div class="score">DOR 0 - M05 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>GER</span>
+                    <span>2026-02-14T14:30Z</span>
+                </div>
+                <div class="matchup">Bayer Leverkusen vs St. Pauli</div>
+                <div class="score">B04 0 - STP 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>FRA</span>
+                    <span>2026-02-13T20:05Z</span>
+                </div>
+                <div class="matchup">AS Monaco vs Nantes</div>
+                <div class="score">MON 0 - NAN 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>FRA</span>
+                    <span>2026-02-14T16:00Z</span>
+                </div>
+                <div class="matchup">Marseille vs Strasbourg</div>
+                <div class="score">OLM 0 - STR 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>FRA</span>
+                    <span>2026-02-15T19:45Z</span>
+                </div>
+                <div class="matchup">Lyon vs Nice</div>
+                <div class="score">LYON 0 - NICE 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>UEFA.CHAMPIONS</span>
+                    <span>2026-02-17T17:45Z</span>
+                </div>
+                <div class="matchup">Galatasaray vs Juventus</div>
+                <div class="score">GAL 0 - JUV 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>UEFA.CHAMPIONS</span>
+                    <span>2026-02-17T20:00Z</span>
+                </div>
+                <div class="matchup">AS Monaco vs Paris Saint-Germain</div>
+                <div class="score">MON 0 - PSG 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+            <div class="game">
+                <div class="header">
+                    <span>UEFA.CHAMPIONS</span>
+                    <span>2026-02-18T20:00Z</span>
+                </div>
+                <div class="matchup">Olympiacos vs Bayer Leverkusen</div>
+                <div class="score">OLY 0 - B04 0</div>
+                <div class="status">pre</div>
+            </div>
+            
+        <div class="footer">
+            Updated: 2026-02-13 03:30 UTC
+        </div>
     </body>
     </html>
     
