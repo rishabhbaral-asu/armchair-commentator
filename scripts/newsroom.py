@@ -248,4 +248,5 @@ def main():
         all_games.extend(get_espn_data(s, l, whitelist, seen))
     generate_html(all_games)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": 
+    main()
