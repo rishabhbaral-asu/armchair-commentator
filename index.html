@@ -2,61 +2,79 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta charset="UTF-8"><title>Tempe Torch | Wire Service</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Georgia&display=swap">
+        <meta charset="UTF-8"><title>The Tempe Torch | Sports Wire</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Inter:wght@400;700&family=Georgia&display=swap">
         <style>
-            :root { --bg: #0a0a0a; --accent: #ff3d00; --card: #151515; --text: #f0f0f0; }
+            :root { --bg: #fdfdfd; --text: #111; --accent: #a00; }
             body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; }
-            header { border-bottom: 3px solid var(--accent); padding-bottom: 20px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
-            h1 { font-size: 3rem; margin: 0; font-weight: 900; letter-spacing: -2px; }
-            .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
-            .card { background: var(--card); border: 1px solid #333; transition: 0.3s; }
-            .card:hover { border-color: var(--accent); }
-            .card-meta { background: #222; padding: 10px 20px; font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; color: #aaa; }
-            .score-box { display: flex; justify-content: space-between; align-items: center; padding: 30px; }
-            .team { text-align: center; width: 40%; }
-            .team img { width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 5px; margin-bottom: 10px; }
-            .score { font-size: 3rem; font-weight: 900; color: #fff; }
-            .btn-dispatch { width: 100%; border: none; background: #222; color: #fff; padding: 18px; cursor: pointer; font-weight: 900; border-top: 1px solid #333; }
-            #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; align-items: center; justify-content: center; }
-            .modal-content { background: #fff; color: #111; max-width: 800px; width: 95%; padding: 60px; overflow-y: auto; max-height: 90vh; }
-            .story-text { font-family: 'Georgia', serif; font-size: 1.4rem; line-height: 1.8; white-space: pre-line; }
+            header { text-align: center; border-bottom: 5px double #000; padding-bottom: 20px; margin-bottom: 40px; }
+            h1 { font-family: 'Playfair Display', serif; font-size: 4rem; margin: 0; text-transform: uppercase; }
+            .date-bar { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+            .card { border: 1px solid #ccc; padding: 25px; background: #fff; cursor: pointer; transition: 0.2s; }
+            .card:hover { border-color: #000; box-shadow: 6px 6px 0px #eee; }
+            .sport-label { font-size: 0.75rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+            .matchup-text { font-weight: 700; font-size: 1.1rem; margin-top: 10px; line-height: 1.2; }
+            .score-display { font-family: 'Playfair Display', serif; font-size: 2.8rem; margin: 15px 0; }
+            
+            #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; overflow-y: auto; }
+            .modal-content { max-width: 750px; margin: 60px auto; padding: 30px; border: 1px solid #eee; }
+            .story-body { font-family: 'Georgia', serif; font-size: 1.35rem; line-height: 1.8; white-space: pre-line; color: #333; }
+            .close-btn { background: #000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
         </style>
     </head>
     <body>
-    <header><h1>TEMPE TORCH <span>WIRE</span></h1><div id="live-clock">--:--</div></header>
+    <header>
+        <h1>The Tempe Torch</h1>
+        <div class="date-bar"><span>February 14, 2026</span><span id="clock"></span></div>
+    </header>
     <div class="grid" id="main-grid"></div>
-    <footer style="margin-top:80px; text-align:center; color:#444; font-weight:900;">Last Update: February 14, 2026 - 11:15 PM AZT</footer>
-    <div id="modal" onclick="closeModal()"><div class="modal-content" onclick="event.stopPropagation()">
-        <h2 id="modal-title" style="font-size: 2rem; border-bottom: 8px solid #111; padding-bottom:10px;"></h2>
-        <div id="modal-body" class="story-text"></div>
-    </div></div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">BACK TO WIRE</button>
+            <div id="modal-sport" class="sport-label"></div>
+            <h2 id="modal-title" style="font-family:'Playfair Display'; font-size: 3rem; margin: 10px 0;"></h2>
+            <hr>
+            <div id="modal-body" class="story-body"></div>
+        </div>
+    </div>
+
     <script>
-        const games = [{"id": "146280d9-bd47-408f-a6bf-6dde091cf383", "sport": "T20 WORLD CUP", "status": "in", "home": {"name": "Pakistan A Women [PKAW]", "logo": "", "score": ""}, "away": {"name": "India A Women [IND-A]", "logo": "", "score": ""}, "story": "**WIRE DISPATCH** \u2014 Match starts at Feb 15, 07:00 GMT. Reporting from the T20 World Cup group stage. India A Women [IND-A] and Pakistan A Women [PKAW] are locked in a high-stakes fixture affecting tournament progression.", "raw_date": "2026-02-15T07:00:00"}, {"id": "e2ab1669-df1e-4471-b11e-408370207a35", "sport": "T20 WORLD CUP", "status": "in", "home": {"name": "India Women [INDW]", "logo": "", "score": ""}, "away": {"name": "Australia Women [AUSW]", "logo": "", "score": ""}, "story": "**WIRE DISPATCH** \u2014 Match starts at Feb 15, 08:15 GMT. Reporting from the T20 World Cup group stage. Australia Women [AUSW] and India Women [INDW] are locked in a high-stakes fixture affecting tournament progression.", "raw_date": "2026-02-15T08:00:00"}, {"id": "e2b37e1e-a01a-492a-8bea-0c1dc67c56e0", "sport": "T20 WORLD CUP", "status": "in", "home": {"name": "United States of America [US]", "logo": "", "score": ""}, "away": {"name": "Namibia [NAM]", "logo": "", "score": ""}, "story": "**WIRE DISPATCH** \u2014 Match starts at Feb 15, 09:30 GMT. Reporting from the T20 World Cup group stage. Namibia [NAM] and United States of America [US] are locked in a high-stakes fixture affecting tournament progression.", "raw_date": "2026-02-15T09:30:00"}, {"id": "e1f2855f-088b-4a0b-92fe-966ce8eb087c", "sport": "T20 WORLD CUP", "status": "in", "home": {"name": "Pakistan [PAK]", "logo": "", "score": ""}, "away": {"name": "India [IND]", "logo": "", "score": ""}, "story": "**WIRE DISPATCH** \u2014 Match starts at Feb 15, 13:30 GMT. Reporting from the T20 World Cup group stage. India [IND] and Pakistan [PAK] are locked in a high-stakes fixture affecting tournament progression.", "raw_date": "2026-02-15T13:30:00"}, {"id": "ce5bd679-baef-4aa4-940f-8202e539f649", "sport": "T20 WORLD CUP", "status": "in", "home": {"name": "Nepal Women [NEPW]", "logo": "", "score": ""}, "away": {"name": "India A Women [IND-A]", "logo": "", "score": ""}, "story": "**WIRE DISPATCH** \u2014 Match starts at Feb 17, 02:30 GMT. Reporting from the T20 World Cup group stage. India A Women [IND-A] and Nepal Women [NEPW] are locked in a high-stakes fixture affecting tournament progression.", "raw_date": "2026-02-17T02:30:00"}];
-        function updateClock() {
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('en-US', { timeZone: 'America/Phoenix', hour12: false }) + " AZT";
-        }
-        setInterval(updateClock, 1000); updateClock();
+        const games = [];
+        function tick() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}) + " AZT"; }
+        setInterval(tick, 1000); tick();
+
         const grid = document.getElementById('main-grid');
+        if(games.length === 0) {
+            grid.innerHTML = "<p>The newsroom is quiet. Check back shortly for whitelist updates.</p>";
+        }
+
         games.forEach(g => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<div class="card-meta">${g.sport} // ${g.status.toUpperCase()}</div>
-                <div class="score-box">
-                    <div class="team"><img src="${g.away.logo}" onerror="this.src='https://ui-avatars.com/api/?name=${g.away.name}'"><br><b>${g.away.name}</b></div>
-                    <div class="score">${g.away.score} - ${g.home.score}</div>
-                    <div class="team"><img src="${g.home.logo}" onerror="this.src='https://ui-avatars.com/api/?name=${g.home.name}'"><br><b>${g.home.name}</b></div>
-                </div>
-                <button class="btn-dispatch" onclick="openModal('${g.id}')">READ FULL DISPATCH</button>`;
-            grid.appendChild(card);
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => openModal(g.id);
+            const statusStr = g.status === 'in' ? '<span style="color:red">● LIVE</span>' : g.status.toUpperCase();
+            div.innerHTML = `
+                <span class="sport-label">${g.sport} // ${statusStr}</span>
+                <div class="matchup-text">${g.away.name}<br>at ${g.home.name}</div>
+                <div class="score-display">${g.away.score} — ${g.home.score}</div>
+            `;
+            grid.appendChild(div);
         });
+
         function openModal(id) {
             const g = games.find(x => x.id === id);
-            document.getElementById('modal-title').innerText = g.away.name + " @ " + g.home.name;
-            document.getElementById('modal-body').innerText = g.story;
-            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = g.away.name + " at " + g.home.name;
+            document.getElementById('modal-sport').innerText = g.sport;
+            document.getElementById('modal-body').innerHTML = g.story;
+            document.getElementById('modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function closeModal() { 
+            document.getElementById('modal').style.display = 'none'; 
+            document.body.style.overflow = 'auto';
+        }
     </script>
     </body></html>
     
