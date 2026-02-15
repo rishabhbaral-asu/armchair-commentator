@@ -97,7 +97,7 @@ def main():
     # Expanded list to cover your whitelist (Soccer, NFL, etc.)
     leagues = [
         ("basketball", "nba"), ("basketball", "mens-college-basketball"), ("basketball", "womens-college-basketball"),
-        ("hockey", "nhl"), ("hockey", "mens-college-hockey"),
+        ("hockey", "nhl"), ("hockey", "mens-college-hockey"), ("basketball", "womens-college-basketball"),
         ("baseball", "mlb"), ("baseball", "college-baseball"), ("baseball", "college-softball"),
         ("football", "nfl"), ("soccer", "usa.mls"), ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "ita.1"), ("soccer", "ger.1")
     ]
