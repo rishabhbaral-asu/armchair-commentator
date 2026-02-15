@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 import os
 import re
+import time
 
 # --- CONFIG ---
 WHITELIST_FILE = "scripts/whitelist.txt"
@@ -29,70 +30,62 @@ def get_stat(stats, label):
     return "0"
 
 def craft_ap_story(summary_json):
-    """The Data-Journalist Engine: Builds stories from raw percentages and trends."""
+    """The Data-Journalist Engine: Mimics the Duke/AP style using raw data."""
     header = summary_json.get("header", {})
     comp = header.get("competitions", [{}])[0]
     state = comp.get("status", {}).get("type", {}).get("state")
     teams = comp.get("competitors", [])
     
-    # Priority: Professional Recap
+    # Priority 1: Professional Recap (If ESPN has a human-written story)
     for art in summary_json.get("news", {}).get("articles", []):
         if art.get("type") == "recap":
             return re.sub('<[^<]+?>', '', art.get("story", ""))
 
+    # Priority 2: Data-Driven AP Story
     if state == "post":
         winner = next((t for t in teams if t.get("winner")), teams[0])
         loser = next((t for t in teams if not t.get("winner")), teams[1])
+        w_team, l_team = winner['team'], loser['team']
+        w_score, l_score = winner.get('score', '0'), loser.get('score', '0')
         
-        w_team = winner['team']
-        l_team = loser['team']
-        w_score, l_score = int(winner['score']), int(loser['score'])
-        
-        # Deep Data Mining
+        # Mine Boxscore for Percentages
         box = summary_json.get("boxscore", {}).get("teams", [])
-        w_stats = box[0].get('statistics', []) if box and box[0]['team']['id'] == w_team['id'] else box[1].get('statistics', []) if len(box)>1 else []
+        w_stats_list = box[0].get('statistics', []) if box and box[0]['team']['id'] == w_team['id'] else box[1].get('statistics', []) if len(box)>1 else []
         
-        fg_pct = get_stat(w_stats, 'fieldGoalsPercentage')
-        three_pct = get_stat(w_stats, 'threePointFieldGoalsPercentage')
-        rebounds = get_stat(w_stats, 'totalRebounds')
+        fg_pct = get_stat(w_stats_list, 'fieldGoalsPercentage')
+        three_pct = get_stat(w_stats_list, 'threePointFieldGoalsPercentage')
+        rebounds = get_stat(w_stats_list, 'totalRebounds')
         
-        # Leader Hunt
+        # Mine Leaders
+        leader_text = "A balanced team effort"
         leaders = summary_json.get("leaders", [])
-        top_performer = "The winning effort"
         if leaders:
             top = leaders[0]['leaders'][0]
-            top_performer = f"{top['athlete']['displayName']}, who finished with {top['displayValue']} {leaders[0]['name']}"
+            leader_text = f"{top['athlete']['displayName']} had {top['displayValue']} {leaders[0]['name']}"
 
-        # AP Inverted Pyramid Construction
+        # Construct Inverted Pyramid
         dateline = f"**{w_team['location'].upper()}** — "
-        lead = f"{top_performer} led the {w_team['displayName']} past the {l_team['displayName']} {w_score}-{l_score} on Friday night."
+        lead = f"{leader_text} as the {w_team['displayName']} defeated the {l_team['displayName']} {w_score}-{l_score}."
         
-        # Adding Contextual Meat
-        stats_para = f"The {w_team['shortDisplayName']} shot {fg_pct}% from the floor and connected on {three_pct}% of their looks from deep. On the glass, they out-muscled {l_team['shortDisplayName']}, pulling down {rebounds} total rebounds to control the tempo."
+        # Records and Standings
+        w_rec = winner.get('records', [{}])[0].get('summary', '')
+        l_rec = loser.get('records', [{}])[0].get('summary', '')
+        record_line = f"The {w_team['shortDisplayName']} ({w_rec}) utilized a strong performance on the boards with {rebounds} rebounds, while the {l_team['shortDisplayName']} ({l_rec}) struggled to close the gap in the final period."
         
-        standing = ""
-        if 'records' in winner:
-            standing = f"The victory moves {w_team['shortDisplayName']} to {winner['records'][0]['summary']} on the season."
-
         # Up Next
-        upcoming = summary_json.get("schedule", {}).get("upcoming", [])
-        up_next = "\n\n**Up next**\n"
-        if upcoming:
-            up_next += f"{w_team['shortDisplayName']}: {upcoming[0].get('shortName', 'Next Matchup')}"
-        else:
-            up_next += f"{w_team['shortDisplayName']}: Scheduled for next week."
+        up = summary_json.get("schedule", {}).get("upcoming", [])
+        up_next = f"\n\n**Up next**\n{w_team['shortDisplayName']}: {up[0]['shortName'] if up else 'Scheduled for next week.'}"
+        
+        return f"{dateline}{lead}\n\n{record_line}\n\n{w_team['shortDisplayName']} finished shooting {fg_pct}% from the field.{up_next}"
 
-        return f"{dateline}{lead}\n\n{stats_para} {standing}{up_next}"
-
-    return "STADIUM DISPATCH — Teams are currently warming up. Scouting reports suggest a high-tempo offensive approach for both squads."
+    return "STADIUM DISPATCH — Teams are currently warming up. Scouting reports suggest a high-tempo approach for today's contest."
 
 def get_cricket_wc(whitelist):
     games = []
     az_tz = pytz.timezone('America/Phoenix')
     today = datetime.now(az_tz)
     
-    # 52613cff-3da7-45f7-9793-a863aad4fb86
-    urls = [f"https://api.cricapi.com/v1/cricScore?apikey={CRICKET_API_KEY}",
+    urls = [f"https://api.cricapi.com/v1/cricScore?apikey={CRICKET_API_KEY}&t={int(time.time())}",
             f"https://api.cricapi.com/v1/matches?apikey={CRICKET_API_KEY}&offset=0"]
     
     seen_ids = set()
@@ -103,7 +96,7 @@ def get_cricket_wc(whitelist):
                 m_id = str(m['id'])
                 if m_id in seen_ids: continue
                 
-                # STRICT 2-DAY WINDOW
+                # DATE FILTER: Tight 24-hour window to keep it relevant
                 dt_str = m.get("dateTimeGMT") or m.get("date")
                 try:
                     m_date = datetime.fromisoformat(dt_str.replace('Z', '+00:00')).astimezone(az_tz)
@@ -128,7 +121,8 @@ def get_cricket_wc(whitelist):
 
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-    params = {"dates": "20260211-20260215", "limit": "100"}
+    # Added Group 80 to catch all Division I (ASU, etc.), not just Top 25
+    params = {"dates": "20260212-20260216", "limit": "100", "groups": "80", "cb": int(time.time())}
     games = []
     try:
         data = requests.get(url, params=params, timeout=10).json()
@@ -137,7 +131,7 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             if e_id in seen_ids: continue
             
             if is_match(event.get("name", ""), whitelist):
-                sum_url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={e_id}"
+                sum_url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={e_id}&cb={int(time.time())}"
                 summary = requests.get(sum_url).json()
                 comp = event["competitions"][0]
                 home, away = comp['competitors'][0], comp['competitors'][1]
@@ -168,7 +162,6 @@ def generate_html(games):
             body {{ font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; }}
             header {{ border-bottom: 3px solid var(--accent); padding-bottom: 20px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }}
             h1 {{ font-size: 3rem; margin: 0; font-weight: 900; letter-spacing: -2px; }}
-            h1 span {{ color: #444; font-weight: 400; }}
             .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }}
             .card {{ background: var(--card); border: 1px solid #333; transition: 0.3s; }}
             .card:hover {{ border-color: var(--accent); }}
@@ -178,18 +171,17 @@ def generate_html(games):
             .team img {{ width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 5px; margin-bottom: 10px; }}
             .score {{ font-size: 3rem; font-weight: 900; color: #fff; }}
             .btn-dispatch {{ width: 100%; border: none; background: #222; color: #fff; padding: 18px; cursor: pointer; font-weight: 900; border-top: 1px solid #333; }}
-            .btn-dispatch:hover {{ background: var(--accent); }}
             #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; align-items: center; justify-content: center; }}
-            .modal-content {{ background: #fff; color: #111; max-width: 800px; width: 90%; padding: 60px; box-shadow: 0 0 50px rgba(255,61,0,0.2); }}
+            .modal-content {{ background: #fff; color: #111; max-width: 800px; width: 95%; padding: 60px; overflow-y: auto; max-height: 90vh; }}
             .story-text {{ font-family: 'Georgia', serif; font-size: 1.4rem; line-height: 1.8; white-space: pre-line; }}
         </style>
     </head>
     <body>
     <header><h1>TEMPE TORCH <span>WIRE</span></h1><div id="live-clock">--:--</div></header>
     <div class="grid" id="main-grid"></div>
-    <footer style="margin-top:80px; text-align:center; color:#444; font-weight:900; text-transform:uppercase;">Last Dispatch: {now} AZT</footer>
+    <footer style="margin-top:80px; text-align:center; color:#444; font-weight:900;">Last Update: {now} AZT</footer>
     <div id="modal" onclick="closeModal()"><div class="modal-content" onclick="event.stopPropagation()">
-        <h2 id="modal-title" style="font-size: 2.5rem; margin-top:0; border-bottom: 8px solid #111; padding-bottom:15px;"></h2>
+        <h2 id="modal-title" style="font-size: 2rem; border-bottom: 8px solid #111; padding-bottom:10px;"></h2>
         <div id="modal-body" class="story-text"></div>
     </div></div>
     <script>
@@ -227,10 +219,17 @@ def main():
     all_games = []
     seen_ids = set()
     
+    # EXACT 2026 LEAGUE TABLE
     leagues = [
-        ("basketball", "nba"), ("basketball", "mens-college-basketball"), 
-        ("hockey", "nhl"), ("hockey", "mens-college-hockey"),
-        ("football", "nfl"), ("baseball", "mlb")
+        ("basketball", "nba"),
+        ("basketball", "mens-college-basketball"),
+        ("basketball", "womens-college-basketball"),
+        ("hockey", "nhl"),
+        ("hockey", "mens-college-hockey"),
+        ("football", "nfl"),
+        ("baseball", "mlb"),
+        ("baseball", "college-baseball"),
+        ("softball", "college-softball")
     ]
     
     for s, l in leagues:
