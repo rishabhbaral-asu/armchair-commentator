@@ -24,8 +24,7 @@ def get_whitelist():
         "la sparks", "washington spirit", "st. pauli", "dallas stars", "texas", "tolouse", "uc davis", 
         "uc irvine", "ucla", "usc", "uc riverside", "uc san diego", "ucsb", "utep", "valkyries", 
         "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
-        "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium", "iowa",
-        "indiana", "illinois"
+        "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium"
     ]
 # --- ENGINES ---
 def get_live_weather(city):
