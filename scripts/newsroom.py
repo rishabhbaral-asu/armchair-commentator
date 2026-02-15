@@ -236,7 +236,7 @@ def main():
         ("hockey", "mens-college-hockey"),
         ("baseball", "mlb"),
         ("baseball", "college-baseball"),
-        ("softball", "college-softball"),
+        ("baseball", "college-softball"),
         ("football", "nfl"),
         ("football", "college-football"),
         ("soccer", "usa.mls"),
