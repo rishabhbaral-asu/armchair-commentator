@@ -14,62 +14,68 @@ def load_whitelist():
     if os.path.exists(WHITELIST_FILE):
         with open(WHITELIST_FILE, "r", encoding="utf-8") as f:
             return [l.strip().lower() for l in f if l.strip()]
-    return ["india", "namibia", "clippers", "suns", "asu"]
+    return ["india", "namibia", "suns", "asu", "duke", "clemson"]
 
 def is_match(text, whitelist):
     if not text: return False
     text_clean = text.lower()
     return any(re.search(r'\b' + re.escape(w) + r'\b', text_clean) for w in whitelist)
 
-def craft_ap_story(data, home, away):
-    """The AP Journalism Engine: Mimics professional sports wire recaps."""
+def craft_ap_story(data, home_name, away_name):
+    """The AP Journalism Engine: Mimics specific wire recap structures."""
     header = data.get("header", {}).get("competitions", [{}])[0]
     state = header.get("status", {}).get("type", {}).get("state")
     
-    # Priority 1: Use actual ESPN Recap if it exists (Professional standard)
+    # 1. PRIORITY: REAL RECAPS
     for art in data.get("news", {}).get("articles", []):
         if art.get("type") == "recap":
             return re.sub('<[^<]+?>', '', art.get("story", ""))
 
-    # Priority 2: Generative AP Recap (Post-Game)
+    # 2. GENERATIVE AP WIRE (The "Duke Template")
     if state == "post":
         comp = header.get("competitors", [])
         winner = next((t for t in comp if t.get("winner")), comp[0])
         loser = next((t for t in comp if not t.get("winner")), comp[1])
-        w_score, l_score = int(winner.get('score', 0)), int(loser.get('score', 0))
-        location = winner.get('team', {}).get('location', '').upper()
+        w_name = winner['team']['displayName']
+        l_name = loser['team']['displayName']
+        w_score = winner.get('score', '0')
+        l_score = loser.get('score', '0')
+        loc = winner['team'].get('location', '').upper()
         
-        # Determine the Lead Verb
-        diff = w_score - l_score
-        if diff > 20: verb = "cruised to a dominant victory"
-        elif diff < 5: verb = "held off a late rally"
-        else: verb = "pulled away in the second half"
-
-        # Find High Scorer
-        hero_text = ""
+        # Stat Extraction
+        hero_line = ""
+        team_stats = ""
         for cat in data.get("leaders", []):
             if cat.get("name") in ["points", "goals", "runs"]:
                 top = cat["leaders"][0]
-                name = top['athlete']['displayName']
-                val = top['displayValue']
-                hero_text = f"{name} led the charge with {val}, helping the {winner['team']['displayName']} stay aggressive throughout."
+                hero_line = f"{top['athlete']['displayName']} had {top['displayValue']} to lead the {w_name}."
                 break
+        
+        # Record & Context
+        w_rec = winner.get('records', [{}])[0].get('summary', '')
+        l_rec = loser.get('records', [{}])[0].get('summary', '')
+        
+        # The Lead (Inverted Pyramid)
+        story = f"{loc} — {hero_line} {w_name} ({w_rec}) defeated {l_name} ({l_rec}) {w_score}-{l_score} on Friday night."
+        
+        # The Detail Paragraph
+        story += f"\n\nThe {w_name} capitalized on efficient scoring opportunities after the break, extending a narrow margin into a comfortable lead midway through the final period. The result marks a key milestone in the {w_name} season as they look toward the postseason rankings."
+        
+        # The "Up Next" Segment
+        story += f"\n\n**Up next**\n{l_name}: Next contest scheduled for Wednesday.\n{w_name}: Returns home for a matchup on Monday."
+        
+        return story
 
-        return f"**{location}** — The {winner['team']['displayName']} {verb} to defeat the {loser['team']['displayName']} {w_score}-{l_score} on Friday night. {hero_text} Despite a gritty effort from the {loser['team']['displayName']}, they were unable to overcome a double-digit deficit in the final period."
-
-    # Priority 3: AP Preview
+    # 3. AP PREVIEW
     venue = data.get("gameInfo", {}).get("venue", {}).get("fullName", "the arena")
-    return f"**PREVIEW** — The {away} travel to face the {home} at {venue}. Wire reports indicate a capacity crowd is expected as both squads look to gain momentum in the standings."
+    return f"**PREVIEW** — The {away_name} visit the {home_name} at {venue}. Tip-off is set as both teams jockey for position in the conference standings."
 
 def get_cricket_wc(whitelist):
-    """STRICT: T20 World Cup, Whitelisted Teams, and 4-Day Date Window."""
+    """T20 World Cup, Whitelisted Teams, 4-Day Window."""
     games = []
-    # Phoenix Time Logic for Filtering
     az_tz = pytz.timezone('America/Phoenix')
     today = datetime.now(az_tz)
-    start_window = today - timedelta(days=2)
-    end_window = today + timedelta(days=2)
-
+    
     urls = [f"https://api.cricapi.com/v1/cricScore?apikey={CRICKET_API_KEY}",
             f"https://api.cricapi.com/v1/matches?apikey={CRICKET_API_KEY}&offset=0"]
     
@@ -80,27 +86,25 @@ def get_cricket_wc(whitelist):
             for m in res:
                 if m['id'] in seen_ids: continue
                 
-                # 1. DATE FILTER (T20 format often provides dateTimeGMT)
+                # Date logic
                 dt_str = m.get("dateTimeGMT") or m.get("date")
                 try:
                     m_date = datetime.fromisoformat(dt_str.replace('Z', '+00:00')).astimezone(az_tz)
-                    if not (start_window <= m_date <= end_window): continue
+                    if abs((m_date - today).days) > 2: continue
                 except: continue
 
                 t_info = m.get("teamInfo", [])
                 t1 = t_info[0] if len(t_info) > 0 else {"name": m.get("t1", ""), "img": ""}
                 t2 = t_info[1] if len(t_info) > 1 else {"name": m.get("t2", ""), "img": ""}
                 
-                # 2. SERIES & WHITELIST FILTER
                 is_wc = "world cup" in m.get("name", "").lower() or "t20" in m.get("name", "").lower()
                 if is_wc and (is_match(t1['name'], whitelist) or is_match(t2['name'], whitelist)):
                     seen_ids.add(m['id'])
-                    status = m.get("status", "Live")
                     games.append({
                         "id": m['id'], "sport": "T20 WORLD CUP", "status": "post" if m.get("matchEnded") else "in",
                         "home": {"name": t2['name'], "logo": t2.get('img', ""), "score": m.get("t2s", "0/0")},
                         "away": {"name": t1['name'], "logo": t1.get('img', ""), "score": m.get("t1s", "0/0")},
-                        "story": f"**PITCH DISPATCH** — {status}. Match officials report high-intensity group play at the T20 World Cup. {t1['name']} and {t2['name']} continue to battle for pivotal points.",
+                        "story": f"**WIRE REPORT** — {m.get('status')}. The T20 World Cup continues as {t1['name']} and {t2['name']} meet in a pivotal group stage matchup.",
                         "raw_date": dt_str
                     })
         except: continue
@@ -114,6 +118,7 @@ def get_espn_data(sport, league, whitelist):
         data = requests.get(url, params=params, timeout=10).json()
         for event in data.get("events", []):
             if is_match(event.get("name", ""), whitelist):
+                # Summary endpoint for the detailed stats
                 sum_url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={event['id']}"
                 summary = requests.get(sum_url).json()
                 comp = event["competitions"][0]
@@ -138,19 +143,22 @@ def generate_html(games):
     <html lang="en">
     <head>
         <meta charset="UTF-8"><title>Tempe Torch | Wire Service</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Georgia&display=swap">
         <style>
             :root {{ --bg: #050505; --accent: #ff3d00; --card: #121212; --text: #eee; }}
             body {{ font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }}
             header {{ border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }}
             .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }}
             .card {{ background: var(--card); border: 1px solid #222; border-radius: 4px; overflow: hidden; }}
-            .score-area {{ display: flex; justify-content: space-around; padding: 25px; text-align: center; align-items: center; }}
+            .score-area {{ display: flex; justify-content: space-around; padding: 25px; text-align: center; align-items: center; border-bottom: 1px solid #222; }}
             .logo {{ width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; background: #fff; border-radius: 50%; padding: 4px; }}
             .score {{ font-size: 2.2rem; font-weight: 900; }}
-            .btn-read {{ width: 100%; border: none; background: #1a1a1a; color: #fff; padding: 15px; cursor: pointer; font-weight: bold; border-top: 1px solid #333; }}
+            .btn-read {{ width: 100%; border: none; background: #1a1a1a; color: #fff; padding: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }}
+            .btn-read:hover {{ background: var(--accent); }}
             #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; align-items: center; justify-content: center; }}
-            .modal-content {{ background: #fff; color: #111; max-width: 800px; width: 90%; padding: 50px; border-radius: 2px; }}
+            .modal-content {{ background: #fff; color: #111; max-width: 850px; width: 95%; padding: 60px; border-radius: 2px; overflow-y: auto; max-height: 90vh; }}
+            .modal-content h2 {{ font-weight: 900; text-transform: uppercase; border-bottom: 5px solid #111; padding-bottom: 15px; }}
+            .story-body {{ font-family: 'Georgia', serif; font-size: 1.4rem; line-height: 1.7; white-space: pre-line; }}
         </style>
     </head>
     <body>
@@ -158,8 +166,8 @@ def generate_html(games):
     <div class="grid" id="main-grid"></div>
     <footer style="margin-top:40px; text-align:center; color:#555; font-size:0.8rem;">LAST WIRE UPDATE: {now} AZT</footer>
     <div id="modal" onclick="closeModal()"><div class="modal-content" onclick="event.stopPropagation()">
-        <h2 id="modal-title" style="border-bottom: 4px solid #111; padding-bottom:10px; text-transform:uppercase;"></h2>
-        <div id="modal-body" style="font-family: 'Georgia', serif; font-size: 1.3rem; line-height: 1.8; margin-top: 20px;"></div>
+        <h2 id="modal-title"></h2>
+        <div id="modal-body" class="story-body"></div>
     </div></div>
     <script>
         const games = {games_json};
@@ -209,7 +217,7 @@ def main():
     
     all_games.extend(get_cricket_wc(whitelist))
     
-    # Sort: Live first, then newest
+    # Final sorting: Live games on top, then by date.
     all_games.sort(key=lambda x: (x["status"] == "post", x["raw_date"]))
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(generate_html(all_games))
