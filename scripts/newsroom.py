@@ -26,31 +26,22 @@ def get_whitelist():
 
 # --- 2. LIVE SCHEDULE LOOKUP ENGINE ---
 def get_up_next(team_id, sport, league):
-    """Fetches the actual next game for a specific team via ESPN Team API."""
     url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
     try:
         data = requests.get(url, timeout=5).json()
         now = datetime.now(pytz.utc)
-        
-        # Look for the first game with a 'scheduled' status occurring after 'now'
         for event in data.get("events", []):
             game_date = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc)
             if game_date > now:
                 competitors = event["competitions"][0]["competitors"]
-                # Determine if the team is home or away
                 for team in competitors:
                     if team["id"] == team_id:
                         opponent = [t["team"]["displayName"] for t in competitors if t["id"] != team_id][0]
                         venue_type = "home" if team["homeAway"] == "home" else "away"
                         date_str = game_date.astimezone(pytz.timezone('US/Arizona')).strftime("%m/%d")
-                        
-                        if venue_type == "home":
-                            return f"Up Next: {date_str} vs {opponent}."
-                        else:
-                            return f"Up Next: {date_str} at {opponent}."
-    except:
-        pass
-    return "Up Next: Schedule pending."
+                        return f"{date_str} {'vs' if venue_type == 'home' else 'at'} {opponent}"
+    except: pass
+    return "Schedule pending"
 
 # --- 3. AP STORY ENGINE ---
 def craft_ap_story(event, sport, league):
@@ -58,12 +49,10 @@ def craft_ap_story(event, sport, league):
     home = comp["competitors"][0]
     away = comp["competitors"][1]
     
-    # 1. Dateline & Venue Info
     city = comp.get("venue", {}).get("address", {}).get("city", "FIELD")
     state = comp.get("venue", {}).get("address", {}).get("state", "ST")
-    dateline = f"{city.upper()}, {state} (AP) — "
+    dateline = f"**{city.upper()}, {state} (AP) — **"
     
-    # 2. Performance Research (Top Scorer)
     details = ""
     try:
         winner = home if home.get("winner") else away
@@ -71,19 +60,16 @@ def craft_ap_story(event, sport, league):
         name = leader["athlete"]["displayName"]
         val = leader["displayValue"]
         stat = winner["leaders"][0].get("displayName", "points").lower()
-        details = f"{name} provided a spark with {val} {stat} for the {winner['team']['shortDisplayName']}. "
+        details = f"{name} provided {val} {stat} to lead the {winner['team']['shortDisplayName']}. "
     except:
-        details = f"The {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} met in a highly anticipated clash. "
+        details = f"The {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} met in a highly anticipated contest. "
 
-    # 3. Dynamic "Up Next" Logic
-    # We pull the next game for the 'featured' team (the one on our whitelist)
-    # For simplicity, we'll pull it for the winner of this game
     winner_id = home["team"]["id"] if home.get("winner") else away["team"]["id"]
-    next_game_blurb = get_up_next(winner_id, sport, league)
+    next_game = get_up_next(winner_id, sport, league)
 
-    return f"{dateline}{details}{next_game_blurb}"
+    return f"{dateline}{details}<br><br><b>Up Next:</b> {next_game}."
 
-# --- 4. DATA FETCH & HTML GENERATION (Integrated) ---
+# --- 4. DATA FETCH & KEY ERROR FIX ---
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     results = []
@@ -93,15 +79,22 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             eid = event["id"]
             name = event.get("name", "").lower()
             if any(team in name for team in whitelist) and eid not in seen_ids:
+                comp = event["competitions"][0]
+                
+                # FIXED: Ensuring all keys required by generate_html exist
                 results.append({
+                    "headline": event.get("name", "Game Update"),
                     "league": league.upper().replace("-", " "),
-                    "score": f"{event['competitions'][0]['competitors'][1]['team']['shortDisplayName']} {event['competitions'][0]['competitors'][1].get('score','0')}, {event['competitions'][0]['competitors'][0]['team']['shortDisplayName']} {event['competitions'][0]['competitors'][0].get('score','0')}",
+                    "score_line": f"{comp['competitors'][1]['team']['shortDisplayName']} {comp['competitors'][1].get('score','0')}, {comp['competitors'][0]['team']['shortDisplayName']} {comp['competitors'][0].get('score','0')}",
                     "ap_story": craft_ap_story(event, sport, league),
                     "status": event["status"]["type"]["detail"]
                 })
                 seen_ids.add(eid)
-    except: pass
+    except Exception as e:
+        print(f"Error fetching {league}: {e}")
     return results
+
+# --- 5. HTML GENERATOR ---
 def generate_html(games):
     now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %Y — %I:%M %p")
     html_content = f"""
@@ -131,7 +124,7 @@ def generate_html(games):
         html_content += f"""
         <div class="story">
             <div class="headline">{g['headline']}</div>
-            <div class="score-box">{g['score_line']}</div>
+            <div class="score-box">{g['score_line']} — {g['status']}</div>
             <div class="ap-body">{g['ap_story']}</div>
         </div>
         """
@@ -141,10 +134,16 @@ def generate_html(games):
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
-    leagues = [("basketball", "mens-college-basketball"), ("basketball", "womens-college-basketball"), ("baseball", "college-baseball")]
+    leagues = [
+        ("basketball", "mens-college-basketball"), 
+        ("basketball", "womens-college-basketball"), 
+        ("baseball", "college-baseball")
+    ]
     for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist, seen))
+    
     generate_html(all_games)
+    print(f"Success! Processed {len(all_games)} games.")
 
 if __name__ == "__main__": 
     main()
