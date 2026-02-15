@@ -5,6 +5,7 @@ import pytz
 
 # --- 1. CONFIG & WHITELIST ---
 def get_whitelist():
+    """Returns the list of teams to monitor."""
     return [
         "san francisco 49ers", "ac milan", "angel city", "anaheim angels", "arizona state", "asu", 
         "athletics", "atletico madrid", "austin fc", "bakersfield", "california", "cal poly", 
@@ -24,8 +25,9 @@ def get_whitelist():
         "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium", "iowa"
     ]
 
-# --- 2. LIVE SCHEDULE LOOKUP ENGINE ---
+# --- 2. LIVE SCHEDULE RESEARCH ---
 def get_up_next(team_id, sport, league):
+    """Fetches the actual next game for a team via ESPN Team API."""
     url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
     try:
         data = requests.get(url, timeout=5).json()
@@ -36,15 +38,17 @@ def get_up_next(team_id, sport, league):
                 competitors = event["competitions"][0]["competitors"]
                 for team in competitors:
                     if team["id"] == team_id:
-                        opponent = [t["team"]["displayName"] for t in competitors if t["id"] != team_id][0]
-                        venue_type = "home" if team["homeAway"] == "home" else "away"
+                        opp = [t["team"]["displayName"] for t in competitors if t["id"] != team_id][0]
+                        venue = "home" if team["homeAway"] == "home" else "away"
+                        # Format date for Arizona time
                         date_str = game_date.astimezone(pytz.timezone('US/Arizona')).strftime("%m/%d")
-                        return f"{date_str} {'vs' if venue_type == 'home' else 'at'} {opponent}"
+                        return f"{date_str} {'vs' if venue == 'home' else 'at'} {opp}"
     except: pass
-    return "Schedule pending"
+    return "TBD"
 
 # --- 3. AP STORY ENGINE ---
 def craft_ap_story(event, sport, league):
+    """Generates a realistic AP-style news report."""
     comp = event["competitions"][0]
     home = comp["competitors"][0]
     away = comp["competitors"][1]
@@ -53,23 +57,25 @@ def craft_ap_story(event, sport, league):
     state = comp.get("venue", {}).get("address", {}).get("state", "ST")
     dateline = f"**{city.upper()}, {state} (AP) — **"
     
-    details = ""
+    winner = home if home.get("winner") else away
+    loser = away if home.get("winner") else home
+    
+    # Research top performer
     try:
-        winner = home if home.get("winner") else away
         leader = winner["leaders"][0]["leaders"][0]
         name = leader["athlete"]["displayName"]
         val = leader["displayValue"]
         stat = winner["leaders"][0].get("displayName", "points").lower()
-        details = f"{name} provided {val} {stat} to lead the {winner['team']['shortDisplayName']}. "
+        detail = f"{name} led the way with {val} {stat} as the {winner['team']['shortDisplayName']} handled {loser['team']['shortDisplayName']}."
     except:
-        details = f"The {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} met in a highly anticipated contest. "
+        detail = f"The {winner['team']['shortDisplayName']} utilized a balanced attack to secure the win over {loser['team']['shortDisplayName']}."
 
-    winner_id = home["team"]["id"] if home.get("winner") else away["team"]["id"]
-    next_game = get_up_next(winner_id, sport, league)
+    # Fetch next game schedule
+    w_next = get_up_next(winner["team"]["id"], sport, league)
+    
+    return f"{dateline}{detail}<br><br><b>Up Next:</b> {winner['team']['shortDisplayName']} ({w_next})."
 
-    return f"{dateline}{details}<br><br><b>Up Next:</b> {next_game}."
-
-# --- 4. DATA FETCH & KEY ERROR FIX ---
+# --- 4. DATA FETCH (Logos & Scores) ---
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     results = []
@@ -80,70 +86,85 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             name = event.get("name", "").lower()
             if any(team in name for team in whitelist) and eid not in seen_ids:
                 comp = event["competitions"][0]
-                
-                # FIXED: Ensuring all keys required by generate_html exist
                 results.append({
                     "headline": event.get("name", "Game Update"),
-                    "league": league.upper().replace("-", " "),
+                    "home_logo": comp["competitors"][0]["team"].get("logo"),
+                    "away_logo": comp["competitors"][1]["team"].get("logo"),
                     "score_line": f"{comp['competitors'][1]['team']['shortDisplayName']} {comp['competitors'][1].get('score','0')}, {comp['competitors'][0]['team']['shortDisplayName']} {comp['competitors'][0].get('score','0')}",
                     "ap_story": craft_ap_story(event, sport, league),
                     "status": event["status"]["type"]["detail"]
                 })
                 seen_ids.add(eid)
-    except Exception as e:
-        print(f"Error fetching {league}: {e}")
+    except: pass
     return results
 
-# --- 5. HTML GENERATOR ---
+# --- 5. GRAPHIC HTML GENERATOR ---
 def generate_html(games):
-    now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %Y — %I:%M %p")
+    now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %Y")
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta charset="UTF-8"><title>The Armchair Commentator</title>
+        <meta charset="UTF-8">
         <style>
-            body {{ font-family: "Georgia", serif; background: #fdfdfd; padding: 50px; line-height: 1.6; color: #111; }}
-            .paper {{ max-width: 800px; margin: auto; background: white; padding: 40px; border: 1px solid #ddd; box-shadow: 10px 10px 0px #eee; }}
-            .masthead {{ text-align: center; border-bottom: 5px double #111; margin-bottom: 40px; }}
-            .masthead h1 {{ font-size: 3.5em; margin: 0; font-family: "Times New Roman", serif; text-transform: uppercase; letter-spacing: -2px; }}
-            .story {{ margin-bottom: 50px; border-bottom: 1px solid #eee; padding-bottom: 30px; }}
-            .headline {{ font-size: 2em; font-weight: bold; line-height: 1.1; margin-bottom: 10px; }}
-            .score-box {{ background: #000; color: #fff; display: inline-block; padding: 2px 10px; font-family: sans-serif; font-weight: bold; margin-bottom: 15px; }}
-            .ap-body {{ font-size: 1.15em; }}
+            body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 40px; color: #1c1e21; }}
+            .container {{ max-width: 850px; margin: auto; }}
+            .header {{ text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #ddd; }}
+            .header h1 {{ font-family: 'Times New Roman', serif; font-size: 3.5em; margin: 0; text-transform: uppercase; }}
+            .card {{ background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; border: 1px solid #ddd; }}
+            .card-header {{ background: #24292e; color: white; padding: 12px 20px; font-weight: bold; display: flex; justify-content: space-between; }}
+            .score-strip {{ display: flex; align-items: center; justify-content: space-around; padding: 25px; background: #fafbfc; border-bottom: 1px solid #eee; }}
+            .team-img {{ height: 70px; width: 70px; object-fit: contain; }}
+            .score-text {{ font-size: 2.2em; font-weight: 800; letter-spacing: -1px; }}
+            .story-body {{ padding: 25px; font-size: 1.15em; line-height: 1.6; }}
+            .up-next-box {{ background: #fff8e1; padding: 10px 15px; border-radius: 4px; border-left: 4px solid #ffc107; font-size: 0.9em; margin-top: 20px; }}
         </style>
     </head>
     <body>
-        <div class="paper">
-            <div class="masthead">
+        <div class="container">
+            <div class="header">
                 <h1>The Armchair Commentator</h1>
-                <p>FINAL EDITION — {now} MST</p>
+                <p>{now} | Sports Desk Edition</p>
             </div>
     """
-    for g in games:
-        html_content += f"""
-        <div class="story">
-            <div class="headline">{g['headline']}</div>
-            <div class="score-box">{g['score_line']} — {g['status']}</div>
-            <div class="ap-body">{g['ap_story']}</div>
-        </div>
-        """
+    if not games:
+        html_content += '<p style="text-align:center; color:#888;">No games found for your whitelist teams today.</p>'
+    else:
+        for g in games:
+            html_content += f"""
+            <div class="card">
+                <div class="card-header">
+                    <span>{g['headline']}</span>
+                    <span>{g['status']}</span>
+                </div>
+                <div class="score-strip">
+                    <img src="{g['away_logo']}" class="team-img">
+                    <div class="score-text">{g['score_line']}</div>
+                    <img src="{g['home_logo']}" class="team-img">
+                </div>
+                <div class="story-body">
+                    {g['ap_story']}
+                </div>
+            </div>
+            """
     html_content += "</div></body></html>"
-    with open("index.html", "w") as f: f.write(html_content)
+    with open("index.html", "w") as f: 
+        f.write(html_content)
 
+# --- 6. MAIN EXECUTION ---
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
     leagues = [
         ("basketball", "mens-college-basketball"), 
-        ("basketball", "womens-college-basketball"), 
-        ("baseball", "college-baseball")
+        ("basketball", "womens-college-basketball"),
+        ("baseball", "college-baseball"),
+        ("basketball", "nba")
     ]
     for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist, seen))
-    
     generate_html(all_games)
-    print(f"Success! Processed {len(all_games)} games.")
+    print(f"Update Complete. {len(all_games)} stories processed.")
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()
