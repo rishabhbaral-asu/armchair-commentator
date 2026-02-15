@@ -23,8 +23,26 @@ def get_whitelist():
         "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
         "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium", "iowa"
     ]
+OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"  # <--- PLUG YOUR KEY IN HERE
+# --- 2. LIVE WEATHER ENGINE ---
+def get_live_weather(city):
+    if not OPENWEATHER_API_KEY or OPENWEATHER_API_KEY == "YOUR_API_KEY_HERE":
+        return "Clear Skies" # Fallback if no key
+    
+    try:
+        # We use imperial units for Fahrenheit
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=imperial"
+        response = requests.get(url, timeout=5).json()
+        
+        if response.get("cod") == 200:
+            temp = round(response["main"]["temp"])
+            desc = response["weather"][0]["description"].capitalize()
+            return f"{temp}°F and {desc}"
+    except:
+        pass
+    return "Variable Conditions"
 
-# --- 2. THE RESEARCH ENGINES (Schedules & Weather) ---
+# --- 3. SCHEDULE RESEARCH ---
 def get_up_next(team_id, sport, league, current_event_id):
     url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
     try:
@@ -43,47 +61,38 @@ def get_up_next(team_id, sport, league, current_event_id):
     except: pass
     return "TBD"
 
-def get_weather(city):
-    """Placeholder for weather integration - easily expandable with OpenWeatherMap API"""
-    return "Partly Cloudy" # In a real scenario, you'd fetch live data here
-
-# --- 3. THE SMART STORY ENGINE ---
+# --- 4. THE STORY ENGINE ---
 def craft_ap_story(event, sport, league):
     comp = event["competitions"][0]
-    status = event["status"]["type"]["name"]
-    home = comp["competitors"][0]
-    away = comp["competitors"][1]
+    status_name = event["status"]["type"]["name"]
+    home, away = comp["competitors"][0], comp["competitors"][1]
     eid = event["id"]
     
-    city = comp.get("venue", {}).get("address", {}).get("city", "TEMPE")
+    city = comp.get("venue", {}).get("address", {}).get("city", "Tempe")
     state = comp.get("venue", {}).get("address", {}).get("state", "AZ")
     dateline = f"**{city.upper()}, {state} (AP) — **"
-    weather = get_weather(city)
+    weather = get_live_weather(city)
 
-    # A. PREGAME PREVIEW
-    if status == "STATUS_SCHEDULED":
+    if status_name == "STATUS_SCHEDULED":
         time_obj = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc)
         local_time = time_obj.astimezone(pytz.timezone('US/Arizona')).strftime("%I:%M %p")
-        return f"{dateline}The {away['team']['displayName']} prepare to face the {home['team']['displayName']} under {weather.lower()} skies. Tip-off is set for {local_time} MST. Both programs enter today's contest looking to secure a pivotal conference result."
+        return f"{dateline}The {away['team']['shortDisplayName']} face {home['team']['shortDisplayName']} today. Weather in {city} is currently {weather}. Tip-off: {local_time} MST."
 
-    # B. POSTGAME RECAP
     winner = home if home.get("winner") else away
     loser = away if home.get("winner") else home
     
     try:
-        # Check if leaders exist and have a valid value (not a season average)
         leader = winner["leaders"][0]["leaders"][0]
-        name = leader["athlete"]["displayName"]
-        val = leader["displayValue"]
-        detail = f"{name} led the charge with {val} as the {winner['team']['shortDisplayName']} surged past {loser['team']['shortDisplayName']}."
+        name, val = leader["athlete"]["displayName"], leader["displayValue"]
+        detail = f"{name} led the charge with {val} as the {winner['team']['shortDisplayName']} defeated {loser['team']['shortDisplayName']}."
     except:
-        detail = f"The {winner['team']['shortDisplayName']} relied on a stout defensive effort to outlast {loser['team']['shortDisplayName']} at {comp.get('venue', {}).get('fullName', 'center court')}."
+        detail = f"The {winner['team']['shortDisplayName']} secured a win over {loser['team']['shortDisplayName']} in {city}."
 
     w_next = get_up_next(winner["team"]["id"], sport, league, eid)
-    return f"{dateline}{detail}<br><br><div class='up-next-box'><b>Up Next:</b> {winner['team']['shortDisplayName']} plays {w_next}.</div>"
+    return f"{dateline}{detail}<br><br><div class='up-next-box'><b>Up Next:</b> {winner['team']['shortDisplayName']} ({w_next}).</div>"
 
-# --- 4. DATA FETCH ---
-def get_espn_data(sport, league, whitelist, seen_ids):
+# --- 5. THE UI & DATA FETCH ---
+def get_espn_data(sport, league, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     results = []
     try:
@@ -91,15 +100,19 @@ def get_espn_data(sport, league, whitelist, seen_ids):
         for event in data.get("events", []):
             eid = event["id"]
             name = event.get("name", "").lower()
-            if any(team in name for team in whitelist) and eid not in seen_ids:
+            # STRICT CHECK: Team name MUST be in your whitelist
+            if any(team in name for team in MY_WHITELIST) and eid not in seen_ids:
                 comp = event["competitions"][0]
-                st_type = event["status"]["type"]["name"]
+                st_name = event["status"]["type"]["name"]
+                
+                score_str = f"{comp['competitors'][1].get('score','0')} - {comp['competitors'][0].get('score','0')}"
+                if st_name == "STATUS_SCHEDULED": score_str = "PREGAME"
                 
                 results.append({
                     "headline": event.get("name", "Game Update"),
                     "home_logo": comp["competitors"][0]["team"].get("logo"),
                     "away_logo": comp["competitors"][1]["team"].get("logo"),
-                    "score_line": f"{comp['competitors'][1].get('score','0')} - {comp['competitors'][0].get('score','0')}" if st_type != "STATUS_SCHEDULED" else "PREGAME",
+                    "score_line": score_str,
                     "away_name": comp["competitors"][1]["team"]["shortDisplayName"],
                     "home_name": comp["competitors"][0]["team"]["shortDisplayName"],
                     "ap_story": craft_ap_story(event, sport, league),
@@ -109,7 +122,6 @@ def get_espn_data(sport, league, whitelist, seen_ids):
     except: pass
     return results
 
-# --- 5. THE MIDNIGHT NEWSROOM HTML ---
 def generate_html(games):
     now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %Y | %I:%M %p")
     html_content = f"""
@@ -118,47 +130,32 @@ def generate_html(games):
     <head>
         <meta charset="UTF-8">
         <style>
-            :root {{
-                --bg: #121212;
-                --card-bg: #1e1e1e;
-                --text: #e0e0e0;
-                --accent: #ffc627; /* ASU GOLD */
-                --border: #333;
-            }}
-            body {{ font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 40px; color: var(--text); }}
+            :root {{ --bg: #0f1113; --card-bg: #1a1d21; --text: #ffffff; --accent: #ffc627; --dim: #a0a6ad; --border: #2d3238; }}
+            body {{ font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 40px; color: var(--text); }}
             .container {{ max-width: 800px; margin: auto; }}
-            .masthead {{ text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 20px; margin-bottom: 40px; }}
-            .masthead h1 {{ font-family: 'Playfair Display', serif; font-size: 3.5em; margin: 0; color: var(--accent); text-transform: uppercase; }}
-            .card {{ background: var(--card-bg); border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border); overflow: hidden; }}
-            .card-header {{ padding: 10px 20px; background: #252525; font-size: 0.8em; font-weight: bold; text-transform: uppercase; color: #888; display: flex; justify-content: space-between; }}
-            .scoreboard {{ display: flex; align-items: center; justify-content: space-around; padding: 30px 20px; border-bottom: 1px solid var(--border); }}
-            .team {{ text-align: center; width: 30%; }}
-            .team img {{ height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }}
-            .team-name {{ display: block; margin-top: 10px; font-weight: bold; font-size: 1.1em; }}
-            .score-display {{ font-size: 3em; font-weight: 900; color: var(--accent); }}
-            .story-body {{ padding: 30px; line-height: 1.7; font-size: 1.1em; }}
-            .up-next-box {{ background: #2a2a2a; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid var(--accent); font-size: 0.9em; }}
+            .masthead {{ text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; }}
+            .masthead h1 {{ font-family: serif; font-size: 3.5em; margin: 0; color: var(--accent); }}
+            .card {{ background: var(--card-bg); border-radius: 16px; margin-bottom: 30px; border: 1px solid var(--border); overflow: hidden; }}
+            .card-header {{ padding: 12px 25px; background: #24292e; font-size: 0.85em; font-weight: 800; color: var(--accent); display: flex; justify-content: space-between; }}
+            .scoreboard {{ display: flex; align-items: center; justify-content: space-around; padding: 40px 20px; }}
+            .team img {{ height: 80px; }}
+            .score-display {{ font-size: 3em; font-weight: 900; }}
+            .story-body {{ padding: 35px; line-height: 1.8; font-size: 1.1em; border-top: 1px solid var(--border); }}
+            .up-next-box {{ background: #121417; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 3px solid var(--accent); color: var(--dim); }}
         </style>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="container">
-            <div class="masthead">
-                <h1>The Armchair Commentator</h1>
-                <p>Digital Newsroom | {now} MST</p>
-            </div>
+            <div class="masthead"><h1>The Armchair Commentator</h1><p style="color:var(--dim);">{now} MST</p></div>
     """
     for g in games:
         html_content += f"""
         <div class="card">
-            <div class="card-header">
-                <span>{g['headline']}</span>
-                <span>{g['status']}</span>
-            </div>
+            <div class="card-header"><span>{g['headline']}</span><span>{g['status']}</span></div>
             <div class="scoreboard">
-                <div class="team"><img src="{g['away_logo']}"><span class="team-name">{g['away_name']}</span></div>
+                <div class="team"><img src="{g['away_logo']}"><br><b>{g['away_name']}</b></div>
                 <div class="score-display">{g['score_line']}</div>
-                <div class="team"><img src="{g['home_logo']}"><span class="team-name">{g['home_name']}</span></div>
+                <div class="team"><img src="{g['home_logo']}"><br><b>{g['home_name']}</b></div>
             </div>
             <div class="story-body">{g['ap_story']}</div>
         </div>
@@ -167,16 +164,11 @@ def generate_html(games):
     with open("index.html", "w") as f: f.write(html_content)
 
 def main():
-    whitelist = get_whitelist()
     all_games, seen = [], set()
-    leagues = [
-        ("basketball", "mens-college-basketball"), 
-        ("basketball", "womens-college-basketball"),
-        ("baseball", "college-baseball"),
-        ("basketball", "nba")
-    ]
+    leagues = [("basketball", "mens-college-basketball"), ("basketball", "nba"), ("baseball", "college-baseball")]
     for s, l in leagues:
-        all_games.extend(get_espn_data(s, l, whitelist, seen))
+        all_games.extend(get_espn_data(s, l, seen))
     generate_html(all_games)
 
 if __name__ == "__main__": main()
+
