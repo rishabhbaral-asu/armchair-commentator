@@ -229,7 +229,7 @@ def main():
         ("football", "nfl"),
         ("baseball", "mlb"),
         ("baseball", "college-baseball"),
-        ("softball", "college-softball")
+        ("baseball", "college-softball")
     ]
     
     for s, l in leagues:
