@@ -55,7 +55,6 @@ def craft_dynamic_story(event, sport, league):
     venue_name = comp.get("venue", {}).get("fullName", "the arena")
     weather = get_live_weather(city)
 
-    # Analytics / Odds
     odds_str = ""
     if "odds" in comp:
         odds_str = f"<b>LINE:</b> {comp['odds'][0].get('details', 'Even')}. "
@@ -66,39 +65,36 @@ def craft_dynamic_story(event, sport, league):
         <b>{a_rank_str}{away['team']['displayName']} ({a_rec}) at {h_rank_str}{home['team']['displayName']} ({h_rec})</b><br>
         {city}, {comp.get('venue', {}).get('address', {}).get('state', 'ST')}; {time_ms.strftime('%A, %I:%M %p')} MST<br><br>
         <b>BOTTOM LINE:</b> {h_rank_str}{home['team']['shortDisplayName']} hosts {away['team']['shortDisplayName']} at {venue_name}. 
-        {odds_str}The local weather in {city} is {weather}. Both teams look to capitalize on key conference positioning in this Sunday matchup.
+        {odds_str}The local weather in {city} is {weather}. Both teams look to capitalize on key positioning in this {sport.capitalize()} matchup.
         """
     
     if status_type == "STATUS_IN_PROGRESS":
         clock = event["status"]["type"]["detail"]
-        return f"<b>LIVE FROM {city.upper()}:</b> The {away['team']['shortDisplayName']} ({away['score']}) and {home['team']['shortDisplayName']} ({home['score']}) are locked in a battle at {venue_name}. Game Clock: {clock}. {away['team']['shortDisplayName']} is currently looking to improve their {a_rec} record with a statement road win."
+        return f"<b>LIVE UPDATING:</b> The {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} are active at {venue_name}. Clock: {clock}. {away['team']['shortDisplayName']} is currently looking to improve their {a_rec} record."
 
     winner = home if home.get("winner") else away
     loser = away if home.get("winner") else home
-    return f"<b>FINAL:</b> {winner['team']['shortDisplayName']} defended home court with a win over {loser['team']['shortDisplayName']} in {city}. Final Score: {winner['score']}-{loser['score']}."
+    return f"<b>FINAL:</b> {winner['team']['shortDisplayName']} defeated {loser['team']['shortDisplayName']} in {city}. Final Score: {winner['score']}-{loser['score']}."
 
 # --- 3. DATA FETCH ---
 def get_espn_data(sport, league, whitelist, seen_ids):
-    # Base URL
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     
-    # 1. Expand the search window (Today + Next 3 days)
     now = datetime.now(MST)
     start_date = now.strftime("%Y%m%d")
     end_date = (now + timedelta(days=3)).strftime("%Y%m%d")
     
     params = {
-        "limit": "500",  # 2. Increase limit to see all games
-        "dates": f"{start_date}-{end_date}" # 3. Date range
+        "limit": "500", 
+        "dates": f"{start_date}-{end_date}"
     }
     
-    # 4. Special fix for College Basketball to see non-ranked teams
-    if league == "mens-college-basketball":
+    # Crucial: Forces API to show all Division I games, not just Top 25
+    if any(x in league for x in ["college-basketball", "college-hockey", "college-football"]):
         params["groups"] = "50" 
 
     results = []
     try:
-        # Use params in the request
         res = requests.get(url, params=params, timeout=10)
         data = res.json()
         
@@ -106,7 +102,6 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             eid = event["id"]
             comp = event["competitions"][0]
             
-            # Extract names for matching
             search_blob = []
             for t in comp["competitors"]:
                 team_obj = t["team"]
@@ -117,14 +112,17 @@ def get_espn_data(sport, league, whitelist, seen_ids):
                     team_obj.get("abbreviation", "").lower()
                 ])
             
-            # Combine whitelist match
             full_blob = " ".join(search_blob)
             match_found = any(team.lower() in full_blob for team in whitelist)
 
             if match_found and eid not in seen_ids:
+                # Add a sport icon
+                icons = {"basketball": "🏀", "hockey": "🏒", "baseball": "⚾", "football": "🏈", "soccer": "⚽", "softball": "🥎"}
+                icon = icons.get(sport, "🏆")
+
                 results.append({
                     "id": eid,
-                    "headline": event.get("name"),
+                    "headline": f"{icon} {event.get('name')}",
                     "home_logo": comp["competitors"][0]["team"].get("logo"),
                     "away_logo": comp["competitors"][1]["team"].get("logo"),
                     "home_name": comp["competitors"][0]["team"]["shortDisplayName"],
@@ -158,15 +156,14 @@ def generate_html(games):
             .container {{ max-width: 900px; margin: auto; }}
             .header {{ text-align: left; border-bottom: 3px solid var(--accent); padding-bottom: 15px; margin-bottom: 40px; position: relative; }}
             .live-clock {{ font-family: monospace; color: var(--accent); font-size: 1.3em; position: absolute; right: 0; top: 0; }}
-            .card {{ background: var(--card); border-radius: 4px; margin-bottom: 30px; border-left: 6px solid var(--accent); transition: transform 0.2s; }}
-            .card:hover {{ transform: scale(1.01); }}
-            .card-header {{ background: #222; padding: 12px 20px; font-weight: 800; font-size: 0.8em; text-transform: uppercase; color: var(--dim); border-bottom: 1px solid #333; }}
+            .card {{ background: var(--card); border-radius: 4px; margin-bottom: 30px; border-left: 6px solid var(--accent); }}
+            .card-header {{ background: #222; padding: 12px 20px; font-weight: 800; font-size: 0.85em; text-transform: uppercase; color: var(--dim); border-bottom: 1px solid #333; }}
             .scoreboard {{ display: flex; align-items: center; padding: 25px 35px; background: #1c2126; }}
             .team {{ display: flex; align-items: center; width: 40%; }}
             .team img {{ height: 55px; margin-right: 18px; }}
-            .score-val {{ width: 20%; text-align: center; font-size: 2.8em; font-weight: 900; color: var(--accent); text-shadow: 0 0 10px rgba(255,198,39,0.2); }}
+            .score-val {{ width: 20%; text-align: center; font-size: 2.8em; font-weight: 900; color: var(--accent); }}
             .story {{ padding: 30px; line-height: 1.7; font-size: 1.05em; border-top: 1px solid #2d3238; color: #ccc; }}
-            .countdown {{ color: #ff4757; font-weight: bold; letter-spacing: 1px; }}
+            .countdown {{ color: #ff4757; font-weight: bold; }}
             .footer {{ text-align: center; color: var(--dim); font-size: 0.8em; margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; }}
         </style>
     </head>
@@ -180,14 +177,14 @@ def generate_html(games):
     """
     
     if not games:
-        html += "<div style='text-align:center; padding:50px; color:var(--dim);'><h3>Scanning the wires... no matches found for your whitelist.</h3></div>"
+        html += "<div style='text-align:center; padding:50px; color:var(--dim);'><h3>No matching games found in the 72-hour window.</h3></div>"
 
     for g in games:
         status_display = f"<span>{g['status_text']}</span>"
         if g['status_type'] == "STATUS_SCHEDULED":
             status_display = f"<span class='countdown' data-time='{g['iso_date']}'>INITIALIZING...</span>"
         elif g['status_type'] == "STATUS_IN_PROGRESS":
-            status_display = f"<span style='color:#2ecc71; animation: pulse 2s infinite;'>● LIVE: {g['status_text']}</span>"
+            status_display = f"<span style='color:#2ecc71;'>● LIVE: {g['status_text']}</span>"
 
         html += f"""
         <div class="card">
@@ -195,23 +192,20 @@ def generate_html(games):
             <div class="scoreboard">
                 <div class="team"><img src="{g['away_logo']}"><div style="font-size:1.4em; font-weight:bold;">{g['away_name']}</div></div>
                 <div class="score-val">{g['away_score']} - {g['home_score']}</div>
-                <div class="team" style="flex-direction: row-reverse; text-align: right;"><img src="{g['home_logo']}" style="margin-left:18px; margin-right:0;"><div style="font-size:1.4em; font-weight:bold;">{g['home_name']}</div></div>
+                <div class="team" style="flex-direction: row-reverse; text-align: right;"><img src="{g['home_logo']}" style="margin-left:18px;"><div style="font-size:1.4em; font-weight:bold;">{g['home_name']}</div></div>
             </div>
             <div class="story">{g['story']}</div>
         </div>"""
 
     html += f"""
             <div class="footer">
-                Data provided by ESPN API & OpenWeather • System Last Sync: {update_time} MST
+                Sync Status: Complete • Found {len(games)} matches • Last Update {update_time} MST
             </div>
         </div>
         <script>
             function update() {{
                 const now = new Date();
-                // Update Master Clock
                 document.getElementById('wall-clock').innerHTML = now.toLocaleTimeString('en-US', {{timeZone: 'America/Phoenix', hour12: true}});
-                
-                // Update Individual Countdowns
                 document.querySelectorAll('.countdown').forEach(el => {{
                     const target = new Date(el.getAttribute('data-time')).getTime();
                     const dist = target - now.getTime();
@@ -235,20 +229,24 @@ def main():
     all_games, seen = [], set()
     leagues = [
         ("basketball", "mens-college-basketball"),
+        ("basketball", "womens-college-basketball"),
         ("basketball", "nba"),
+        ("basketball", "wnba"),
         ("hockey", "nhl"),
-        ("soccer", "usa.mls"),
-        ("soccer", "eng.1"),
+        ("hockey", "mens-college-hockey"),
         ("baseball", "mlb"),
-        ("football", "nfl")
+        ("baseball", "college-baseball"),
+        ("softball", "college-softball"),
+        ("football", "nfl"),
+        ("football", "college-football"),
+        ("soccer", "usa.mls"),
+        ("soccer", "eng.1")
     ]
     for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist, seen))
     
-    # Sort games by date
     all_games.sort(key=lambda x: x['iso_date'])
-    
     generate_html(all_games)
-    print(f"Update Success: {len(all_games)} articles generated at index.html")
+    print(f"Update Success: {len(all_games)} matches identified.")
 
 if __name__ == "__main__": main()
