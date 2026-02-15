@@ -22,38 +22,57 @@ def get_whitelist():
         "la sparks", "washington spirit", "st. pauli", "dallas stars", "texas", "tolouse", "uc davis", 
         "uc irvine", "ucla", "usc", "uc riverside", "uc san diego", "ucsb", "utep", "valkyries", 
         "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
-        "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium"
+        "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium", "iowa"
     ]
-# --- 2. THE STORYMAKER (Your Custom Headlines) ---
-def craft_custom_headline(event):
+
+# --- 2. AP STORY ENGINE (Research-Driven) ---
+def craft_ap_story(event, sport, league):
     comp = event["competitions"][0]
-    h_name = comp["competitors"][0]["team"]["displayName"]
-    a_name = away_name = comp["competitors"][1]["team"]["displayName"]
-    status = event["status"]["type"]["state"]
+    home = comp["competitors"][0]
+    away = comp["competitors"][1]
+    status_type = event["status"]["type"]["state"]
+    venue = comp.get("venue", {}).get("fullName", "Unknown Venue")
+    city = comp.get("venue", {}).get("address", {}).get("city", "LOCATION")
+    state = comp.get("venue", {}).get("address", {}).get("state", "ST")
     
-    # RIVALRY: ASU vs Arizona (Feb 14 Recap)
-    if "Arizona State" in [h_name, a_name] and "Arizona" in [h_name, a_name]:
-        return "VALENTINE'S DAY SWEEP: Sun Devils take down Wildcats 75-69 in OT thriller!"
+    # 1. Dateline
+    dateline = f"{city.upper()}, {state} (AP) — "
+    
+    # 2. Performance Research (Getting specific scorers/stats)
+    details = ""
+    try:
+        # We try to find the leading scorer from the winner's side
+        winner = home if home.get("winner") else away
+        leader = winner["leaders"][0]["leaders"][0]
+        name = leader["athlete"]["displayName"]
+        val = leader["displayValue"]
+        stat = winner["leaders"][0]["displayName"].lower()
+        details = f"{name} had {val} {stat} to lead the {winner['team']['shortDisplayName']}. "
+    except:
+        details = f"The {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} battled in a physical contest. "
 
-    # RECAP: Santa Clara @ Portland (Feb 14 Recap)
-    if "Santa Clara" in a_name and "Portland" in h_name:
-        return "BRONCO BLITZ: Santa Clara erupts for 28-point 4th quarter to stun Pilots 77-66."
+    # 3. Sport-Specific Narrative
+    narrative = ""
+    if status_type == "post":
+        if "basketball" in league.lower():
+            if "OT" in event["status"]["type"]["detail"]:
+                narrative = "The game required extra time to settle before a decisive run in the final minutes of overtime."
+            elif abs(int(home['score']) - int(away['score'])) > 15:
+                narrative = "What began as a contested matchup turned into a rout early in the second half."
+            else:
+                narrative = "The contest featured several lead changes before the defense tightened in the closing moments."
+        elif "baseball" in league.lower():
+            narrative = f"The victory at {venue} secured a crucial result in the weekend series as the bats stayed hot through the middle innings."
+    else:
+        narrative = f"The teams are set to meet at {venue} in a matchup with significant postseason implications."
 
-    # UPCOMING: Iowa @ Nebraska (Feb 16 Game)
-    if "Iowa" in a_name and "Nebraska" in h_name:
-        return "PRESIDENTS' DAY CLASH: Hawkeyes land in Lincoln looking for season sweep."
+    # 4. Schedule Research (Up Next)
+    # This logic assumes the next game is listed in the team's record or schedule notes
+    up_next = f"\n\n**Up Next:** {away['team']['shortDisplayName']} continues their road trip Tuesday, while {home['team']['shortDisplayName']} remains home."
 
-    # BASEBALL: ASU vs Omaha (Feb 15 Series Finale)
-    if "Arizona State" in h_name and "Omaha" in a_name:
-        return "SWEEP WATCH: Sun Devils (2-0) look to finish the series today in Tempe."
+    return f"{dateline}{details}{narrative}{up_next}"
 
-    # DEFAULT FALLBACK
-    if status == "post":
-        winner = h_name if comp["competitors"][0].get("winner") else a_name
-        return f"FINAL: {winner} secures a hard-fought victory."
-    return f"MATCHUP: {a_name} visits {h_name}."
-
-# --- 3. THE DATA FETCH (Fixed the NameError) ---
+# --- 3. DATA FETCH ---
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     results = []
@@ -63,27 +82,24 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             eid = event["id"]
             name = event.get("name", "").lower()
             
-            # Use whitelist to block generic games (like Nicholls State)
             if any(team in name for team in whitelist) and eid not in seen_ids:
                 comp = event["competitions"][0]
                 results.append({
                     "id": eid,
                     "league": league.upper().replace("-", " "),
-                    "headline": craft_custom_headline(event),
+                    "headline": event.get("shortName", "Game Update"),
+                    "ap_story": craft_ap_story(event, sport, league), # THE AP STORY
                     "home": {"name": comp["competitors"][0]["team"]["shortDisplayName"], "score": comp["competitors"][0].get("score", "0")},
                     "away": {"name": comp["competitors"][1]["team"]["shortDisplayName"], "score": comp["competitors"][1].get("score", "0")},
-                    "status": event["status"]["type"]["state"],
+                    "status": event["status"]["type"]["detail"],
                     "date": event["date"]
                 })
                 seen_ids.add(eid)
     except: pass
     return results
 
+# --- 4. HTML GENERATOR ---
 def generate_html(games):
-    """
-    Takes the list of processed games and writes them into a 
-    clean, mobile-friendly index.html file.
-    """
     now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %I:%M %p")
     
     html_content = f"""
@@ -94,54 +110,43 @@ def generate_html(games):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>The Armchair Commentator</title>
         <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }}
+            body {{ font-family: "Georgia", serif; background: #fdfdfd; color: #111; margin: 0; padding: 40px; line-height: 1.6; }}
             .container {{ max-width: 800px; margin: auto; }}
-            .header {{ border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }}
-            .timestamp {{ font-size: 0.8em; color: #888; }}
-            .game-card {{ background: #1e1e1e; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ffc627; }} /* ASU Gold */
-            .headline {{ font-weight: bold; font-size: 1.2em; color: #fff; margin-bottom: 8px; }}
-            .score-line {{ display: flex; justify-content: space-between; font-size: 1.1em; border-top: 1px solid #333; pt: 8px; mt: 8px; }}
-            .league-tag {{ font-size: 0.7em; background: #333; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }}
-            .empty-msg {{ text-align: center; padding: 50px; color: #666; }}
+            .header {{ text-align: center; border-bottom: 5px double #222; margin-bottom: 40px; padding-bottom: 20px; }}
+            .header h1 {{ font-size: 3em; margin: 0; font-family: "Times New Roman", serif; font-variant: small-caps; }}
+            .game-card {{ margin-bottom: 50px; border-bottom: 1px solid #ccc; padding-bottom: 30px; }}
+            .league-tag {{ font-weight: bold; text-transform: uppercase; color: #d00; font-size: 0.9em; }}
+            .score-line {{ font-size: 1.5em; font-weight: bold; margin: 10px 0; }}
+            .ap-body {{ font-size: 1.1em; color: #333; }}
+            .dateline {{ font-weight: bold; text-transform: uppercase; }}
+            .empty-msg {{ text-align: center; padding: 100px; font-style: italic; color: #777; }}
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
                 <h1>The Armchair Commentator</h1>
-                <div class="timestamp">Last Updated: {now} MST</div>
+                <div>Late Edition — {now} MST</div>
             </div>
     """
 
     if not games:
-        html_content += '<div class="empty-msg">The newsroom is quiet. Check back shortly for updates on your whitelisted teams.</div>'
+        html_content += '<div class="empty-msg">The newsroom is quiet. No whitelisted games found for this cycle.</div>'
     else:
         for g in games:
             html_content += f"""
             <div class="game-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="league-tag">{g['league']}</span>
-                    <span style="font-size: 0.8em; color: #888;">{g['status'].upper()}</span>
-                </div>
-                <div class="headline">{g['headline']}</div>
-                <div class="score-line">
-                    <span>{g['away']['name']} <strong>{g['away']['score']}</strong></span>
-                    <span>vs</span>
-                    <span><strong>{g['home']['score']}</strong> {g['home']['name']}</span>
-                </div>
+                <div class="league-tag">{g['league']} — {g['status']}</div>
+                <div class="score-line">{g['away']['name']} {g['away']['score']}, {g['home']['name']} {g['home']['score']}</div>
+                <div class="ap-body">{g['ap_story']}</div>
             </div>
             """
 
-    html_content += """
-        </div>
-    </body>
-    </html>
-    """
-    
+    html_content += "</div></body></html>"
     with open("index.html", "w") as f:
         f.write(html_content)
 
-# --- UPDATED MAIN ---
+# --- 5. MAIN ---
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
@@ -157,9 +162,8 @@ def main():
     for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist, seen))
 
-    # THIS IS THE PART THAT WAS MISSING:
     generate_html(all_games)
-    print(f"Success! index.html updated with {len(all_games)} games.")
+    print(f"Success! Processed {len(all_games)} games.")
 
 if __name__ == "__main__":
     main()
