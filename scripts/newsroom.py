@@ -79,23 +79,47 @@ def craft_dynamic_story(event, sport, league):
 
 # --- 3. DATA FETCH ---
 def get_espn_data(sport, league, whitelist, seen_ids):
+    # Base URL
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
+    
+    # 1. Expand the search window (Today + Next 3 days)
+    now = datetime.now(MST)
+    start_date = now.strftime("%Y%m%d")
+    end_date = (now + timedelta(days=3)).strftime("%Y%m%d")
+    
+    params = {
+        "limit": "500",  # 2. Increase limit to see all games
+        "dates": f"{start_date}-{end_date}" # 3. Date range
+    }
+    
+    # 4. Special fix for College Basketball to see non-ranked teams
+    if league == "mens-college-basketball":
+        params["groups"] = "50" 
+
     results = []
     try:
-        data = requests.get(url, timeout=10).json()
+        # Use params in the request
+        res = requests.get(url, params=params, timeout=10)
+        data = res.json()
+        
         for event in data.get("events", []):
             eid = event["id"]
             comp = event["competitions"][0]
             
-            # Extract all possible team name variants for matching
+            # Extract names for matching
             search_blob = []
             for t in comp["competitors"]:
-                search_blob.append(t["team"].get("shortDisplayName", "").lower())
-                search_blob.append(t["team"].get("displayName", "").lower())
-                search_blob.append(t["team"].get("name", "").lower())
-                search_blob.append(t["team"].get("abbreviation", "").lower())
-                
-            match_found = any(team in " ".join(search_blob) for team in whitelist)
+                team_obj = t["team"]
+                search_blob.extend([
+                    team_obj.get("shortDisplayName", "").lower(),
+                    team_obj.get("displayName", "").lower(),
+                    team_obj.get("name", "").lower(),
+                    team_obj.get("abbreviation", "").lower()
+                ])
+            
+            # Combine whitelist match
+            full_blob = " ".join(search_blob)
+            match_found = any(team.lower() in full_blob for team in whitelist)
 
             if match_found and eid not in seen_ids:
                 results.append({
@@ -113,7 +137,8 @@ def get_espn_data(sport, league, whitelist, seen_ids):
                     "story": craft_dynamic_story(event, sport, league)
                 })
                 seen_ids.add(eid)
-    except: pass
+    except Exception as e:
+        print(f"Error fetching {league}: {e}")
     return results
 
 # --- 4. HTML GENERATION ---
