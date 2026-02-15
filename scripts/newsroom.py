@@ -3,7 +3,10 @@ import json
 from datetime import datetime, timedelta
 import pytz
 
-# --- 1. CONFIG & WHITELIST ---
+# --- 1. CONFIG ---
+OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
+MST = pytz.timezone('US/Arizona')
+
 def get_whitelist():
     return [
         "san francisco 49ers", "ac milan", "angel city", "anaheim angels", "arizona state", "asu", 
@@ -22,165 +25,169 @@ def get_whitelist():
         "uc irvine", "ucla", "usc", "uc riverside", "uc san diego", "ucsb", "utep", "valkyries", 
         "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
         "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium", "iowa",
-        "indiana", "illinois" # Added these so your test game shows up!
+        "indiana", "illinois"
     ]
 
-OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
-
-# --- 2. LIVE WEATHER ENGINE ---
+# --- 2. ENGINES ---
 def get_live_weather(city):
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=imperial"
-        response = requests.get(url, timeout=5).json()
-        if response.get("cod") == 200:
-            temp = round(response["main"]["temp"])
-            desc = response["weather"][0]["description"].capitalize()
-            return f"{temp}°F and {desc}"
+        res = requests.get(url, timeout=5).json()
+        if res.get("cod") == 200:
+            return f"{round(res['main']['temp'])}°F and {res['weather'][0]['description']}"
     except: pass
-    return "Variable Conditions"
+    return "Clear Skies"
 
-# --- 3. SCHEDULE RESEARCH ---
-def get_up_next(team_id, sport, league, current_event_id):
-    url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
-    try:
-        data = requests.get(url, timeout=5).json()
-        now = datetime.now(pytz.utc)
-        for event in data.get("events", []):
-            if event["id"] == current_event_id: continue
-            g_date = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc)
-            if g_date > (now - timedelta(hours=2)):
-                comp = event["competitions"][0]
-                team_info = next(t for t in comp["competitors"] if t["id"] == team_id)
-                opp = next(t["team"]["displayName"] for t in comp["competitors"] if t["id"] != team_id)
-                venue = "home" if team_info["homeAway"] == "home" else "away"
-                date_str = g_date.astimezone(pytz.timezone('US/Arizona')).strftime("%m/%d")
-                return f"{date_str} {'vs' if venue == 'home' else 'at'} {opp}"
-    except: pass
-    return "TBD"
-
-# --- 4. THE STORY ENGINE ---
-def craft_ap_story(event, sport, league):
+def craft_dynamic_story(event, sport, league):
+    status_type = event["status"]["type"]["name"]
     comp = event["competitions"][0]
-    status_name = event["status"]["type"]["name"]
     home, away = comp["competitors"][0], comp["competitors"][1]
-    eid = event["id"]
-    
     city = comp.get("venue", {}).get("address", {}).get("city", "Tempe")
-    state = comp.get("venue", {}).get("address", {}).get("state", "AZ")
-    dateline = f"**{city.upper()}, {state} (AP) — **"
     weather = get_live_weather(city)
+    
+    # PREGAME PREVIEW
+    if status_type == "STATUS_SCHEDULED":
+        time_ms = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST)
+        return f"**{city.upper()}** — Anticipation is high at {comp.get('venue', {}).get('fullName', 'the arena')} as {away['team']['shortDisplayName']} visits {home['team']['shortDisplayName']}. Current local weather is {weather}. Fans in {city} are prepping for a {time_ms.strftime('%I:%M %p')} MST start."
 
-    if status_name == "STATUS_SCHEDULED":
-        time_obj = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc)
-        local_time = time_obj.astimezone(pytz.timezone('US/Arizona')).strftime("%I:%M %p")
-        return f"{dateline}The {away['team']['shortDisplayName']} face {home['team']['shortDisplayName']} today. Weather in {city} is currently {weather}. Tip-off: {local_time} MST."
+    # LIVE IN-PROGRESS
+    if status_type == "STATUS_IN_PROGRESS":
+        clock = event["status"]["type"]["detail"]
+        return f"**LIVE FROM {city.upper()}** — Intense action underway! The score is {away['score']} - {home['score']} with {clock} remaining. Both sides are battling for control in {city} as momentum shifts with every possession."
 
+    # POSTGAME RECAP
     winner = home if home.get("winner") else away
     loser = away if home.get("winner") else home
+    diff = abs(int(home['score']) - int(away['score']))
+    margin = "in a thrilling nail-biter" if diff < 5 else "decisively"
     
-    try:
-        leader = winner["leaders"][0]["leaders"][0]
-        name, val = leader["athlete"]["displayName"], leader["displayValue"]
-        detail = f"{name} led the charge with {val} as the {winner['team']['shortDisplayName']} defeated {loser['team']['shortDisplayName']}."
-    except:
-        detail = f"The {winner['team']['shortDisplayName']} secured a win over {loser['team']['shortDisplayName']} in {city}."
+    return f"**{city.upper()} (AP)** — The {winner['team']['shortDisplayName']} protected their home turf today, defeating {loser['team']['shortDisplayName']} {winner['score']}-{loser['score']} {margin}. The atmosphere in {city} was electric as the hosts secured the win."
 
-    w_next = get_up_next(winner["team"]["id"], sport, league, eid)
-    return f"{dateline}{detail}<br><br><div class='up-next-box'><b>Up Next:</b> {winner['team']['shortDisplayName']} ({w_next}).</div>"
-
-# --- 5. THE UI & DATA FETCH ---
+# --- 3. DATA FETCH ---
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
     results = []
     try:
-        response = requests.get(url, timeout=10)
-        data = response.json()
+        data = requests.get(url, timeout=10).json()
         for event in data.get("events", []):
             eid = event["id"]
             name = event.get("name", "").lower()
-            
-            # Use the passed 'whitelist' variable correctly
             if any(team in name for team in whitelist) and eid not in seen_ids:
-                print(f"Match Found: {event.get('name')}") # Debug print
                 comp = event["competitions"][0]
-                st_name = event["status"]["type"]["name"]
-                
-                score_str = f"{comp['competitors'][1].get('score','0')} - {comp['competitors'][0].get('score','0')}"
-                if st_name == "STATUS_SCHEDULED": score_str = "PREGAME"
-                
                 results.append({
-                    "headline": event.get("name", "Game Update"),
+                    "id": eid,
+                    "headline": event.get("name"),
                     "home_logo": comp["competitors"][0]["team"].get("logo"),
                     "away_logo": comp["competitors"][1]["team"].get("logo"),
-                    "score_line": score_str,
-                    "away_name": comp["competitors"][1]["team"]["shortDisplayName"],
                     "home_name": comp["competitors"][0]["team"]["shortDisplayName"],
-                    "ap_story": craft_ap_story(event, sport, league),
-                    "status": event["status"]["type"]["detail"]
+                    "away_name": comp["competitors"][1]["team"]["shortDisplayName"],
+                    "home_score": comp["competitors"][0].get("score", "0"),
+                    "away_score": comp["competitors"][1].get("score", "0"),
+                    "status_text": event["status"]["type"]["detail"],
+                    "status_type": event["status"]["type"]["name"],
+                    "iso_date": event["date"], 
+                    "story": craft_dynamic_story(event, sport, league)
                 })
                 seen_ids.add(eid)
-    except Exception as e: 
-        print(f"Error fetching {league}: {e}")
+    except: pass
     return results
 
+# --- 4. HTML GENERATION ---
 def generate_html(games):
-    now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %Y | %I:%M %p")
-    html_content = f"""
+    now_str = datetime.now(MST).strftime("%B %d, %Y")
+    html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <style>
-            :root {{ --bg: #0f1113; --card-bg: #1a1d21; --text: #ffffff; --accent: #ffc627; --dim: #a0a6ad; --border: #2d3238; }}
-            body {{ font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 40px; color: var(--text); }}
-            .container {{ max-width: 800px; margin: auto; }}
-            .masthead {{ text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; }}
-            .masthead h1 {{ font-family: serif; font-size: 3.5em; margin: 0; color: var(--accent); }}
-            .card {{ background: var(--card-bg); border-radius: 16px; margin-bottom: 30px; border: 1px solid var(--border); overflow: hidden; }}
-            .card-header {{ padding: 12px 25px; background: #24292e; font-size: 0.85em; font-weight: 800; color: var(--accent); display: flex; justify-content: space-between; }}
-            .scoreboard {{ display: flex; align-items: center; justify-content: space-around; padding: 40px 20px; }}
-            .team {{ text-align: center; width: 30%; }}
-            .team img {{ height: 80px; }}
-            .score-display {{ font-size: 3em; font-weight: 900; }}
-            .story-body {{ padding: 35px; line-height: 1.8; font-size: 1.1em; border-top: 1px solid var(--border); }}
-            .up-next-box {{ background: #121417; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 3px solid var(--accent); color: var(--dim); }}
+            :root {{ --bg: #0b0d0f; --card: #161a1e; --accent: #ffc627; --text: #eee; --dim: #888; }}
+            body {{ font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; }}
+            .container {{ max-width: 850px; margin: auto; }}
+            .header {{ text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 20px; margin-bottom: 40px; }}
+            .live-clock {{ font-family: monospace; color: var(--accent); font-size: 1.4em; margin-top: 10px; }}
+            .card {{ background: var(--card); border-radius: 12px; margin-bottom: 30px; border: 1px solid #2d3238; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }}
+            .card-header {{ background: #222; padding: 12px 20px; display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9em; border-bottom: 1px solid #333; }}
+            .scoreboard {{ display: flex; align-items: center; justify-content: space-around; padding: 35px 20px; }}
+            .team {{ text-align: center; width: 33%; }}
+            .team img {{ height: 85px; filter: drop-shadow(0 0 8px rgba(255,198,39,0.1)); }}
+            .score-val {{ font-size: 3.5em; font-weight: 900; letter-spacing: -2px; }}
+            .story {{ padding: 30px; line-height: 1.8; font-size: 1.15em; background: rgba(255,255,255,0.02); }}
+            .countdown {{ color: #ff4757; font-family: monospace; }}
+            .status-live {{ color: #2ecc71; animation: blink 2s infinite; }}
+            @keyframes blink {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.5; }} 100% {{ opacity: 1; }} }}
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="masthead"><h1>The Armchair Commentator</h1><p style="color:var(--dim);">{now} MST</p></div>
+            <div class="header">
+                <h1 style="margin:0; font-family: serif; font-size: 3.5em;">THE ARMCHAIR COMMENTATOR</h1>
+                <div id="wall-clock" class="live-clock">Loading Clock...</div>
+                <p style="color:var(--dim); margin-top:5px;">{now_str}</p>
+            </div>
     """
-    if not games:
-        html_content += "<div style='text-align:center; padding: 50px;'><h3>No games found for your teams today.</h3></div>"
     
+    if not games:
+        html += "<p style='text-align:center; color:var(--dim);'>No scheduled games on your watchlist today.</p>"
+
     for g in games:
-        html_content += f"""
+        # Determine status style
+        status_html = f"<span>{g['status_text']}</span>"
+        if g['status_type'] == "STATUS_SCHEDULED":
+            status_html = f"<span class='countdown' data-time='{g['iso_date']}'>Calculating...</span>"
+        elif g['status_type'] == "STATUS_IN_PROGRESS":
+            status_html = f"<span class='status-live'>● {g['status_text']}</span>"
+
+        html += f"""
         <div class="card">
-            <div class="card-header"><span>{g['headline']}</span><span>{g['status']}</span></div>
+            <div class="card-header">
+                <span>{g['headline']}</span>
+                {status_html}
+            </div>
             <div class="scoreboard">
                 <div class="team"><img src="{g['away_logo']}"><br><b>{g['away_name']}</b></div>
-                <div class="score-display">{g['score_line']}</div>
+                <div class="score-val">{g['away_score']} - {g['home_score']}</div>
                 <div class="team"><img src="{g['home_logo']}"><br><b>{g['home_name']}</b></div>
             </div>
-            <div class="story-body">{g['ap_story']}</div>
+            <div class="story">{g['story']}</div>
         </div>
         """
-    html_content += "</div></body></html>"
-    with open("index.html", "w") as f: f.write(html_content)
+
+    html += """
+        </div>
+        <script>
+            function updateClocks() {
+                // 1. Digital Wall Clock (MST)
+                const now = new Date();
+                const mst = now.toLocaleTimeString('en-US', {timeZone: 'America/Phoenix', hour12: true});
+                document.getElementById('wall-clock').innerHTML = mst + " MST";
+
+                // 2. Countdown Engine
+                document.querySelectorAll('.countdown').forEach(el => {
+                    const target = new Date(el.getAttribute('data-time')).getTime();
+                    const dist = target - now.getTime();
+                    if (dist < 0) { el.innerHTML = "LIVE"; return; }
+                    const h = Math.floor(dist / (1000 * 60 * 60));
+                    const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((dist % (1000 * 60)) / 1000);
+                    el.innerHTML = "STARTS IN: " + h + "h " + m + "m " + s + "s";
+                });
+            }
+            setInterval(updateClocks, 1000);
+            updateClocks();
+        </script>
+    </body>
+    </html>
+    """
+    with open("index.html", "w", encoding="utf-8") as f: f.write(html)
 
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
-    leagues = [
-        ("basketball", "mens-college-basketball"), 
-        ("basketball", "nba"), 
-        ("baseball", "college-baseball")
-    ]
+    leagues = [("basketball", "mens-college-basketball"), ("basketball", "nba"), ("baseball", "college-baseball"), ("basketball", "womens-college-basketball"), ("hockey", "mens-college-hockey"), ("hockey", "nhl")]
     for s, l in leagues:
-        # Fixed: passing 'whitelist' as the 3rd argument
         all_games.extend(get_espn_data(s, l, whitelist, seen))
-    
     generate_html(all_games)
-    print(f"Success! Generated index.html with {len(all_games)} games.")
+    print(f"Generated Live Newsroom with {len(all_games)} matches.")
 
 if __name__ == "__main__": main()
