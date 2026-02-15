@@ -10,10 +10,23 @@ OUTPUT_FILE = "index.html"
 
 def get_whitelist():
     return [
-        "arizona state", "asu", "sun devils", "iowa", "nebraska", "santa clara", 
-        "portland", "utep", "suns", "49ers", "mercury", "arizona", "wildcats"
+        "san francisco 49ers", "ac milan", "angel city", "anaheim angels", "arizona state", "asu", 
+        "athletics", "atletico madrid", "austin fc", "bakersfield", "california", "cal poly", 
+        "capitals", "arizona cardinals", "cal baptist", "la chargers", "chelsea", "la clippers", 
+        "commanders", "coventry city", "dallas cowboys", "crystal palace", "arizona diamondbacks", 
+        "dc united", "fc dallas", "houston dash", "la dodgers", "anaheim ducks", "east texas a&m", 
+        "fresno state", "fulham", "fullerton", "san francisco giants", "new york giants", "gcu", 
+        "houston dynamo", "juventus", "sacramento kings", "la kings", "la galaxy", "lafc", "india", 
+        "la lakers", "united states", "lbsu", "leeds united", "leverkusen", "lyon", "m'gladbach", 
+        "mainz", "marseille", "maryland", "dallas mavericks", "phoenix mercury", "phoenix suns", 
+        "inter miami", "as monaco", "mystics", "washington nationals", "north texas", "norwich", 
+        "nott'm forest", "orioles", "san diego padres", "parma", "psv", "la rams", "texas rangers", 
+        "baltimore ravens", "saint mary's", "san diego", "san jose", "santa clara", "san jose sharks", 
+        "la sparks", "washington spirit", "st. pauli", "dallas stars", "texas", "tolouse", "uc davis", 
+        "uc irvine", "ucla", "usc", "uc riverside", "uc san diego", "ucsb", "utep", "valkyries", 
+        "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
+        "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium"
     ]
-
 def get_espn_data(sport, league, whitelist, seen_ids):
     # Forced Group 50 for ALL College sports to ensure ASU/Santa Clara etc. show up
     group_id = "50" if "college" in league else "80"
