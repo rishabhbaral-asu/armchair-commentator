@@ -2,14 +2,25 @@ name: Tempe Torch News Ticker
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # Runs every 30 minutes
-  workflow_dispatch:         # Allows manual button click
+    - cron: "*/30 * * * *"  # Every 30 minutes
+  workflow_dispatch:        # Manual button click
 
+# These permissions are required for the new "Direct Deploy" method
 permissions:
-  contents: write            # IMPORTANT: Allows the script to save the JSON
+  contents: read
+  pages: write
+  id-token: write
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   update-newsroom:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
@@ -23,23 +34,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install requests googlesearch-python pytz
 
       - name: Run The Newsroom
         env:
-          CI: true  # Tells the script "Do not loop, just run once"
+          CI: true
         run: python scripts/newsroom.py
 
-      - name: Commit and Push
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Force add the file to the staging area
-          git add index.html
-          
-          # Commit only if there are changes (avoids error if no games were found)
-          git commit -m "Update Gazette: $(date)" || exit 0
-          
-          git push origin main --force
+      # NEW: This replaces the 'Commit and Push' steps
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # Grabs the index.html created by your script
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
