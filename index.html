@@ -9,7 +9,6 @@
             body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; }
             header { border-bottom: 3px solid var(--accent); padding-bottom: 20px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
             h1 { font-size: 3rem; margin: 0; font-weight: 900; letter-spacing: -2px; }
-            h1 span { color: #444; font-weight: 400; }
             .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
             .card { background: var(--card); border: 1px solid #333; transition: 0.3s; }
             .card:hover { border-color: var(--accent); }
@@ -19,18 +18,17 @@
             .team img { width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 5px; margin-bottom: 10px; }
             .score { font-size: 3rem; font-weight: 900; color: #fff; }
             .btn-dispatch { width: 100%; border: none; background: #222; color: #fff; padding: 18px; cursor: pointer; font-weight: 900; border-top: 1px solid #333; }
-            .btn-dispatch:hover { background: var(--accent); }
             #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; align-items: center; justify-content: center; }
-            .modal-content { background: #fff; color: #111; max-width: 800px; width: 90%; padding: 60px; box-shadow: 0 0 50px rgba(255,61,0,0.2); }
+            .modal-content { background: #fff; color: #111; max-width: 800px; width: 95%; padding: 60px; overflow-y: auto; max-height: 90vh; }
             .story-text { font-family: 'Georgia', serif; font-size: 1.4rem; line-height: 1.8; white-space: pre-line; }
         </style>
     </head>
     <body>
     <header><h1>TEMPE TORCH <span>WIRE</span></h1><div id="live-clock">--:--</div></header>
     <div class="grid" id="main-grid"></div>
-    <footer style="margin-top:80px; text-align:center; color:#444; font-weight:900; text-transform:uppercase;">Last Dispatch: February 14, 2026 - 08:38 PM AZT</footer>
+    <footer style="margin-top:80px; text-align:center; color:#444; font-weight:900;">Last Update: February 14, 2026 - 08:49 PM AZT</footer>
     <div id="modal" onclick="closeModal()"><div class="modal-content" onclick="event.stopPropagation()">
-        <h2 id="modal-title" style="font-size: 2.5rem; margin-top:0; border-bottom: 8px solid #111; padding-bottom:15px;"></h2>
+        <h2 id="modal-title" style="font-size: 2rem; border-bottom: 8px solid #111; padding-bottom:10px;"></h2>
         <div id="modal-body" class="story-text"></div>
     </div></div>
     <script>
