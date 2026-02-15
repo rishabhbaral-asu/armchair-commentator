@@ -79,7 +79,69 @@ def get_espn_data(sport, league, whitelist, seen_ids):
     except: pass
     return results
 
-# --- 4. THE MAIN LOOP ---
+def generate_html(games):
+    """
+    Takes the list of processed games and writes them into a 
+    clean, mobile-friendly index.html file.
+    """
+    now = datetime.now(pytz.timezone('US/Arizona')).strftime("%B %d, %I:%M %p")
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The Armchair Commentator</title>
+        <style>
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }}
+            .container {{ max-width: 800px; margin: auto; }}
+            .header {{ border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }}
+            .timestamp {{ font-size: 0.8em; color: #888; }}
+            .game-card {{ background: #1e1e1e; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ffc627; }} /* ASU Gold */
+            .headline {{ font-weight: bold; font-size: 1.2em; color: #fff; margin-bottom: 8px; }}
+            .score-line {{ display: flex; justify-content: space-between; font-size: 1.1em; border-top: 1px solid #333; pt: 8px; mt: 8px; }}
+            .league-tag {{ font-size: 0.7em; background: #333; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }}
+            .empty-msg {{ text-align: center; padding: 50px; color: #666; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>The Armchair Commentator</h1>
+                <div class="timestamp">Last Updated: {now} MST</div>
+            </div>
+    """
+
+    if not games:
+        html_content += '<div class="empty-msg">The newsroom is quiet. Check back shortly for updates on your whitelisted teams.</div>'
+    else:
+        for g in games:
+            html_content += f"""
+            <div class="game-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="league-tag">{g['league']}</span>
+                    <span style="font-size: 0.8em; color: #888;">{g['status'].upper()}</span>
+                </div>
+                <div class="headline">{g['headline']}</div>
+                <div class="score-line">
+                    <span>{g['away']['name']} <strong>{g['away']['score']}</strong></span>
+                    <span>vs</span>
+                    <span><strong>{g['home']['score']}</strong> {g['home']['name']}</span>
+                </div>
+            </div>
+            """
+
+    html_content += """
+        </div>
+    </body>
+    </html>
+    """
+    
+    with open("index.html", "w") as f:
+        f.write(html_content)
+
+# --- UPDATED MAIN ---
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
@@ -87,18 +149,17 @@ def main():
         ("basketball", "mens-college-basketball"), 
         ("basketball", "womens-college-basketball"),
         ("baseball", "college-baseball"),
-        ("baskeball", "nba"),
+        ("basketball", "nba"),
         ("baseball", "mlb"),
-        ("hockey", "nhl"),
-        ("hockey", "mens-college-hockey")
+        ("hockey", "nhl")
     ]
     
     for s, l in leagues:
-        # Calling the correct function name here fixes your error!
         all_games.extend(get_espn_data(s, l, whitelist, seen))
 
-    # Output to HTML (Using your existing HTML generator logic)
-    print(f"Success! Processed {len(all_games)} games for your whitelist.")
+    # THIS IS THE PART THAT WAS MISSING:
+    generate_html(all_games)
+    print(f"Success! index.html updated with {len(all_games)} games.")
 
 if __name__ == "__main__":
     main()
