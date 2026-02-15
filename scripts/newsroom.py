@@ -34,100 +34,167 @@ def is_match(event_name, whitelist):
     name_clean = event_name.lower()
     return any(re.search(r'\b' + re.escape(team) + r'\b', name_clean) for team in whitelist)
 
-def craft_ap_story(summary_json):
-    header = summary_json.get("header", {})
-    comp = header.get("competitions", [{}])[0]
-    state = comp.get("status", {}).get("type", {}).get("state")
-    teams = comp.get("competitors", [])
-    for art in summary_json.get("news", {}).get("articles", []):
-        if art.get("type") == "recap":
-            return re.sub('<[^<]+?>', '', art.get("story", ""))
-    if state == "post":
-        winner = next((t for t in teams if t.get("winner")), teams[0])
-        loser = next((t for t in teams if not t.get("winner")), teams[1])
-        return f"**{winner['team']['location'].upper()}** — The {winner['team']['displayName']} secured the win over the {loser['team']['displayName']}."
-    return "WIRE DISPATCH — Event in progress or scheduled. Final reports pending."
-
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
-    params = {"limit": "200", "cb": int(time.time())}
-    if "college-" in league: params["groups"] = "50"
+    params = {"limit": "250", "groups": "50" if "college" in league else "80", "cb": int(time.time())}
     games = []
     try:
         data = requests.get(url, params=params, timeout=10).json()
         for event in data.get("events", []):
             eid = str(event['id'])
             if eid in seen_ids or not is_match(event.get("name", ""), whitelist): continue
+            
+            # Fetch deeper data for realistic stories
             sum_url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={eid}"
-            summary = requests.get(sum_url).json()
+            s_data = requests.get(sum_url).json()
+            
+            # Extract Story Headlines or Recaps
+            story = "No detailed report available yet."
+            news = s_data.get("news", {}).get("articles", [])
+            if news:
+                story = news[0].get("description") or news[0].get("headline")
+            elif event["status"]["type"]["state"] == "post":
+                winner = next(t for t in event["competitions"][0]["competitors"] if t.get("winner"))
+                story = f"FINAL: {winner['team']['displayName']} controlled the pace to secure the victory."
+
             comp = event["competitions"][0]
-            home, away = comp['competitors'][0], comp['competitors'][1]
-            seen_ids.add(eid)
             games.append({
-                "id": eid, "sport": league.upper().replace("-", " "), 
+                "id": eid, 
+                "league": league.upper().replace("-", " "),
                 "status": event["status"]["type"]["state"],
-                "home": {"name": home['team']['displayName'], "score": home.get("score", "0")},
-                "away": {"name": away['team']['displayName'], "score": away.get("score", "0")},
-                "story": craft_ap_story(summary), "raw_date": event.get("date")
+                "home": {"name": comp['competitors'][0]['team']['shortDisplayName'], "score": comp['competitors'][0].get("score", "0")},
+                "away": {"name": comp['competitors'][1]['team']['shortDisplayName'], "score": comp['competitors'][1].get("score", "0")},
+                "story": story,
+                "date": event["date"]  # UTC Format for Countdown
             })
+            seen_ids.add(eid)
     except: pass
     return games
 
 def generate_html(games):
     az_tz = pytz.timezone('America/Phoenix')
-    now = datetime.now(az_tz).strftime("%B %d, %Y")
+    now_str = datetime.now(az_tz).strftime("%A, %B %d, %Y")
     games_json = json.dumps(games)
+    
     return f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta charset="UTF-8"><title>The Tempe Torch</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Inter:wght@400;700&family=Georgia&display=swap">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TEMPE TORCH | Sports Wire</title>
+        <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Oswald:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
         <style>
-            body {{ font-family: 'Inter', sans-serif; background: #fdfdfd; padding: 40px; color: #111; }}
-            header {{ text-align: center; border-bottom: 5px double #000; margin-bottom: 40px; }}
-            h1 {{ font-family: 'Playfair Display', serif; font-size: 3.5rem; text-transform: uppercase; margin: 0; }}
-            .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }}
-            .card {{ border: 1px solid #ccc; padding: 20px; background: #fff; cursor: pointer; }}
-            .score {{ font-family: 'Playfair Display', serif; font-size: 2rem; margin: 10px 0; }}
-            #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; overflow-y: auto; padding: 50px; box-sizing: border-box; }}
-            .story-body {{ font-family: 'Georgia', serif; font-size: 1.2rem; line-height: 1.6; max-width: 700px; margin: auto; }}
+            :root {{ --gold: #FFC627; --maroon: #8C1D40; --dark: #121212; --card: #1E1E1E; }}
+            body {{ background: var(--dark); color: #eee; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }}
+            header {{ text-align: center; border-bottom: 3px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; }}
+            h1 {{ font-family: 'UnifrakturMaguntia', serif; font-size: 5rem; color: var(--gold); margin: 0; }}
+            .subhead {{ font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }}
+            
+            .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }}
+            .card {{ background: var(--card); border-left: 5px solid var(--maroon); padding: 20px; position: relative; cursor: pointer; transition: 0.3s; }}
+            .card:hover {{ transform: translateY(-5px); background: #2a2a2a; }}
+            
+            .league-tag {{ font-size: 10px; font-weight: 800; color: var(--gold); background: #333; padding: 2px 6px; border-radius: 3px; }}
+            .teams {{ font-size: 1.4rem; font-weight: 700; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }}
+            .score {{ font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: #fff; }}
+            
+            .status-line {{ font-size: 12px; font-weight: bold; color: #888; border-top: 1px solid #333; padding-top: 10px; margin-top: 10px; }}
+            .countdown {{ color: var(--gold); }}
+
+            #modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; overflow-y: auto; }}
+            .modal-content {{ max-width: 600px; margin: 100px auto; padding: 20px; line-height: 1.6; font-size: 1.2rem; }}
+            .close-btn {{ background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: 900; cursor: pointer; }}
         </style>
     </head>
     <body>
-        <header><h1>The Tempe Torch</h1><p>{now}</p></header>
-        <div class="grid" id="grid"></div>
-        <div id="modal"><button onclick="closeModal()">CLOSE</button><div id="m-content" class="story-body"></div></div>
+        <header>
+            <h1>The Tempe Torch</h1>
+            <div class="subhead">{now_str} | <span id="master-clock">00:00:00</span></div>
+        </header>
+
+        <div class="grid" id="main-grid"></div>
+
+        <div id="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal()">CLOSE WIRE</button>
+                <h2 id="m-title" style="color:var(--gold); font-size: 2rem;"></h2>
+                <p id="m-body"></p>
+            </div>
+        </div>
+
         <script>
             const games = {games_json};
-            const grid = document.getElementById('grid');
-            if(games.length === 0) grid.innerHTML = "<h3>No wire updates for your whitelist teams at this hour.</h3>";
+            
+            function updateClocks() {{
+                const now = new Date();
+                document.getElementById('master-clock').innerText = now.toLocaleTimeString('en-US', {{ hour12: false, timeZone: 'America/Phoenix' }}) + " MST";
+                
+                games.forEach(g => {{
+                    if (g.status === 'pre') {{
+                        const target = new Date(g.date);
+                        const diff = target - now;
+                        const el = document.getElementById('timer-' + g.id);
+                        if (el) {{
+                            if (diff > 0) {{
+                                const h = Math.floor(diff / 3600000);
+                                const m = Math.floor((diff % 3600000) / 60000);
+                                const s = Math.floor((diff % 60000) / 1000);
+                                el.innerText = `STARTS IN: ${{h}}h ${{m}}m ${{s}}s`;
+                            }} else {{
+                                el.innerText = "KICKOFF / STARTING";
+                            }}
+                        }}
+                    }}
+                }});
+            }}
+
+            const grid = document.getElementById('main-grid');
             games.forEach(g => {{
-                const d = document.createElement('div'); d.className = 'card'; d.onclick = () => openModal(g.id);
-                d.innerHTML = `<b>${{g.sport}}</b><br>${{g.away.name}} @ ${{g.home.name}}<div class="score">${{g.away.score}} - ${{g.home.score}}</div>`;
-                grid.appendChild(d);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openModal(g);
+                
+                let statusHtml = g.status === 'pre' 
+                    ? `<span id="timer-${{g.id}}" class="countdown">Calculating...</span>` 
+                    : g.status === 'in' ? '<span style="color:#ff4d4d">● LIVE</span>' : 'FINAL';
+
+                card.innerHTML = `
+                    <span class="league-tag">${{g.league}}</span>
+                    <div class="teams">
+                        <span>${{g.away.name}} <br>at ${{g.home.name}}</span>
+                        <span class="score">${{g.away.score}} - ${{g.home.score}}</span>
+                    </div>
+                    <div class="status-line">${{statusHtml}}</div>
+                `;
+                grid.appendChild(card);
             }});
-            function openModal(id) {{ 
-                const g = games.find(x => x.id === id); 
-                document.getElementById('m-content').innerHTML = `<h2>${{g.away.name}} vs ${{g.home.name}}</h2><hr><p>${{g.story}}</p>`;
-                document.getElementById('modal').style.display = 'block'; 
+
+            function openModal(g) {{
+                document.getElementById('m-title').innerText = `${{g.away.name}} vs ${{g.home.name}}`;
+                document.getElementById('m-body').innerText = g.story;
+                document.getElementById('modal').style.display = 'block';
             }}
             function closeModal() {{ document.getElementById('modal').style.display = 'none'; }}
+            
+            setInterval(updateClocks, 1000);
+            updateClocks();
         </script>
-    </body></html>"""
+    </body>
+    </html>
+    """
 
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
     leagues = [
         ("basketball", "nba"), ("basketball", "mens-college-basketball"), ("basketball", "womens-college-basketball"),
-        ("hockey", "nhl"), ("hockey", "mens-college-hockey"),
-        ("baseball", "mlb"), ("baseball", "college-baseball"), ("baseball", "college-softball"),
-        ("football", "nfl"), ("soccer", "usa.mls"), ("soccer", "eng.1"), ("soccer", "esp.1"), ("soccer", "ita.1")
+        ("hockey", "nhl"), ("baseball", "mlb"), ("baseball", "college-baseball"), ("baseball", "college-softball"),
+        ("soccer", "usa.mls"), ("soccer", "eng.1")
     ]
     for s, l in leagues:
         all_games.extend(get_espn_data(s, l, whitelist, seen))
-    all_games.sort(key=lambda x: (x["status"] == "post", x["raw_date"]))
+    
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(generate_html(all_games))
 
