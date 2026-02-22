@@ -26,6 +26,7 @@ def get_whitelist():
         "uc irvine", "ucla", "usc", "uc riverside", "uc san diego", "ucsb", "utep", "valkyries", 
         "venezia", "golden state warriors", "san diego wave", "dallas wings", "wizards", "wrexham", 
         "chicago red stars", "argentina", "brazil", "spain", "france", "germany", "belgium",
+        "indiana", "illinois", "iowa", "hoosiers", "illini"
     ]
 
 # --- 2. ENGINES ---
@@ -39,59 +40,68 @@ def get_live_weather(city):
     return "Variable Conditions"
 
 def get_up_next(team_id, sport, league):
+    """Aggressively finds the next game by checking multiple season types."""
     try:
-        url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
-        data = requests.get(url, timeout=5).json()
-        future = [e for e in data.get("events", []) if e["status"]["type"]["name"] == "STATUS_SCHEDULED"]
-        if future:
-            nxt = future[0]
-            dt = datetime.strptime(nxt["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST).strftime("%a, %b %d")
-            opp = next((t["team"]["displayName"] for t in nxt["competitions"][0]["competitors"] if t["team"]["id"] != team_id), "TBD")
-            return f"vs {opp} ({dt})"
+        # Check Regular Season (2) and Postseason (3)
+        for stype in [2, 3]:
+            url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule?seasontype={stype}"
+            data = requests.get(url, timeout=5).json()
+            events = data.get("events", [])
+            # Find first game that is strictly in the future
+            future = [e for e in events if e["status"]["type"]["name"] == "STATUS_SCHEDULED"]
+            if future:
+                nxt = future[0]
+                dt = datetime.strptime(nxt["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST).strftime("%a, %b %d")
+                # Identify opponent
+                opp = "TBD"
+                for t in nxt["competitions"][0]["competitors"]:
+                    if str(t["team"]["id"]) != str(team_id):
+                        opp = t["team"]["displayName"]
+                return f"vs {opp} ({dt})"
     except: pass
-    return "Check Schedule"
+    return "TBD"
 
 def craft_dynamic_story(event, sport, league):
     status_type = event["status"]["type"]["name"]
     comp = event["competitions"][0]
     home, away = comp["competitors"][0], comp["competitors"][1]
     
-    # Metadata
     city = comp.get("venue", {}).get("address", {}).get("city", "Unknown").upper()
     state = comp.get("venue", {}).get("address", {}).get("state", "ST")
     venue = comp.get("venue", {}).get("fullName", "the arena")
     
-    # Leaders
-    def get_lead(c):
-        try: return f"{c['leaders'][0]['leaders'][0]['athlete']['displayName']} ({c['leaders'][0]['leaders'][0]['displayValue']})"
-        except: return None
-
-    h_lead, a_lead = get_lead(home), get_lead(away)
+    # Records
     h_rec = next((r["summary"] for r in home.get("records", []) if r["type"] == "total"), "0-0")
     a_rec = next((r["summary"] for r in away.get("records", []) if r["type"] == "total"), "0-0")
 
-    # Dateline
-    dateline = f"{city}, {state} -- "
+    # Sport vocab
+    surface = "pitch" if sport == "soccer" else "ice" if sport == "hockey" else "hardwood"
+    dateline = f"<b>{city}, {state} -- </b>"
 
+    # --- FINAL RECAP ---
     if status_type == "STATUS_FINAL":
         win = home if home.get("winner") else away
         los = away if home.get("winner") else home
-        w_lead = get_lead(win)
-        
-        story = f"<b>{dateline}</b> {w_lead if w_lead else win['team']['displayName']} sparked the offense as {win['team']['displayName']} "
-        story += f"dropped {los['team']['displayName']} {win['score']}-{los['score']} at {venue}.<br><br>"
+        story = f"{dateline} {win['team']['displayName']} sharpened their form on the {surface} Saturday, "
+        story += f"securing a vital {win['score']}-{los['score']} victory over {los['team']['displayName']} at {venue}.<br><br>"
         story += f"The win moves {win['team']['shortDisplayName']} to {h_rec if win==home else a_rec} on the season. "
         
-        # Up Next Section
-        story += f"<div style='margin-top:10px; font-size:0.9em; color:#888; border-top:1px solid #333; padding-top:8px;'>"
+        # Up Next
+        story += f"<div style='margin-top:12px; font-size:0.85em; color:#888; border-top:1px solid #443; padding-top:8px;'>"
         story += f"<b>UP NEXT:</b> {home['team']['shortDisplayName']} {get_up_next(home['team']['id'], sport, league)} | "
         story += f"{away['team']['shortDisplayName']} {get_up_next(away['team']['id'], sport, league)}</div>"
         return story
 
+    # --- LIVE UPDATE ---
     if status_type == "STATUS_IN_PROGRESS":
-        return f"<b>{dateline}</b> Currently in {event['status']['type']['detail']}, the {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} are locked in a battle. {a_lead if a_lead else ''} has been the story for the visitors in {city}."
+        clock = event['status']['type']['detail']
+        return f"{dateline} Action is currently in {clock} at {venue} where the {away['team']['shortDisplayName']} and {home['team']['shortDisplayName']} are locked in a battle. " \
+               f"The {home['team']['shortDisplayName']} are looking to protect their home {surface} and improve their {h_rec} record."
 
-    return f"<b>{dateline}</b> The {away['team']['displayName']} ({a_rec}) visit {home['team']['displayName']} ({h_rec}) at {venue}. Kickoff/Tip-off is set for {city} local time."
+    # --- PREGAME PREVIEW ---
+    time_ms = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST)
+    return f"{dateline} The {away['team']['displayName']} ({a_rec}) travel to face {home['team']['displayName']} ({h_rec}) at {venue}. " \
+           f"Local weather in {city} is {get_live_weather(city)}. Kickoff is set for {time_ms.strftime('%I:%M %p')} MST."
 
 # --- 3. DATA FETCH ---
 def get_espn_data(sport, league, whitelist, seen_ids):
@@ -106,14 +116,12 @@ def get_espn_data(sport, league, whitelist, seen_ids):
             eid = event["id"]
             comp = event["competitions"][0]
             
-            # Logic: Match whole words only to avoid India/Indiana mixups
+            # Logic: Whitelist match with Whole Word check (India vs Indiana fix)
             match_found = False
             for t in comp["competitors"]:
-                names = [t["team"].get("displayName", "").lower(), t["team"].get("shortDisplayName", "").lower(), t["team"].get("name", "").lower()]
-                for n in names:
-                    for w in whitelist:
-                        if re.search(rf'\b{re.escape(w.lower())}\b', n):
-                            match_found = True
+                name_blob = f"{t['team'].get('displayName','')} {t['team'].get('shortDisplayName','')} {t['team'].get('name','')}".lower()
+                if any(re.search(rf'\b{re.escape(w.lower())}\b', name_blob) for w in whitelist):
+                    match_found = True
             
             if match_found and eid not in seen_ids:
                 icons = {"basketball": "🏀", "hockey": "🏒", "baseball": "⚾", "football": "🏈", "soccer": "⚽"}
@@ -134,34 +142,30 @@ def get_espn_data(sport, league, whitelist, seen_ids):
     except: pass
     return results
 
-# --- 4. HTML GENERATION ---
 def generate_html(games):
-    now_dt = datetime.now(MST)
-    html = f"""
-    <!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-    :root {{ --bg: #0b0d0f; --card: #161a1e; --accent: #ffc627; --text: #eee; --dim: #888; }}
-    body {{ font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px; }}
-    .container {{ max-width: 850px; margin: auto; }}
-    .card {{ background: var(--card); border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--accent); overflow: hidden; }}
-    .card-header {{ background: #222; padding: 10px 20px; font-size: 0.8em; color: var(--dim); border-bottom: 1px solid #333; }}
-    .scoreboard {{ display: flex; align-items: center; padding: 20px; background: #1c2126; }}
-    .team {{ display: flex; align-items: center; width: 45%; }}
-    .team img {{ height: 45px; margin: 0 15px; }}
-    .score {{ width: 10%; text-align: center; font-size: 2em; font-weight: 900; color: var(--accent); }}
-    .story {{ padding: 25px; line-height: 1.6; color: #ccc; }}
+    now_str = datetime.now(MST).strftime("%B %d, %Y • %I:%M %p MST")
+    html = f"""<!DOCTYPE html><html><head><style>
+    :root {{ --bg: #0b0d0f; --card: #161a1e; --accent: #ffc627; --text: #eee; }}
+    body {{ font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); padding: 30px; line-height:1.5; }}
+    .container {{ max-width: 800px; margin: auto; }}
+    .card {{ background: var(--card); border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--accent); padding: 0; overflow: hidden; }}
+    .card-header {{ background: #222; padding: 10px 20px; font-size: 0.75em; text-transform: uppercase; color: #888; }}
+    .score-area {{ display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; background: #1c2126; }}
+    .team-box {{ display: flex; align-items: center; gap: 15px; font-size: 1.2em; font-weight: bold; }}
+    .score-box {{ font-size: 2.5em; font-weight: 900; color: var(--accent); }}
+    .story-box {{ padding: 25px; color: #ccc; border-top: 1px solid #2d3238; }}
     </style></head><body><div class="container">
-    <h1 style="border-bottom: 2px solid var(--accent); padding-bottom:10px;">NEWSROOM WIRE <span style="font-size:0.4em; color:var(--dim); float:right;">{now_dt.strftime('%I:%M %p MST')}</span></h1>
+    <h1 style="margin-bottom:5px;">NEWSROOM WIRE</h1><p style="color:#888; margin-top:0;">{now_str}</p>
     """
     for g in games:
-        html += f"""
-        <div class="card">
+        html += f"""<div class="card">
             <div class="card-header">{g['headline']} — {g['status_text']}</div>
-            <div class="scoreboard">
-                <div class="team" style="justify-content: flex-end;">{g['away_name']}<img src="{g['away_logo']}"></div>
-                <div class="score">{g['away_score']}-{g['home_score']}</div>
-                <div class="team"><img src="{g['home_logo']}">{g['home_name']}</div>
+            <div class="score-area">
+                <div class="team-box"><img src="{g['away_logo']}" height="40">{g['away_name']}</div>
+                <div class="score-box">{g['away_score']} - {g['home_score']}</div>
+                <div class="team-box">{g['home_name']}<img src="{g['home_logo']}" height="40"></div>
             </div>
-            <div class="story">{g['story']}</div>
+            <div class="story-box">{g['story']}</div>
         </div>"""
     html += "</div></body></html>"
     with open("index.html", "w", encoding="utf-8") as f: f.write(html)
@@ -170,14 +174,11 @@ def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
     leagues = [
-        ("basketball", "mens-college-basketball"), ("basketball", "womens-college-basketball"),
-        ("basketball", "nba"), ("hockey", "nhl"), ("hockey", "mens-college-hockey"),
-        ("baseball", "mlb"), ("football", "nfl"), ("football", "college-football"),
-        ("soccer", "usa.mls"), ("soccer", "eng.1")
+        ("basketball", "mens-college-basketball"), ("hockey", "mens-college-hockey"),
+        ("soccer", "eng.1"), ("basketball", "nba"), ("football", "nfl")
     ]
     for s, l in leagues: all_games.extend(get_espn_data(s, l, whitelist, seen))
     all_games.sort(key=lambda x: x['iso_date'])
     generate_html(all_games)
-    print(f"Update Success: {len(all_games)} matches.")
 
 if __name__ == "__main__": main()
