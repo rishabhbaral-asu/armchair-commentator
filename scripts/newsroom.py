@@ -5,58 +5,65 @@ import pytz
 import re
 import os
 
-# --- 1. CONFIG ---
+# --- 1. CONFIG & WHITELIST ---
 MST = pytz.timezone('US/Arizona')
-OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
 
 def get_whitelist():
     with open("scripts/whitelist.txt", "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
 
-# --- 2. THE CORRECTED STORY ENGINE ---
+# --- 2. DUAL-ROUTING STORY ENGINE ---
 
 def craft_ap_story(event, sport, league):
-    """Fetches news specifically TIED to this game ID only."""
-    status_type = event["status"]["type"]["name"]
+    """
+    Recaps: Hits /summary and fetches 'story'
+    Previews: Hits /preview and fetches 'analysis'
+    """
     eid = event["id"]
+    status_type = event["status"]["type"]["name"]
+    
+    # 1. Determine Endpoint and Target Key
+    if status_type == "STATUS_FINAL":
+        url = f"https://site.web.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={eid}"
+        target_key = "story"
+    else:
+        url = f"https://site.web.api.espn.com/apis/site/v2/sports/{sport}/{league}/preview?event={eid}"
+        target_key = "analysis"
+
+    try:
+        response = requests.get(url, timeout=5).json()
+        
+        # 2. Fetch the specific attribute from the JSON
+        # The 'story' attribute in summary and 'analysis' in preview usually live here:
+        content_data = response.get(target_key, {})
+        
+        # If it's a recap 'story', it often contains 'header' and 'description'
+        if target_key == "story":
+            headline = content_data.get("header", "GAME RECAP").upper()
+            body = content_data.get("description", "")
+            if body: return f"<b>{headline}</b><br><br>— {body}"
+        
+        # If it's a preview 'analysis', it often contains 'preview' or 'shortDescription'
+        if target_key == "analysis":
+            headline = f"ANALYSIS: {event['competitions'][0]['competitors'][1]['team']['shortDisplayName']} @ {event['competitions'][0]['competitors'][0]['team']['shortDisplayName']}".upper()
+            body = content_data.get("preview", content_data.get("shortDescription", ""))
+            if body: return f"<b>{headline}</b><br><br>— {body}"
+            
+    except Exception as e:
+        print(f"Error fetching {target_key} for {eid}: {e}")
+
+    # 3. Dynamic Fallback (if the story/analysis tags are empty in the API)
     comp = event["competitions"][0]
     home = comp["competitors"][0]["team"]["shortDisplayName"]
     away = comp["competitors"][1]["team"]["shortDisplayName"]
     
-    # FETCH SUMMARY FOR THIS SPECIFIC GAME
-    try:
-        url = f"https://site.web.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={eid}"
-        detail = requests.get(url, timeout=5).json()
-        
-        # VALIDATION: Ensure the news article actually mentions these teams
-        articles = detail.get("news", {}).get("articles", [])
-        if articles:
-            headline = articles[0].get('headline', '')
-            description = articles[0].get('description', '')
-            # Only return if the headline matches the context of the teams involved
-            if home.lower() in headline.lower() or away.lower() in headline.lower():
-                return f"<b>{headline.upper()}</b><br><br>— {description}"
-    except:
-        pass
-
-    # FALLBACK: If no specific AP story exists yet, build a custom narrative for THESE teams
-    city = comp.get("venue", {}).get("address", {}).get("city", "Site").upper()
-    venue = comp.get("venue", {}).get("fullName", "the arena")
-    
     if status_type == "STATUS_FINAL":
-        h_score = int(comp["competitors"][0]["score"])
-        a_score = int(comp["competitors"][1]["score"])
-        win = home if h_score > a_score else away
-        los = away if h_score > a_score else home
-        return f"<b>{win.upper()} SECURES VICTORY AT {venue}</b><br><br>The {win} outlasted {los} in a hard-fought battle in {city}, finishing with a final score of {max(h_score, a_score)}-{min(h_score, a_score)}."
+        return f"<b>{home.upper()} vs {away.upper()}</b><br><br>The game has concluded. Official AP wire report is pending for this matchup."
+    else:
+        time_ms = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST)
+        return f"<b>UPCOMING: {away.upper()} @ {home.upper()}</b><br><br>Broadcast analysis will be available closer to the {time_ms.strftime('%I:%M %p')} MST start time."
 
-    # PREVIEW LOGIC
-    time_ms = datetime.strptime(event["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=pytz.utc).astimezone(MST)
-    diff = time_ms - datetime.now(MST)
-    countdown = f"{diff.days}d {diff.seconds//3600}h {(diff.seconds//60)%60}m"
-    return f"<b>PREVIEW: {away.upper()} @ {home.upper()}</b><br><br><b>T-MINUS {countdown}</b>. Tip-off scheduled for {time_ms.strftime('%A at %I:%M %p')} MST."
-
-# --- 3. DATA FETCHING ---
+# --- 3. DATA FETCHING (INCLUDES COLLEGE HOCKEY) ---
 
 def get_espn_data(sport, league, whitelist, seen_ids):
     url = f"http://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/scoreboard"
@@ -70,11 +77,13 @@ def get_espn_data(sport, league, whitelist, seen_ids):
         for event in data.get("events", []):
             eid = event["id"]
             comp = event["competitions"][0]
-            # Match whitelist against full team names
+            
+            # Match whitelist
             match = False
             for t in comp["competitors"]:
-                full_name = t['team'].get('displayName','').lower()
-                if any(w in full_name for w in whitelist): match = True
+                name_blob = f"{t['team'].get('displayName','')} {t['team'].get('shortDisplayName','')} {t['team'].get('name','')}".lower()
+                if any(re.search(rf'\b{re.escape(w)}\b', name_blob) for w in whitelist):
+                    match = True
             
             if match and eid not in seen_ids:
                 results.append({
@@ -92,12 +101,12 @@ def get_espn_data(sport, league, whitelist, seen_ids):
     except: pass
     return results
 
-# --- 4. EXACT AESTHETICS REPLICATION ---
+# --- 4. EXACT UI REPLICATION ---
 
 def generate_html(games):
     html = """<!DOCTYPE html><html><head><style>
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Condensed:wght@400;700&display=swap');
-    body { background: #0f1113; color: #eee; font-family: 'Roboto Condensed', sans-serif; padding: 40px; }
+    body { background: #0f1113; color: #eee; font-family: 'Roboto Condensed', sans-serif; padding: 40px; margin: 0; }
     .container { max-width: 900px; margin: auto; }
 
     /* NBC NHL TOP-BAR STYLE */
@@ -108,14 +117,15 @@ def generate_html(games):
     .hockey-score { width: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-family: 'Oswald'; background: rgba(0,0,0,0.4); }
 
     /* ESPN NCAA FLAT STYLE */
-    .bug-ncaa { display: flex; background: #fff; color: #000; height: 70px; align-items: stretch; margin-top: 40px; border-left: 10px solid #000; }
+    .bug-ncaa { display: flex; background: #fff; color: #000; height: 75px; align-items: stretch; margin-top: 40px; border-left: 10px solid #000; }
     .ncaa-team { flex: 1; display: flex; align-items: center; padding: 0 20px; font-size: 1.5em; font-weight: 800; text-transform: uppercase; gap: 12px; }
     .ncaa-team img { height: 45px; width: 45px; }
     .ncaa-score { background: #000; color: #fff; width: 90px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-family: 'Oswald'; }
-    .ncaa-status { background: #e2e2e2; width: 120px; display: flex; align-items: center; justify-content: center; font-size: 0.85em; font-weight: bold; border-left: 1px solid #ccc; text-align: center; color: #444; }
+    .ncaa-status { background: #e2e2e2; width: 130px; display: flex; align-items: center; justify-content: center; font-size: 0.85em; font-weight: bold; border-left: 1px solid #ccc; text-align: center; color: #444; }
 
     .wire-box { background: #fff; color: #222; padding: 35px; border-radius: 0 0 4px 4px; line-height: 1.6; font-size: 1.15em; margin-bottom: 60px; border-top: 1px solid #ddd; }
-    </style></head><body><div class="container">"""
+    </style></head><body><div class="container">
+    <h1 style="font-family:'Oswald'; border-left: 6px solid #ffc627; padding-left: 20px; letter-spacing: 2px;">THE WIRE</h1>"""
 
     for g in games:
         if g['sport_type'] == "hockey":
@@ -138,7 +148,6 @@ def generate_html(games):
 def main():
     whitelist = get_whitelist()
     all_games, seen = [], set()
-    # ACTIVATED COLLEGE HOCKEY
     leagues = [("basketball", "mens-college-basketball"), ("hockey", "mens-college-hockey"), ("soccer", "eng.1")]
     for s, l in leagues: all_games.extend(get_espn_data(s, l, whitelist, seen))
     all_games.sort(key=lambda x: x['iso_date'])
