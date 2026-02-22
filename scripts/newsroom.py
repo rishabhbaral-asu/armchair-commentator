@@ -13,7 +13,7 @@ def get_whitelist():
     """Pulls teams from whitelist.txt; handles empty or missing file gracefully."""
     if not os.path.exists("scripts/whitelist.txt"):
         return []
-    with open("whitelist.txt", "r") as f:
+    with open("scripts/whitelist.txt", "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
 
 # --- 2. THE STORY ENGINE (UNIQUE & DYNAMIC) ---
