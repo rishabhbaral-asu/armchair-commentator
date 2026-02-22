@@ -11,7 +11,7 @@ MST = pytz.timezone('US/Arizona')
 
 def get_whitelist():
     """Pulls teams from whitelist.txt; handles empty or missing file gracefully."""
-    if not os.path.exists("whitelist.txt"):
+    if not os.path.exists("scripts/whitelist.txt"):
         return []
     with open("whitelist.txt", "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
