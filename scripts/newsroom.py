@@ -10,9 +10,9 @@ MST = pytz.timezone('US/Arizona')
 OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
 
 def get_whitelist():
-    if not os.path.exists("whitelist.txt"):
+    if not os.path.exists("./whitelist.txt"):
         return []
-    with open("whitelist.txt", "r") as f:
+    with open("./whitelist.txt", "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
 
 # --- 2. STORY ENGINE (GAME-MATCHED) ---
