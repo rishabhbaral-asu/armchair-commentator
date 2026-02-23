@@ -10,45 +10,43 @@ MST = pytz.timezone('US/Arizona')
 OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
 
 def get_whitelist():
-    """Reads teams from whitelist.txt in the same directory."""
-    if not os.path.exists("scripts/whitelist.txt"):
+    """Look for whitelist.txt specifically in the script's own directory."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    whitelist_path = os.path.join(script_dir, "whitelist.txt")
+    
+    if not os.path.exists(whitelist_path):
+        print(f"Warning: Whitelist not found at {whitelist_path}")
         return []
-    with open("scripts/whitelist.txt", "r") as f:
+    with open(whitelist_path, "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
 
 def clean_narrative(raw_text):
-    """Cleans up the scraped text for a professional AP-style look."""
     if not raw_text: return ""
-    # Remove excessive whitespace and repetitive ads
     clean = re.sub(r'\s+', ' ', raw_text).strip()
     return clean
 
 # --- 2. ENGINES: SCRAPING & ODDS ---
 
 def fetch_full_narrative(eid, league, is_final):
-    """Scrapes the actual ESPN web page for a deep recap/preview."""
     mode = "recap" if is_final else "preview"
     url = f"https://www.espn.com/{league}/{mode}/_/gameId/{eid}"
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         res = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
         
-        # Target the main article body used on ESPN web
         article = soup.find('div', class_='article-body') or soup.find('article', class_='article')
         if article:
-            # Strip out non-prose elements (ads, videos, sidebars)
             for tag in article.find_all(['aside', 'figure', 'div', 'script', 'style']):
                 tag.decompose()
             paragraphs = article.find_all('p')
             full_text = " ".join([p.get_text() for p in paragraphs])
             return clean_narrative(full_text)
-        return "NARRATIVE: Report is being compiled by wire services."
+        return "NARRATIVE: Wire services are currently updating this report."
     except:
         return "WIRE ERROR: Connection to news desk failed."
 
 def get_betting_data(eid, league):
-    """Pulls betting lines and O/U from the ESPN summary API."""
     try:
         url = f"https://site.web.api.espn.com/apis/site/v2/sports/basketball/{league}/summary?event={eid}"
         data = requests.get(url, timeout=5).json()
@@ -60,7 +58,6 @@ def get_betting_data(eid, league):
         return "LINE: N/A | O/U: N/A"
 
 def get_live_weather(city):
-    """Accurate local weather via OpenWeather."""
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=imperial"
         res = requests.get(url, timeout=5).json()
@@ -82,7 +79,6 @@ def get_data(sport, league, whitelist, seen_ids):
             eid = event["id"]
             comp = event["competitions"][0]
             
-            # Whitelist Match
             teams = [t['team']['displayName'].lower() for t in comp["competitors"]]
             if any(any(w in t for w in whitelist) for t in teams) and eid not in seen_ids:
                 is_final = event["status"]["type"]["name"] == "STATUS_FINAL"
@@ -126,32 +122,29 @@ def generate_html(games):
 
         .container {{ max-width: 950px; margin: auto; padding: 20px; }}
 
-        /* NBC NHL STYLE */
         .bug-hockey {{ display: flex; background: linear-gradient(180deg, #2c2f36 0%, #000 100%); border: 1px solid #444; height: 52px; align-items: stretch; margin-top: 40px; border-radius: 4px; overflow: hidden; }}
         .hockey-status {{ background: #cc0000; color: #fff; padding: 0 15px; display: flex; align-items: center; font-family: 'Oswald'; font-size: 0.9em; }}
         .hockey-team {{ flex: 1; display: flex; align-items: center; padding: 0 15px; font-weight: 700; gap: 10px; border-right: 1px solid #333; text-transform: uppercase; }}
         .hockey-team img {{ height: 30px; }}
         .hockey-score {{ width: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-family: 'Oswald'; background: rgba(0,0,0,0.5); }}
 
-        /* ESPN NCAA STYLE */
-        .bug-ncaa {{ background: #fff; color: #000; margin-top: 40px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
-        .ncaa-main {{ display: flex; height: 70px; align-items: stretch; }}
-        .ncaa-team {{ flex: 1; display: flex; align-items: center; padding: 0 20px; font-size: 1.5em; font-weight: 800; text-transform: uppercase; gap: 10px; }}
-        .ncaa-team img {{ height: 40px; }}
-        .ncaa-score {{ background: #111; color: #fff; width: 80px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-family: 'Oswald'; }}
-        .ncaa-status {{ background: #e5e5e5; width: 140px; display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: 900; border-left: 1px solid #ccc; color: #333; text-align: center; }}
+        .bug-ncaa {{ background: #fff; color: #000; margin-top: 40px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; }}
+        .ncaa-main {{ display: flex; height: 75px; align-items: stretch; border-bottom: 1px solid #ddd; }}
+        .ncaa-team {{ flex: 1; display: flex; align-items: center; padding: 0 20px; font-size: 1.6em; font-weight: 800; text-transform: uppercase; gap: 12px; }}
+        .ncaa-team img {{ height: 45px; width: 45px; object-fit: contain; }}
+        .ncaa-score {{ background: #111; color: #fff; width: 85px; display: flex; align-items: center; justify-content: center; font-size: 2.8em; font-family: 'Oswald'; }}
+        .ncaa-status {{ background: #e5e5e5; width: 140px; display: flex; align-items: center; justify-content: center; font-size: 0.85em; font-weight: 900; border-left: 1px solid #ccc; color: #333; text-align: center; text-transform: uppercase; }}
         
-        .info-bar {{ background: #f8f8f8; color: #c00; font-size: 0.85em; padding: 8px 20px; font-weight: bold; border-top: 1px solid #ddd; font-family: 'Oswald'; display: flex; justify-content: space-between; }}
-        .wire-box {{ background: #fff; color: #222; padding: 35px; line-height: 1.7; font-size: 1.15em; border-top: 1px solid #eee; }}
+        .info-bar {{ background: #f8f8f8; color: #c00; font-size: 0.9em; padding: 10px 25px; font-weight: bold; border-top: 1px solid #ddd; font-family: 'Oswald'; display: flex; justify-content: space-between; letter-spacing: 1px; }}
+        .wire-box {{ background: #fff; color: #222; padding: 40px; line-height: 1.8; font-size: 1.2em; border-top: 1px solid #eee; text-align: justify; }}
     </style></head><body>
     <div class="ticker-bar">
         <div class="ticker-clock">{ticker_time}</div>
-        <div class="ticker-text">CENTRAL WIRE // LIVE FEED // {now_mst.strftime('%A')}</div>
+        <div class="ticker-text">CENTRAL WIRE // LIVE FEED // {now_mst.strftime('%A').upper()}</div>
     </div>
     <div class="container">"""
 
     for g in games:
-        # Countdown logic
         g_time = datetime.fromisoformat(g['iso_date'].replace('Z', '+00:00')).astimezone(MST)
         if not g['is_final'] and g_time > now_mst:
             diff = g_time - now_mst
@@ -182,7 +175,12 @@ def generate_html(games):
             </div>"""
 
     html += "</div></body></html>"
-    with open("index.html", "w", encoding="utf-8") as f: f.write(html)
+    
+    # SAVE TO ROOT (Up one level from /scripts)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    root_path = os.path.join(base_dir, "..", "index.html")
+    with open(root_path, "w", encoding="utf-8") as f:
+        f.write(html)
 
 def main():
     whitelist = get_whitelist()
