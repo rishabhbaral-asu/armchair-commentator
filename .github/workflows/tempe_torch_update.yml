@@ -1,52 +1,32 @@
-name: Tempe Torch News Ticker
+name: Live Wire Update
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # Every 30 minutes
-  workflow_dispatch:        # Manual button click
-
-# These permissions are required for the new "Direct Deploy" method
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Ensure only one deployment runs at a time
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+    - cron: '*/30 * * * *' # Runs every 30 minutes
+  workflow_dispatch:      # Allows manual trigger via GitHub website
 
 jobs:
-  update-newsroom:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.9'
 
-      - name: Install dependencies
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4 pytz
+
+      - name: Run Scraper
+        run: python scraper.py
+
+      - name: Commit and Push
         run: |
-          pip install requests googlesearch-python pytz
-
-      - name: Run The Newsroom
-        env:
-          CI: true
-        run: python scripts/newsroom.py
-
-      # NEW: This replaces the 'Commit and Push' steps
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.' # Grabs the index.html created by your script
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add index.html
+          git commit -m "Automated Wire Update: $(date)" || exit 0
+          git push
