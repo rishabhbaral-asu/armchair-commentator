@@ -11,9 +11,9 @@ OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
 
 def get_whitelist():
     """Reads teams from whitelist.txt in the same directory."""
-    if not os.path.exists("whitelist.txt"):
+    if not os.path.exists("scripts/whitelist.txt"):
         return []
-    with open("whitelist.txt", "r") as f:
+    with open("scripts/whitelist.txt", "r") as f:
         return [line.strip().lower() for line in f if line.strip()]
 
 def clean_narrative(raw_text):
