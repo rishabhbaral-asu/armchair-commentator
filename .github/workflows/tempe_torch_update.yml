@@ -23,10 +23,13 @@ jobs:
       - name: Run Scraper
         run: python scripts/newsroom.py
 
-      - name: Commit and Push
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add index.html
-          git commit -m "Automated Wire Update: $(date)" || exit 0
-          git push
+      
+      # NEW: This replaces the 'Commit and Push' steps
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # Grabs the index.html created by your script
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
