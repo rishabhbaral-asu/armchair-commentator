@@ -21,7 +21,7 @@ jobs:
         run: pip install requests beautifulsoup4 pytz
 
       - name: Run Scraper
-        run: python scraper.py
+        run: python newsroom.py
 
       - name: Commit and Push
         run: |
