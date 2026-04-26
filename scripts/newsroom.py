@@ -17,7 +17,6 @@ logging.basicConfig(
 
 MST = pytz.timezone('US/Arizona')
 OPENWEATHER_API_KEY = "ac08c1c364001a27b81d418f26e28315"
-
 def get_whitelist() -> List[str]:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(script_dir, "whitelist.txt")
@@ -36,6 +35,110 @@ def clean_narrative(raw_text: str) -> str:
         return ""
     return re.sub(r'\s+', ' ', raw_text).strip()
 
+# --- 2. ENGINES: SCRAPING & SYNTHETIC NARRATIVE ---
+
+def fetch_full_narrative(game: Dict[str, Any]) -> str:
+    """
+    Scrapes ESPN for Recaps or Scoring Summaries using BeautifulSoup.
+    Strictly targets specific CSS classes on specific URLs.
+    """
+    eid = game['id']
+    league = game['league']
+    is_final = game['is_final']
+    
+    # Crucial: Headers to mimic a real browser to bypass basic anti-bot filters
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+    }
+
+    # --- 1. ATTEMPT RECAP SCRAPE ---
+    recap_url = f"https://www.espn.com/{league}/recap/_/gameId/{eid}"
+    try:
+        res = requests.get(recap_url, headers=headers, timeout=10)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        
+        # Target exact requested class: "Story__Body t__body"
+        # Using lambda to ensure both class segments are in the element's class list
+        article = soup.find('div', class_=lambda x: x and 'Story__Body' in x and 't__body' in x)
+        
+        # Fallback if they slightly changed the class string but kept the main identifier
+        if not article:
+            article = soup.find('div', class_=re.compile(r'Story__Body'))
+            
+        if article:
+            # Strip out videos, ads, inline scripts
+            for tag in article.find_all(['aside', 'figure', 'div', 'script', 'style', 'ul']):
+                tag.decompose()
+                
+            paragraphs = article.find_all('p')
+            full_text = " ".join([p.get_text() for p in paragraphs if len(p.get_text()) > 35])
+            
+            if len(full_text) > 150:
+                return clean_narrative(full_text)
+    except requests.exceptions.RequestException as e:
+        logging.debug(f"Recap scrape failed for {eid}: {e}")
+
+    # --- 2. FALLBACK: SCORING SUMMARY SCRAPE ---
+    game_url = f"https://www.espn.com/{league}/game/_/gameId/{eid}"
+    try:
+        res = requests.get(game_url, headers=headers, timeout=10)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        
+        # Target exact requested class: "Card Card--ScoringSummary"
+        summary_card = soup.find('div', class_=lambda x: x and 'Card' in x and 'Card--ScoringSummary' in x)
+        
+        if summary_card:
+            plays = []
+            for item in summary_card.find_all(['li', 'tr']):
+                text = item.get_text(separator=" ", strip=True)
+                if len(text) > 15 and "Scoring Summary" not in text:
+                    plays.append(text)
+            
+            if plays:
+                city = game['city'].upper()
+                away, home = game['away_name'], game['home_name']
+                
+                story = (f"{city} — In a matchup between the {away} and {home}, "
+                         f"the scoring action unfolded as follows: ")
+                story += ". ".join(plays) + ". "
+                story += (f"The final score concluded with the {home} tallying {game['home_score']} "
+                          f"and the {away} putting up {game['away_score']}.")
+                return clean_narrative(story)
+    except requests.exceptions.RequestException as e:
+        logging.debug(f"Scoring Summary scrape failed for {eid}: {e}")
+
+    # --- 3. SYNTHETIC NEWS DESK FALLBACK ---
+    home, away = game['home_name'], game['away_name']
+    city, weather = game['city'], game['weather']
+    
+    if is_final:
+        h_score, a_score = int(game['home_score']), int(game['away_score'])
+        winner = home if h_score > a_score else away
+        loser = away if h_score > a_score else home
+        return (f"{city.upper()} — The {winner} pulled away late to secure a victory over the {loser}, "
+                f"finishing with a final score of {max(h_score, a_score)}-{min(h_score, a_score)}. "
+                f"Wire reports indicate a high-level physical contest. The game concluded under {weather} "
+                f"conditions.")
+    
+    return (f"{city.upper()} — National wire services are monitoring the upcoming matchup between the {away} "
+            f"and the {home}. The contest is currently listed with {game['odds']}. Forecasts at the venue "
+            f"call for {weather}.")
+
+def get_betting_data(eid: str, league: str) -> str:
+    url = f"https://site.web.api.espn.com/apis/site/v2/sports/basketball/{league}/summary?event={eid}"
+    try:
+        res = requests.get(url, timeout=5)
+        res.raise_for_status()
+        data = res.json()
+        pick = data.get('pickcenter', [{}])[0]
+        return f"LINE: {pick.get('details', 'OFF')} | O/U: {pick.get('overUnder', 'OFF')}"
+    except (requests.exceptions.RequestException, KeyError, IndexError):
+        return "LINE: N/A | O/U: N/A"
+
 def get_live_weather(city: str) -> str:
     if OPENWEATHER_API_KEY == "MISSING_KEY":
         return "72°F CLEAR (NO API KEY)"
@@ -47,85 +150,6 @@ def get_live_weather(city: str) -> str:
         return f"{round(data['main']['temp'])}°F {data['weather'][0]['main'].upper()}"
     except (requests.exceptions.RequestException, KeyError):
         return "72°F CLEAR"
-
-# --- 2. THE UNIFIED API EXTRACTION ENGINE ---
-
-def fetch_game_extras(game: Dict[str, Any]) -> Dict[str, str]:
-    """
-    Hits ESPN's hidden summary API to extract betting odds, recaps, and scoring plays
-    in a single, lightning-fast request without needing a web browser.
-    """
-    eid = game['id']
-    sport = game['sport_type']
-    league = game['league']
-    is_final = game['is_final']
-    
-    url = f"https://site.web.api.espn.com/apis/site/v2/sports/{sport}/{league}/summary?event={eid}"
-    
-    extras = {
-        "odds": "LINE: N/A | O/U: N/A",
-        "story": ""
-    }
-    
-    try:
-        res = requests.get(url, timeout=8)
-        res.raise_for_status()
-        data = res.json()
-        
-        # 1. Extract Betting Odds
-        try:
-            pick = data.get('pickcenter', [{}])[0]
-            extras["odds"] = f"LINE: {pick.get('details', 'OFF')} | O/U: {pick.get('overUnder', 'OFF')}"
-        except IndexError:
-            pass
-
-        # 2. Extract Narrative (Recap/Article)
-        articles = data.get('articles', [])
-        if articles:
-            # Articles usually come back as HTML inside the JSON, so we clean it with BS4
-            raw_html = articles[0].get('story', '')
-            clean_text = BeautifulSoup(raw_html, "html.parser").get_text(separator=" ")
-            if len(clean_text) > 150:
-                extras["story"] = clean_narrative(clean_text)
-                return extras
-
-        # 3. Extract Scoring Summary if no article exists
-        scoring_plays = data.get('scoringPlays', [])
-        if scoring_plays:
-            plays = [play.get('text') for play in scoring_plays if play.get('text')]
-            if plays:
-                city = game['city'].upper()
-                away, home = game['away_name'], game['home_name']
-                
-                story = (f"{city} — In a matchup between the {away} and {home}, "
-                         f"the scoring action unfolded as follows: ")
-                story += ". ".join(plays) + ". "
-                story += (f"The final score concluded with the {home} tallying {game['home_score']} "
-                          f"and the {away} putting up {game['away_score']}.")
-                extras["story"] = clean_narrative(story)
-                return extras
-
-    except requests.exceptions.RequestException as e:
-        logging.debug(f"API scrape failed for {eid}: {e}")
-
-    # 4. Fallback to Synthetic Generation
-    home, away = game['home_name'], game['away_name']
-    city, weather = game['city'], game['weather']
-    
-    if is_final:
-        h_score, a_score = int(game['home_score']), int(game['away_score'])
-        winner = home if h_score > a_score else away
-        loser = away if h_score > a_score else home
-        extras["story"] = (f"{city.upper()} — The {winner} pulled away late to secure a victory over the {loser}, "
-                           f"finishing with a final score of {max(h_score, a_score)}-{min(h_score, a_score)}. "
-                           f"Wire reports indicate a high-level physical contest. The game concluded under {weather} "
-                           f"conditions.")
-    else:
-        extras["story"] = (f"{city.upper()} — National wire services are monitoring the upcoming matchup between the {away} "
-                           f"and the {home}. The contest is currently listed with {extras['odds']}. Forecasts at the venue "
-                           f"call for {weather}.")
-
-    return extras
 
 # --- 3. DATA FETCHING ---
 
@@ -168,13 +192,11 @@ def get_data(sport: str, league: str, whitelist: List[str], seen_ids: Set[str]) 
                     "is_final": event["status"]["type"]["name"] == "STATUS_FINAL", 
                     "city": city,
                     "weather": get_live_weather(city),
+                    "odds": get_betting_data(eid, league)
                 }
                 
-                # Fetch odds and narrative from the summary API
-                extras = fetch_game_extras(game_info)
-                game_info["odds"] = extras["odds"]
-                game_info["story"] = extras["story"]
-                
+                # Fetch story explicitly via HTTP requests and BS4
+                game_info["story"] = fetch_full_narrative(game_info)
                 results.append(game_info)
                 seen_ids.add(eid)
                 logging.info(f"Processed match: {game_info['away_name']} @ {game_info['home_name']}")
