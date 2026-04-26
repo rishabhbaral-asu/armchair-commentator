@@ -44,36 +44,77 @@ def clean_narrative(raw_text: str) -> str:
 # --- 2. ENGINES: SCRAPING & SYNTHETIC NARRATIVE ---
 
 def fetch_full_narrative(game: Dict[str, Any]) -> str:
-    """Scrapes ESPN for professional narratives or generates fallback reports."""
+    """
+    Scrapes ESPN for professional narratives (Recaps).
+    Falls back to building a natural-language story from the Scoring Summary.
+    Uses synthetic generation as a last resort.
+    """
     eid = game['id']
     league = game['league']
     is_final = game['is_final']
-    mode = "recap" if is_final else "preview"
     
-    # 1. ATTEMPT LIVE SCRAPE
-    url = f"https://www.espn.com/{league}/{mode}/_/gameId/{eid}"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-    
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
+    # 1. ATTEMPT RECAP SCRAPE
+    recap_url = f"https://www.espn.com/{league}/recap/_/gameId/{eid}"
     try:
-        res = requests.get(url, headers=headers, timeout=8)
+        res = requests.get(recap_url, headers=headers, timeout=8)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
-        article = soup.find(['div', 'article'], class_=['article-body', 'Article__Content', 'story'])
+        
+        # Target the specific Recap class
+        article = soup.find('div', class_='Story__Body t__body')
         
         if article:
+            # Remove junk elements like embedded videos or ads
             for tag in article.find_all(['aside', 'figure', 'div', 'script', 'style']):
                 tag.decompose()
+                
             paragraphs = article.find_all('p')
             full_text = " ".join([p.get_text() for p in paragraphs if len(p.get_text()) > 35])
             
             if len(full_text) > 150:
                 return clean_narrative(full_text)
     except requests.exceptions.RequestException as e:
-        logging.warning(f"Failed to scrape narrative for game {eid}: {e}")
-    except Exception as e:
-        logging.error(f"Unexpected error parsing narrative for game {eid}: {e}")
+        logging.debug(f"Recap scrape failed for {eid}: {e}")
 
-    # 2. SYNTHETIC NEWS DESK FALLBACK
+    # 2. FALLBACK: SCORING SUMMARY SCRAPE
+    game_url = f"https://www.espn.com/{league}/game/_/gameId/{eid}"
+    try:
+        res = requests.get(game_url, headers=headers, timeout=8)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        
+        # Target the Scoring Summary Card
+        summary_card = soup.find('div', class_=re.compile(r'Card Card--ScoringSummary'))
+        
+        if summary_card:
+            plays = []
+            # Extract text from list items or table rows containing the plays
+            for item in summary_card.find_all(['li', 'tr']):
+                # Getting text with a space separator prevents words from mashing together
+                text = item.get_text(separator=" ", strip=True)
+                # Filter out generic headers or extremely short rows
+                if len(text) > 15 and "Scoring Summary" not in text:
+                    plays.append(text)
+            
+            if plays:
+                city = game['city'].upper()
+                away, home = game['away_name'], game['home_name']
+                
+                story = (f"{city} — In a matchup between the {away} and {home}, "
+                         f"the scoring action unfolded as follows: ")
+                
+                # Join the plays with a period and space to make it read like sentences
+                story += ". ".join(plays) + ". "
+                
+                story += (f"The final score concluded with the {home} tallying {game['home_score']} "
+                          f"and the {away} putting up {game['away_score']}.")
+                return clean_narrative(story)
+    except requests.exceptions.RequestException as e:
+        logging.debug(f"Scoring Summary scrape failed for {eid}: {e}")
+
+    # 3. SYNTHETIC NEWS DESK FALLBACK
     home, away = game['home_name'], game['away_name']
     city, weather = game['city'], game['weather']
     
@@ -84,11 +125,11 @@ def fetch_full_narrative(game: Dict[str, Any]) -> str:
         return (f"{city.upper()} — The {winner} pulled away late to secure a victory over the {loser}, "
                 f"finishing with a final score of {max(h_score, a_score)}-{min(h_score, a_score)}. "
                 f"Wire reports indicate a high-level physical contest. The game concluded under {weather} "
-                f"conditions. Official box scores and league standings are being updated accordingly.")
+                f"conditions.")
     
     return (f"{city.upper()} — National wire services are monitoring the upcoming matchup between the {away} "
             f"and the {home}. The contest is currently listed with {game['odds']}. Forecasts at the venue "
-            f"call for {weather}. Both clubs are expected to finalize rosters as game-time approaches in {city}.")
+            f"call for {weather}.")
 
 def get_betting_data(eid: str, league: str) -> str:
     """Fetches line and over/under data for a given game."""
@@ -180,7 +221,6 @@ def generate_html(games: List[Dict[str, Any]]) -> None:
     now_mst = datetime.now(MST)
     ticker_time = now_mst.strftime("%I:%M:%S %p %Z")
     
-    # Keeping the CSS minimal and injecting it properly
     html_parts = [f"""<!DOCTYPE html><html><head><meta charset="utf-8">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Condensed:wght@400;700&display=swap');
